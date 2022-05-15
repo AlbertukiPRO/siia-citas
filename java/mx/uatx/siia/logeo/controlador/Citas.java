@@ -143,8 +143,12 @@ public class Citas implements Serializable {
         logger.info("Bean Citas { Constructor() }");
         fechasDisable = obtenerFechasInhabil();
         listHorarios = new ArrayList<String>();
-        listHorarios = generarHorarios(8,13,25);
+    }
 
+    private List<String> FromSerGetHorariosRe(){
+        System.out.println("------ GET HORARIOS FROM DB  => [ Run ]");
+        List<String> horariosReservados = ServicesCitas.getHorariosAPI("http://localhost/siiaServices/apis/getFechasReservadas.php", strFechaReserva);
+        return horariosReservados;
     }
 
     public void NuevaCita(){
@@ -171,7 +175,7 @@ public class Citas implements Serializable {
         listTramites.add("Constancia de Estudios");
     }
 
-    public List<String> generarHorarios(int horaInicio, int HoraFin, int DuracionCitas){
+    public List<String> generarHorarios(int horaInicio, int HoraFin, int DuracionCitas, List<String> horariosReservados){
 
         List<String> listHorarios = new ArrayList<String>();
 
@@ -191,14 +195,14 @@ public class Citas implements Serializable {
                 hora+=1;
             }
         }
-
-        //TODO: Cambiar por los valores reales.
-        List<String> horariosReservados =Arrays.asList("11:45","10:30","11:20");
+        System.out.println("Lista de horarios generados =>" + listHorarios);
+        System.out.println("Lista de horarios reservador =>" + horariosReservados);
 
         horariosReservados.stream().forEach((item)->{
             for (int i = 0; i < listHorarios.size(); i++) {
                 if (item.equals(listHorarios.get(i))){
                     listHorarios.remove(i);
+                    System.out.println(listHorarios.get(i)+" Comparate to "+horariosReservados.get(i));
                 }
             }
         });
@@ -216,15 +220,14 @@ public class Citas implements Serializable {
 
     public void ComprobarFecha(){
         //TODO: Checar la disponibilidad.
-        System.out.println("------------Comprobando las disponibilidad de las fechas");
-        final ResultadoTO res = new ResultadoTO();
-        res.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.fechas.ok");
-        vHelp.pintarMensajes(msj, res);
+        System.out.println("------------Comprobando las disponibilidad de las fechas-----------");
+
+
+        listHorarios = generarHorarios(8,13,25, FromSerGetHorariosRe());
     }
 
     public void AgendarCita(){
         System.out.println("----------------Agendar Cita---------\n");
-        ServicesCitas servicesCitas = new ServicesCitas();
 
         Map<String, String> valores = new HashMap<String, String>();
 
@@ -235,7 +238,7 @@ public class Citas implements Serializable {
         valores.put("fecha",strcalendarValue);
         valores.put("hora",strHoraValue);
 
-        int codeResponse = servicesCitas.addValues("http://localhost/siiaServices/apis/Insert.php",valores);
+        int codeResponse = ServicesCitas.addValues("http://localhost/siiaServices/apis/Insert.php",valores);
     }
 
     public String getStrHoraValue() {

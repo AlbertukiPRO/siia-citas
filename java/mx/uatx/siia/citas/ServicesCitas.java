@@ -14,10 +14,7 @@ import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ServicesCitas {
 
@@ -63,7 +60,30 @@ public class ServicesCitas {
         return listaCitas;
     }
 
-    public int addValues(String link, Map<String, String> valores){
+    public static List<String> getHorariosAPI(String link, String fecha){
+
+        System.out.println("--- GET HORARIOS => [Run]");
+
+        List<String> lista;
+
+        try {
+            String resultado = readUrl(link+"?fecha="+fecha);
+
+            if (!resultado.equals("0")){
+                lista = Arrays.asList(resultado.split(","));
+            }else{
+                lista = new ArrayList<>();
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println("Finish Horarios Reservados => [value] = "+lista.toString());
+        return lista;
+    }
+
+    public static int addValues(String link, Map<String, String> valores){
         int codeResponde = 0;
        try {
            URL url = new URL(link);
@@ -112,6 +132,7 @@ public class ServicesCitas {
     }
 
     private static String readUrl(String urlString) throws Exception {
+        System.out.println("----- GET DATA FROM URL => [Run]");
         BufferedReader reader = null;
         try {
             URL url = new URL(urlString);
@@ -121,6 +142,8 @@ public class ServicesCitas {
             char[] chars = new char[1024];
             while ((read = reader.read(chars)) != -1)
                 buffer.append(chars, 0, read);
+
+            System.out.println("----- FINISH DATA FROM URL => [Value] ="+ buffer);
 
             return buffer.toString();
         } finally {
