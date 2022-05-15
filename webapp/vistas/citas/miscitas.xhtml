@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:b="http://bootsfaces.net/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="/layouts/template.xhtml">
+
+    <ui:define name="content">
+        <b:container fluid="true">
+            <b:panel title="Mis citas" collapsed="false">
+                <b:container>
+                    <br/>
+                    <h:form>
+                        <b:dataTable lang="es" value="#{}" var="cita">
+                            <b:dataTableColumn value="#{}"></b:dataTableColumn>
+                        </b:dataTable>
+                    </h:form>
+                </b:container>
+            </b:panel>
+        </b:container>
+    </ui:define>
+</ui:composition>

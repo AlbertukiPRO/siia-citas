@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:b="http://bootsfaces.net/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="/layouts/template.xhtml">
+
+    <ui:define name="content">
+
+        <b:container fluid="true">
+            <b:panel title="Citas" collapsible="false">
+                <b:container>
+                    <br/>
+                    <b:container styleClass="panel-body" fluid="true">
+                        <legend>Citas</legend>
+                        <b:form horizontal="true">
+                            <b:row>
+                                <b:column mediumScreen="6">
+                                    <b:selectOneMenu value="#{cita.listaDatosAlumn}" colMd="6" colLg="6" id="selectAlumno"
+                                                     label="Seleccione el periodo educativo" labelColLg="4"
+                                                     onchange="console.log('before the change');" ajax="true" process="@this">
+
+                                        <f:selectItem itemLabel="(Please select)" itemValue="none" />
+                                        <f:selectItems value="#{cita.listDatosAlumno}" var="c" itemValue="#{c}" itemLabel="#{c}"/>
+                                    </b:selectOneMenu>
+                                </b:column>
+                                <b:column mediumScreen="6"></b:column>
+                            </b:row>
+                            <br/>
+                            <b:row>
+                                <b:column mediumScreen="8"></b:column>
+                                <b:column mediumScreen="1">
+                                    <b:commandButton styleClass="btn btn-default"  action="#{cita.updateValues(auth.strNombreUsuarioLogin,auth.strUsuario)}" title="Nueva cita" onclick="location.reload();" value="Nueva cita">
+                                    </b:commandButton>
+                                </b:column>
+                                <b:column mediumScreen="1">
+                                    <b:button value="Buscar Citas" styleClass="btn btn-default">
+                                    </b:button>
+                                </b:column>
+                            </b:row>
+                            <!--TODO: RENDER DEL MODO nueva CITA-->
+                            <b:container update="selectAlumno" rendered="#{cita.renderDatosAlumno}">
+                                <legend>Datos de la cita</legend>
+                                <br/>
+                                <b:container fluid="true" style="width:70%;margin:0 auto;">
+                                    <b:row>
+                                        <b:column mediumScreen="4">
+                                            <h:outputText>Nombre del alumno:</h:outputText>
+                                            <h:outputText value="#{auth.strNombreUsuarioLogin}" title="Nombre del Alumno:">
+                                            </h:outputText>
+                                        </b:column>
+                                        <b:column mediumScreen="4">
+                                            <h:outputText>Facultad:</h:outputText>
+                                            <h:outputText value="#{cita.localfacultdad}"></h:outputText>
+                                        </b:column>
+                                        <b:column mediumScreen="4">
+                                            <h:outputText value="Programa Educativo:">Programa Educativo:</h:outputText>
+                                            <h:outputText value="#{cita.localprogramaEducativo}"></h:outputText>
+                                        </b:column>
+                                        <b:column mediumScreen="4">
+                                            <h:outputText>Fecha Reservada:</h:outputText>
+                                            <h:outputText value="#{cita.strcalendarValue}"></h:outputText>
+                                        </b:column>
+                                        <b:column mediumScreen="4">
+                                            <h:outputText>Hora Reservada:</h:outputText>
+                                            <h:outputText value="#{cita.strHoraValue}"></h:outputText>
+                                        </b:column>
+                                    </b:row>
+                                </b:container>
+                                <br/>
+                                <br/>
+                                <b:formGroup>
+                                    <b:row>
+                                        <b:column mediumScreen="5">
+                                            <b:selectOneMenu value="#{cita.listaDatosAreas}" colMd="6" colLg="6" id="selectArea"
+                                                             label="Seleccione el area" labelColLg="4"
+                                                             ajax="true" process="@this">
+
+                                                <f:selectItem itemLabel="Seleccione --" itemValue="none" />
+                                                <f:selectItems value="#{cita.listAreas}"/>
+                                            </b:selectOneMenu>
+                                        </b:column>
+                                        <b:column mediumScreen="5">
+                                            <b:selectOneMenu value="#{cita.listaDatosTramites}" colMd="6" colLg="6" id="selectTramite"
+                                                             label="Seleccione el tramite" labelColLg="4"
+                                                             ajax="true" process="@this">
+
+                                                <f:selectItem itemLabel="(Please select)" itemValue="none" />
+                                                <f:selectItems value="#{cita.listTramites}" var="e" itemValue="#{e}" itemLabel="#{e}"/>
+                                            </b:selectOneMenu>
+                                        </b:column>
+                                    </b:row>
+                                    <br/>
+                                    <b:row>
+                                        <b:column mediumScreen="4">
+                                            <b:dateTimePicker format="MM/DD/YYYY" locale="es" mediumScreen="4" label="Seleccione la fecha de su cita" weekDaysDisabled="6" value="#{cita.strcalendarValue}" required="true" week-days-disabled='6' showTime="false" disabledDates="#{cita.fechasDisable}">
+                                            </b:dateTimePicker>
+                                            <b:message for="@previous"></b:message>
+                                            <b:commandButton value="Comprobar disponibilidad" action="#{cita.ComprobarFecha()}" update="@form" styleClass="btn btn-default"></b:commandButton>
+                                        </b:column>
+                                        <b:column mediumScreen="4">
+                                            <b:selectOneMenu value="#{cita.strHoraValue}" colMd="6" colLg="6" id="selectHora"
+                                                             label="Seleccione el horario" labelColLg="4"
+                                                             ajax="true" process="@this">
+
+                                                <f:selectItem itemLabel="Seleccione --" itemValue="none" />
+                                                <f:selectItems value="#{cita.listHorarios}"/>
+                                            </b:selectOneMenu>
+                                        </b:column>
+                                    </b:row>
+                                </b:formGroup>
+                                <b:row>
+                                    <b:column mediumScreen="8"></b:column>
+                                    <b:column mediumScreen="2">
+                                        <b:commandButton value="Agendar cita" styleClass="btn btn-default" action="#{cita.AgendarCita()}"></b:commandButton>
+                                    </b:column>
+                                </b:row>
+                            </b:container>
+                        </b:form>
+                        <br/>
+                    </b:container>
+                    <br/>
+                </b:container>
+            </b:panel>
+        </b:container>
+        <!-- TODO:Agregar el output para los datos del alumno -->
+    </ui:define>
+</ui:composition>

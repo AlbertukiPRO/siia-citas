@@ -1,0 +1,409 @@
+package mx.uatx.siia.logeo.controlador;
+
+import com.ibm.icu.text.SimpleDateFormat;
+import com.sun.istack.NotNull;
+import mx.uatx.siia.citas.ServicesCitas;
+import mx.uatx.siia.citas.modelo.Areas.areasBusiness.areaBusiness;
+import mx.uatx.siia.citas.modelo.Tramites.tramitesBusiness.tramiteBusiness;
+import mx.uatx.siia.citas.modelo.citasBusiness.citaBusiness;
+import mx.uatx.siia.comun.helper.VistasHelper;
+import mx.uatx.siia.serviciosUniversitarios.dto.AreasTO;
+import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
+import mx.uatx.siia.serviciosUniversitarios.dto.TramitesTO;
+import mx.uatx.siia.serviciosUniversitarios.enums.SeveridadMensajeEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.SessionScoped;
+import java.io.Serializable;
+import java.time.Instant;
+import java.time.temporal.TemporalAccessor;
+import java.util.*;
+
+
+@ManagedBean(name = "cita")
+@SessionScoped
+public class Citas implements Serializable {
+    /**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = -2621529818431646329L;
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+
+    @ManagedProperty("#{citaBusiness}")
+    private citaBusiness citaBusiness;
+
+    @ManagedProperty("#{msj}")
+    private ResourceBundle msj;
+
+    private final VistasHelper vHelp = new VistasHelper();
+
+    // ATRIBUTOS DEl Objeto CITA.
+
+    private Integer intIdCita;
+    private Integer intIdAlumno;
+    private Integer intIdArea;
+    private Integer intIdTramite;
+    private String strDescripcionTramite;
+    private String strEstatus;
+    private String strFechaReserva;
+    private String strRetroalimentacion;
+    private String strHoraReservada;
+    public String strIdString;
+
+    //Datos del alumno
+    private String localstrMatricula;
+
+    public String getLocalstrMatricula() {
+        return localstrMatricula;
+    }
+
+    public void setLocalstrMatricula(String localstrMatricula) {
+        this.localstrMatricula = localstrMatricula;
+    }
+
+    public String getLocalstrNombre() {
+        return localstrNombre;
+    }
+
+    public void setLocalstrNombre(String localstrNombre) {
+        this.localstrNombre = localstrNombre;
+    }
+
+    public String getLocalfacultdad() {
+        return localfacultdad;
+    }
+
+    public void setLocalfacultdad(String localfacultdad) {
+        this.localfacultdad = localfacultdad;
+    }
+
+    public String getLocalprogramaEducativo() {
+        return localprogramaEducativo;
+    }
+
+    public void setLocalprogramaEducativo(String localprogramaEducativo) {
+        this.localprogramaEducativo = localprogramaEducativo;
+    }
+
+    private String localstrNombre;
+    private String localfacultdad;
+    private String localprogramaEducativo;
+
+    //USO DE LA INTERFAZ
+    @NotNull
+    private String listaDatosAlumn = null;
+    @NotNull
+    private String listaDatosAreas = null;
+    @NotNull
+    private String listaDatosTramites = null;
+    private final List<String> listDatosAlumno;
+    @NotNull
+    private String strcalendarValue;
+    @NotNull
+    private String strHoraValue;
+
+    private String fechasDisable;
+    private Map<String,String> listAreas;
+    private List<String> listTramites;
+    private List<String> listHorarios;
+
+    public boolean isRenderDatosAlumno() {
+        return renderDatosAlumno;
+    }
+
+    public void setRenderDatosAlumno(boolean renderDatosAlumno) {
+        this.renderDatosAlumno = renderDatosAlumno;
+    }
+
+    private boolean renderDatosAlumno;
+
+    public void updateValues(String nombre, String matricula){
+
+        //TODO: Obtener los valores de la DB.
+
+        localstrNombre = nombre;
+        localstrMatricula = matricula;
+        localprogramaEducativo = "Ingeniería en Computación";
+        localfacultdad = "Facultad de Ciencias Basicas Ingeniería y Tecnologia";
+
+        renderDatosAlumno = true;
+
+        System.out.println("Cambiando los valores");
+    }
+
+    public Citas()  {
+        listDatosAlumno = Arrays.asList("[20181837] LICENCIATURA EN INGENIERÍA EN COMPUTACIÓN CAMPUS APIZACO (2018)");
+        obtenerAreas();
+        renderDatosAlumno = false;
+        obtenerTramites();
+        logger.info("Bean Citas { Constructor() }");
+        fechasDisable = obtenerFechasInhabil();
+        listHorarios = new ArrayList<String>();
+        listHorarios = generarHorarios(8,13,25);
+
+    }
+
+    public void NuevaCita(){
+        final ResultadoTO res = citaBusiness.NuevaCita(this.strIdString);//TODO: agregar los demas valores para registrar la cita.
+        vHelp.pintarMensajes(msj,res);
+    }
+
+    public void obtenerAreas(){
+        listAreas = new HashMap<>();
+        listAreas.put("Servicios Escolares","Servicios Escolares");
+        listAreas.put("Servicios Financieros","Servicios Financieros");
+        listAreas.put("Servicios Universitarios","Servicios Universitarios");
+        listAreas.put("Secretaria Técnica","Secretaria Técnica");
+    }
+
+    public void obtenerTramites()  {
+
+        listTramites = new Stack<>();
+
+        listTramites.add("Baja Definitiva");
+        listTramites.add("Baja Temporal");
+        listTramites.add("Constancia de Expendientes");
+        listTramites.add("Certificado Carta Pasante");
+        listTramites.add("Constancia de Estudios");
+    }
+
+    public List<String> generarHorarios(int horaInicio, int HoraFin, int DuracionCitas){
+
+        List<String> listHorarios = new ArrayList<String>();
+
+        int hora = horaInicio;
+        int minuto = 0;
+        int residuo = 0;
+        while (hora<HoraFin){
+            if ( minuto < 59 && hora != HoraFin){
+                String item = formatHora(Integer.toString(hora))+":"+formatHora(Integer.toString(minuto));
+                listHorarios.add(item);
+            }
+            if(minuto<=60){
+                minuto+=DuracionCitas;
+            }else{
+                residuo=minuto-60;
+                minuto=residuo;
+                hora+=1;
+            }
+        }
+
+        //TODO: Cambiar por los valores reales.
+        List<String> horariosReservados =Arrays.asList("11:45","10:30","11:20");
+
+        horariosReservados.stream().forEach((item)->{
+            for (int i = 0; i < listHorarios.size(); i++) {
+                if (item.equals(listHorarios.get(i))){
+                    listHorarios.remove(i);
+                }
+            }
+        });
+
+        return listHorarios;
+    }
+
+    public String formatHora(String number){
+        return number.length() == 1 ? "0"+number : number;
+    }
+
+    public String obtenerFechasInhabil(){
+        return "'5/10/2022','5/16/2022'";
+    }
+
+    public void ComprobarFecha(){
+        //TODO: Checar la disponibilidad.
+        System.out.println("------------Comprobando las disponibilidad de las fechas");
+        final ResultadoTO res = new ResultadoTO();
+        res.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.fechas.ok");
+        vHelp.pintarMensajes(msj, res);
+    }
+
+    public void AgendarCita(){
+        System.out.println("----------------Agendar Cita---------\n");
+        ServicesCitas servicesCitas = new ServicesCitas();
+
+        Map<String, String> valores = new HashMap<String, String>();
+
+        valores.put("matricula",localstrMatricula);
+        valores.put("idtramite",listaDatosTramites);
+        valores.put("idarea",listaDatosAreas);
+        valores.put("descripcion","");
+        valores.put("fecha",strcalendarValue);
+        valores.put("hora",strHoraValue);
+
+        int codeResponse = servicesCitas.addValues("http://localhost/siiaServices/apis/Insert.php",valores);
+    }
+
+    public String getStrHoraValue() {
+        return strHoraValue;
+    }
+
+    public void setStrHoraValue(String strHoraValue) {
+        this.strHoraValue = strHoraValue;
+    }
+
+    public List<String> getListHorarios() {
+        return listHorarios;
+    }
+
+    public void setListHorarios(List<String> listHorarios) {
+        this.listHorarios = listHorarios;
+    }
+
+
+    public String getFechasDisable() {
+        return fechasDisable;
+    }
+
+    public void setFechasDisable(String fechasDisable) {
+        this.fechasDisable = fechasDisable;
+    }
+
+    public String getStrcalendarValue() {
+        return strcalendarValue;
+    }
+
+    public void setStrcalendarValue(String strcalendarValue) {
+        this.strcalendarValue = strcalendarValue;
+    }
+    public String getListaDatosTramites() {
+        return listaDatosTramites;
+    }
+
+    public void setListaDatosTramites(String listaDatosTramites) {
+        this.listaDatosTramites = listaDatosTramites;
+    }
+
+    public String getListaDatosAlumn() {
+        return listaDatosAlumn;
+    }
+
+    public void setListaDatosAlumn(String listaDatosAlumno) {
+        this.listaDatosAlumn = listaDatosAlumno;
+    }
+
+    public Map<String, String> getListAreas() {
+        return listAreas;
+    }
+
+    public void setListAreas(Map<String, String> listAreas) {
+        this.listAreas = listAreas;
+    }
+
+    public List<String> getListDatosAlumno(){
+        return listDatosAlumno;
+    }
+
+
+    public List<String> getListTramites() {
+        return listTramites;
+    }
+
+    public void setListTramites(List<String> listTramites) {
+        this.listTramites = listTramites;
+    }
+
+    public Integer getIntIdCita() {
+        return intIdCita;
+    }
+
+    public void setIntIdCita(Integer intIdCita) {
+        this.intIdCita = intIdCita;
+    }
+
+    public Integer getIntIdAlumno() {
+        return intIdAlumno;
+    }
+
+    public void setIntIdAlumno(Integer intIdAlumno) {
+        this.intIdAlumno = intIdAlumno;
+    }
+
+    public Integer getIntIdArea() {
+        return intIdArea;
+    }
+
+    public void setIntIdArea(Integer intIdArea) {
+        this.intIdArea = intIdArea;
+    }
+
+    public Integer getIntIdTramite() {
+        return intIdTramite;
+    }
+
+    public void setIntIdTramite(Integer intIdTramite) {
+        this.intIdTramite = intIdTramite;
+    }
+
+    public String getStrDescripcionTramite() {
+        return strDescripcionTramite;
+    }
+
+    public void setStrDescripcionTramite(String strDescripcionTramite) {
+        this.strDescripcionTramite = strDescripcionTramite;
+    }
+
+    public String getStrEstatus() {
+        return strEstatus;
+    }
+
+    public void setStrEstatus(String strEstatus) {
+        this.strEstatus = strEstatus;
+    }
+
+    public String getStrFechaReserva() {
+        return strFechaReserva;
+    }
+
+    public void setStrFechaReserva(String strFechaReserva) {
+        this.strFechaReserva = strFechaReserva;
+    }
+
+    public String getStrRetroalimentacion() {
+        return strRetroalimentacion;
+    }
+
+    public void setStrRetroalimentacion(String strRetroalimentacion) {
+        this.strRetroalimentacion = strRetroalimentacion;
+    }
+
+    public String getStrHoraReservada() {
+        return strHoraReservada;
+    }
+
+    public void setStrHoraReservada(String strHoraReservada) {
+        this.strHoraReservada = strHoraReservada;
+    }
+
+    /*
+    *   Propiedad set para la inyección
+    *   @param CitaBusiness
+    */
+    public citaBusiness getCitaBusiness() {
+        return citaBusiness;
+    }
+
+    public void setCitaBusiness(citaBusiness citaBusiness) {
+        this.citaBusiness = citaBusiness;
+    }
+
+    public ResourceBundle getMsj() {
+        return msj;
+    }
+
+    public void setMsj(ResourceBundle msj) {
+        this.msj = msj;
+    }
+
+    public String getListaDatosAreas() {
+        return listaDatosAreas;
+    }
+
+    public void setListaDatosAreas(String listaDatosAreas) {
+        this.listaDatosAreas = listaDatosAreas;
+    }
+}
