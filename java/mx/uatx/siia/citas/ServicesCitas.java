@@ -1,13 +1,14 @@
 package mx.uatx.siia.citas;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.*;
-import com.microsoft.graph.models.extensions.User;
-import mx.uatx.siia.logeo.controlador.Citas;
+import mx.uatx.siia.serviciosUniversitarios.dto.AreasTO;
 import mx.uatx.siia.serviciosUniversitarios.dto.CitasTO;
+import mx.uatx.siia.serviciosUniversitarios.dto.TramitesTO;
 import mx.uatx.siia.serviciosUniversitarios.dto.UserTest;
 import sun.net.www.protocol.http.HttpURLConnection;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
@@ -19,7 +20,6 @@ import java.util.*;
 public class ServicesCitas {
 
     private List<CitasTO> list = null;
-
     public List<CitasTO> getList() {
         return list;
     }
@@ -27,37 +27,42 @@ public class ServicesCitas {
         this.list = list;
     }
 
-    ServicesCitas(String url){
-        list = new ArrayList<CitasTO>();
-        String strJson = obtenerJson(url);
-        list = generarLista(strJson); //as Response
-    }
-
     public ServicesCitas(){
 
     }
 
-    public String obtenerJson(String url){
-        String response;
-        try {
-            response = readUrl("https://jsonplaceholder.typicode.com/users");
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return response;
-    }
-
-    private static List<CitasTO> generarLista(String response){
+    private List<CitasTO> generarLista(String response){
         Type listType = new TypeToken<List<UserTest>>(){}.getType();
 
         List<CitasTO> listaCitas = new Gson().fromJson(response,listType);
-
 //        for (int i = 0; i < listaCitas.size(); i++) {
 //            System.out.println("Nombre:" + listaCitas.get(i).getName());
 //        }
-
         return listaCitas;
+    }
+
+    public static List<AreasTO> getAreasAPI(String url){
+        List<AreasTO> listaAreas;
+        String strJson = readUrl(url);
+        System.out.println("----- FINISH GET AREAS [ Value ] => "+strJson);
+        Type listType = new TypeToken<List<AreasTO>>(){}.getType();
+
+        listaAreas = new Gson().fromJson(strJson,listType);
+
+        return listaAreas;
+    }
+
+    public static List<TramitesTO> getTramitesAPI(String url, String idArea){
+        List<TramitesTO> listTramites;
+        String strJson = readUrl(url+"?idTramite="+idArea);
+
+        System.out.println("---- FINISH GET TRAMITES WHERE ARES = "+idArea);
+
+        Type listType = new TypeToken<List<TramitesTO>>(){}.getType();
+
+        listTramites = new Gson().fromJson(strJson,listType);
+
+        return listTramites;
     }
 
     public static List<String> getHorariosAPI(String link, String fecha){
@@ -82,7 +87,6 @@ public class ServicesCitas {
         System.out.println("Finish Horarios Reservados => [value] = "+lista.toString());
         return lista;
     }
-
     public static int addValues(String link, Map<String, String> valores){
         int codeResponde = 0;
        try {
@@ -131,7 +135,7 @@ public class ServicesCitas {
         return codeResponde;
     }
 
-    private static String readUrl(String urlString) throws Exception {
+    private static String readUrl(String urlString)  {
         System.out.println("----- GET DATA FROM URL => [Run]");
         BufferedReader reader = null;
         try {
@@ -146,9 +150,16 @@ public class ServicesCitas {
             System.out.println("----- FINISH DATA FROM URL => [Value] ="+ buffer);
 
             return buffer.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         } finally {
-            if (reader != null)
-                reader.close();
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 }

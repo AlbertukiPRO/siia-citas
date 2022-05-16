@@ -139,10 +139,8 @@ public class Citas implements Serializable {
         listDatosAlumno = Arrays.asList("[20181837] LICENCIATURA EN INGENIERÍA EN COMPUTACIÓN CAMPUS APIZACO (2018)");
         obtenerAreas();
         renderDatosAlumno = false;
-        obtenerTramites();
         logger.info("Bean Citas { Constructor() }");
         fechasDisable = obtenerFechasInhabil();
-        listHorarios = new ArrayList<String>();
     }
 
     private List<String> FromSerGetHorariosRe(){
@@ -157,22 +155,27 @@ public class Citas implements Serializable {
     }
 
     public void obtenerAreas(){
+        System.out.println("---- GET DATA OF AREAS");
+        List<AreasTO> areas = ServicesCitas.getAreasAPI("http://localhost/siiaServices/apis/getAreas.php");
+
         listAreas = new HashMap<>();
-        listAreas.put("Servicios Escolares","Servicios Escolares");
-        listAreas.put("Servicios Financieros","Servicios Financieros");
-        listAreas.put("Servicios Universitarios","Servicios Universitarios");
-        listAreas.put("Secretaria Técnica","Secretaria Técnica");
+
+        areas.forEach((e)-> listAreas.put(e.getStrNombreAreas(),e.getStrNombreAreas()));
     }
 
     public void obtenerTramites()  {
 
-        listTramites = new Stack<>();
+        System.out.println("---- GET DATA OF TRAMITES");
 
-        listTramites.add("Baja Definitiva");
-        listTramites.add("Baja Temporal");
-        listTramites.add("Constancia de Expendientes");
-        listTramites.add("Certificado Carta Pasante");
-        listTramites.add("Constancia de Estudios");
+        List<TramitesTO> tramites = ServicesCitas.getTramitesAPI("http://localhost/siiaServices/apis/getTramites.php",listaDatosAreas);
+
+        tramites.forEach((e)->listTramites.add(e.getStrNombreTramite()));
+//
+//        listTramites.add("Baja Definitiva");
+//        listTramites.add("Baja Temporal");
+//        listTramites.add("Constancia de Expendientes");
+//        listTramites.add("Certificado Carta Pasante");
+//        listTramites.add("Constancia de Estudios");
     }
 
     public List<String> generarHorarios(int horaInicio, int HoraFin, int DuracionCitas, List<String> horariosReservados){
@@ -195,14 +198,10 @@ public class Citas implements Serializable {
                 hora+=1;
             }
         }
-        System.out.println("Lista de horarios generados =>" + listHorarios);
-        System.out.println("Lista de horarios reservador =>" + horariosReservados);
-
         horariosReservados.stream().forEach((item)->{
             for (int i = 0; i < listHorarios.size(); i++) {
                 if (item.equals(listHorarios.get(i))){
                     listHorarios.remove(i);
-                    System.out.println(listHorarios.get(i)+" Comparate to "+horariosReservados.get(i));
                 }
             }
         });

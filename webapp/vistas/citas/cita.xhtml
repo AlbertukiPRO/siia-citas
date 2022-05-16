@@ -79,13 +79,13 @@
                                                              ajax="true" process="@this">
 
                                                 <f:selectItem itemLabel="Seleccione --" itemValue="none" />
-                                                <f:selectItems value="#{cita.listAreas}"/>
+                                                <f:selectItems value="#{cita.listAreas}" />
                                             </b:selectOneMenu>
                                         </b:column>
                                         <b:column mediumScreen="5">
                                             <b:selectOneMenu value="#{cita.listaDatosTramites}" colMd="6" colLg="6" id="selectTramite"
                                                              label="Seleccione el tramite" labelColLg="4"
-                                                             ajax="true" process="@this">
+                                                             ajax="true" process="@this" update="#{cita.obtenerTramites()}">
 
                                                 <f:selectItem itemLabel="(Please select)" itemValue="none" />
                                                 <f:selectItems value="#{cita.listTramites}" var="e" itemValue="#{e}" itemLabel="#{e}"/>
@@ -110,7 +110,6 @@
                                             </b:selectOneMenu>
                                         </b:column>
                                     </b:row>
-
                                 </b:formGroup>
                                 <b:row>
                                     <b:column mediumScreen="8"></b:column>
