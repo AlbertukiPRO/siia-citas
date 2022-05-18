@@ -1,0 +1,156 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.menuHeader {
+    width: 55%;
+    margin: 30px 80px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    padding: 0px 45px;
+    box-shadow: 0 0 0.5rem #ECECEC;
+    border-radius: 9px;
+}
+
+.menuHeader div {
+    height: 70px;
+    width: 150px;
+    padding-top: 25px;
+    text-align: center;
+    color: #59041F;
+    font-family: sans-serif;
+}
+
+.menuHeader div:hover {
+    border-bottom: 3px #82133d solid;
+    cursor: pointer;
+}
+
+.activeMenu {
+    border-bottom: 3px #59041F solid;
+}
+
+.profile {
+    border-radius: 6px;
+    margin-top: 30px;
+    margin-right: 80px;
+    box-shadow: 0 0 0.5rem #ECECEC;
+    width: 22%;
+    height: 70px;
+
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.profile figure {
+    clip-path: circle();
+    box-shadow: 0 0 1rem #ECECEC;
+}
+
+.profile figure img {
+    width: 80px;
+    height: 80px;
+}
+
+.profile .dataprofile {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile .dataprofile h4,
+.profile .dataprofile label {
+    line-height:0;
+    margin: 0;
+    width: 100%;
+    padding: 0;
+}
+
+.dataprofile label {
+    font-size: 12px;
+}
+
+.profile span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+main {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+main .calendar {
+    box-shadow: 0 0 0.5rem #ECECEC;
+    width: 55%;
+    height: 50vh;
+    border-radius: 9px;
+    margin-left: 20px;
+}
+
+main .config {
+    width: 22%;
+    margin-right: 10px;
+    box-shadow: 0 0 0.5rem #ECECEC;
+    height: 50vh;
+    border-radius: 9px;
+}
+
+main .calendar div {
+    border-bottom: 0.5px #C4C4C4 solid;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.calendar .titleCalendar {
+    padding: 0px 35px;
+}
+
+.titleCalendar p {
+    font-family: sans-serif;
+    color: #82133d;
+    width: min-content;
+    font-weight: bold;
+    height: 50px;
+    padding: 15px;
+    border-bottom: 3px #82133d solid;
+}
+
+.calendar div .btnReload {
+    width: min-content;
+    height: min-content;
+    padding: 5px 10px;
+    border-radius: 15px;
+    background-color: #82133d;
+    color: white;
+    font-size: 13px;
+    font-family: sans-serif;
+    margin-right: 40px;
+    transition: 0.2s;
+}
+
+
+.btnReload:hover {
+    transform: scale(1.05);
+    cursor: pointer;
+}
+
+.btnReload span {
+    margin-left: 15px;
+}
