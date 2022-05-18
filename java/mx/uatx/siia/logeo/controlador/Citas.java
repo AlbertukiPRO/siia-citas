@@ -105,6 +105,8 @@ public class Citas implements Serializable {
     private String strcalendarValue;
     @NotNull
     private String strHoraValue;
+    @NotNull
+    private String strDescripcion;
 
     private String fechasDisable;
     private Map<String,String> listAreas;
@@ -165,11 +167,6 @@ public class Citas implements Serializable {
         return (s == null || s.length() == 0)
                 ? null
                 : (s.substring(0, s.length() - 1));
-    }
-
-    public void NuevaCita(){
-        final ResultadoTO res = citaBusiness.NuevaCita(this.strIdString);//TODO: agregar los demas valores para registrar la cita.
-        vHelp.pintarMensajes(msj,res);
     }
 
     public void obtenerAreas(){
@@ -269,13 +266,19 @@ public class Citas implements Serializable {
         valores.put("matricula",localstrMatricula);
         valores.put("idtramite",listaDatosTramites);
         valores.put("idarea",listaDatosAreas);
-        valores.put("descripcion","");
+        valores.put("descripcion",strDescripcion);
         valores.put("fecha",strcalendarValue);
         valores.put("hora",strHoraValue);
 
         int codeResponse = ServicesCitas.addValues("http://localhost/siiaServices/apis/Insert.php",valores);
     }
 
+    public String getStrDescripcion() {
+        return strDescripcion;
+    }
+    public void setStrDescripcion(String strDescripcion) {
+        this.strDescripcion = strDescripcion;
+    }
     public String getStrHoraValue() {
         return strHoraValue;
     }

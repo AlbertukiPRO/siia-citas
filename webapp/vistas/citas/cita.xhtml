@@ -94,6 +94,7 @@
                                     </b:row>
                                     <br/>
                                 </b:formGroup>
+                                <br/>
                                 <b:formGroup>
                                     <b:row>
                                         <b:column mediumScreen="5">
@@ -114,6 +115,14 @@
                                                 <f:selectItems value="#{cita.listHorarios}"/>
                                             </b:selectOneMenu>
                                         </b:column>
+                                    </b:row>
+                                    <br/>
+                                    <b:row>
+                                        <b:column mediumScreen="3"></b:column>
+                                        <b:column mediumScreen="6">
+                                            <b:inputText value="#{cita.strDescripcion}" label="Ingrese una descripcion del motivo de su cita" ajax="true" placeholder="Escriba aquí"></b:inputText>
+                                        </b:column>
+                                        <b:column mediumScreen="3"></b:column>
                                     </b:row>
                                 </b:formGroup>
                                 <b:row>
