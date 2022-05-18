@@ -69,14 +69,14 @@ header {
 }
 
 .profile .dataprofile h4,
-.profile .dataprofile label {
+.profile .dataprofile span {
     line-height:0;
     margin: 0;
     width: 100%;
     padding: 0;
 }
 
-.dataprofile label {
+.dataprofile span {
     font-size: 12px;
 }
 

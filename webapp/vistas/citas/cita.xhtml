@@ -73,15 +73,21 @@
                                 <br/>
                                 <b:formGroup>
                                     <b:row>
+
+                                        <!-- COMBOX OF Areas -->
                                         <b:column mediumScreen="5">
                                             <b:selectOneMenu value="#{cita.listaDatosAreas}" colMd="6" colLg="6" id="selectArea"
                                                              label="Seleccione el area" labelColLg="4"
-                                                             ajax="true" process="@this" >
-                                                <f:ajax event="change" listener="#{cita.obtenerTramites()}"></f:ajax>
+                                                             ajax="true" process="@this">
+
+                                                <f:ajax event="change" render="selectTramite" execute="@this" listener="#{cita.obtenerTramites}"></f:ajax>
+
                                                 <f:selectItem itemLabel="Seleccione --" itemValue="none" />
-                                                <f:selectItems value="#{cita.listAreas}" />
+                                                <f:selectItems value="#{cita.obtenerAreas()}" />
                                             </b:selectOneMenu>
                                         </b:column>
+
+                                        <!-- Combo Box of Tramites -->
                                         <b:column mediumScreen="5" >
                                             <b:selectOneMenu value="#{cita.listaDatosTramites}" colMd="6" colLg="6" id="selectTramite"
                                                              label="Seleccione el tramite" labelColLg="4"
@@ -100,7 +106,8 @@
                                         <b:column mediumScreen="5">
                                             <h:outputText value="Seleccione la fecha de su cita"></h:outputText>
 
-                                            <b:dateTimePicker format="MM/DD/YYYY" locale="es" mediumScreen="8" labelMediumScreen="2" weekDaysDisabled="6" value="#{cita.strcalendarValue}" required="true" week-days-disabled='6' showTime="false" disabledDates="#{cita.fechasDisable}">
+                                            <b:dateTimePicker format="MM/DD/YYYY" colMd="6" colLg="6" locale="es" mediumScreen="8" labelMediumScreen="2" weekDaysDisabled="6" value="#{cita.strcalendarValue}" required="true" week-days-disabled='6' showTime="false" disabledDates="#{cita.fechasDisable}">
+
                                             </b:dateTimePicker>
 
                                             <b:commandButton value="Comprobar disponibilidad" action="#{cita.ComprobarFecha()}" update="@form" styleClass="btn btn-default"></b:commandButton>
@@ -120,7 +127,7 @@
                                     <b:row>
                                         <b:column mediumScreen="3"></b:column>
                                         <b:column mediumScreen="6">
-                                            <b:inputText value="#{cita.strDescripcion}" label="Ingrese una descripcion del motivo de su cita" ajax="true" placeholder="Escriba aquí"></b:inputText>
+                                            <b:inputText value="#{cita.strDescripcion}" colMd="6" colLg="6" label="Ingrese una descripcion del motivo de su cita" ajax="true" placeholder="Escriba aquí"></b:inputText>
                                         </b:column>
                                         <b:column mediumScreen="3"></b:column>
                                     </b:row>

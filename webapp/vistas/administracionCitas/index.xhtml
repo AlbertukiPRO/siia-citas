@@ -13,8 +13,40 @@
 
 </h:head>
 <h:body>
-    <b:container>
+    <header>
+        <b:container styleClass="menuHeader">
+            <b:container styleClass="activeMenu">
+                <h4><h:outputText value="Tablero"></h:outputText></h4>
+            </b:container>
+            <b:container >
+                <h4><h:outputText value="Linea de Tiempo"></h:outputText></h4>
+            </b:container>
+            <b:container >
+                <h4><h:outputText value="Reportes"></h:outputText></h4>
+            </b:container>
+        </b:container>
 
-    </b:container>
+        <b:container styleClass="profile">
+            <figure>
+                <img src="https://i.pinimg.com/originals/1f/8e/66/1f8e6642fa0dc8d2b5135c319c6b911e.jpg" alt="" />
+            </figure>
+            <b:container styleClass="dataprofile">
+                <h4><h:outputText value="Lic. Anita Gomez"></h:outputText></h4>
+                <span><h:outputText value="Servicios Escolares"></h:outputText></span>
+            </b:container>
+        </b:container>
+    </header>
+    <main>
+        <b:container styleClass="calendar">
+            <div>
+                <b:container styleClass="titleCalendar">
+                    <p>Calendario</p>
+                </b:container>
+                <b:container>
+                    <b:commandButton styleClass="btn btn-default" value="Regarcar" icon="fa-rotate-left"></b:commandButton>
+                </b:container>
+            </div>
+        </b:container>
+    </main>
 </h:body>
 </html>

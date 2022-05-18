@@ -2,6 +2,7 @@ package mx.uatx.siia.logeo.controlador;
 
 import com.ibm.icu.text.SimpleDateFormat;
 import com.sun.istack.NotNull;
+import mx.uatx.siia.citas.CitasHelper;
 import mx.uatx.siia.citas.ServicesCitas;
 import mx.uatx.siia.citas.modelo.Areas.areasBusiness.areaBusiness;
 import mx.uatx.siia.citas.modelo.Tramites.tramitesBusiness.tramiteBusiness;
@@ -11,12 +12,14 @@ import mx.uatx.siia.serviciosUniversitarios.dto.AreasTO;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
 import mx.uatx.siia.serviciosUniversitarios.dto.TramitesTO;
 import mx.uatx.siia.serviciosUniversitarios.enums.SeveridadMensajeEnum;
+import org.primefaces.behavior.ajax.AjaxBehavior;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.model.SelectItem;
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.temporal.TemporalAccessor;
@@ -138,7 +141,10 @@ public class Citas implements Serializable {
         System.out.println("Cambiando los valores");
     }
 
+    private CitasHelper citasHelper;
+
     public Citas()  {
+        citasHelper  = new CitasHelper();
         listDatosAlumno = Arrays.asList("[20181837] LICENCIATURA EN INGENIERÍA EN COMPUTACIÓN CAMPUS APIZACO (2018)");
         obtenerAreas();
         renderDatosAlumno = false;
@@ -169,13 +175,9 @@ public class Citas implements Serializable {
                 : (s.substring(0, s.length() - 1));
     }
 
-    public void obtenerAreas(){
+    public List<SelectItem> obtenerAreas(){
         System.out.println("---- GET DATA OF AREAS");
-        List<AreasTO> areas = ServicesCitas.getAreasAPI("http://localhost/siiaServices/apis/getAreas.php");
-
-        listAreas = new HashMap<>();
-
-        areas.forEach((e)-> listAreas.put(e.getStrNombreAreas(),e.getStrNombreAreas()));
+        return citasHelper.getSelectAreas();
     }
 
     public void obtenerTramites()  {
