@@ -65,6 +65,23 @@ public class ServicesCitas {
         return listTramites;
     }
 
+    public static List<String> getFechasInabilesAPI(String url, String area){
+        List<String> lista = null;
+
+        try {
+            String resultado = readUrl(url+"?whereFecha="+area);
+            if (!resultado.equals("0")){
+                lista = Arrays.asList(resultado.split(","));
+            }else{
+                lista = new ArrayList<>();
+            }
+        }catch (Exception e){
+            System.out.println(e);
+        }
+        System.out.println("Finish Horarios Reservados => [value] = "+lista.toString());
+        return lista;
+    }
+
     public static List<String> getHorariosAPI(String link, String fecha){
 
         System.out.println("--- GET HORARIOS => [Run]");

@@ -132,6 +132,7 @@ public class Citas implements Serializable {
 
         renderDatosAlumno = true;
 
+
         System.out.println("Cambiando los valores");
     }
 
@@ -140,13 +141,30 @@ public class Citas implements Serializable {
         obtenerAreas();
         renderDatosAlumno = false;
         logger.info("Bean Citas { Constructor() }");
-        fechasDisable = obtenerFechasInhabil();
     }
 
     private List<String> FromSerGetHorariosRe(){
         System.out.println("------ GET HORARIOS FROM DB  => [ Run ]");
         List<String> horariosReservados = ServicesCitas.getHorariosAPI("http://localhost/siiaServices/apis/getFechasReservadas.php", strFechaReserva);
         return horariosReservados;
+    }
+
+    public String getFechasInhabiles(){
+
+        System.out.println("----- GET FECHAS INHÁBILES");
+        StringBuilder cadena = new StringBuilder();
+        List<String> value = ServicesCitas.getFechasInabilesAPI("http://localhost/siiaServices/apis/getFechasReservadas.php",""+listaDatosAreas.replace(" ","%20"));
+
+        for (String item: value){
+            cadena.append("'").append(item).append("',");
+        }
+        return removeLastChar(String.valueOf(cadena));
+    }
+
+    public static String removeLastChar(String s) {
+        return (s == null || s.length() == 0)
+                ? null
+                : (s.substring(0, s.length() - 1));
     }
 
     public void NuevaCita(){
@@ -164,18 +182,32 @@ public class Citas implements Serializable {
     }
 
     public void obtenerTramites()  {
-
         System.out.println("---- GET DATA OF TRAMITES");
+        if(listaDatosAreas!=null){
+            List<TramitesTO> tramites = ServicesCitas.getTramitesAPI("http://localhost/siiaServices/apis/getTramites.php",""+listaDatosAreas.replace(" ","%20"));
+            listTramites = new ArrayList<>();
+            try {
+                System.out.println("--- TRAMITES LIST<TramitesTO>");
+                tramites.forEach((e)-> System.out.println(e.getStrNombreTramite()));
+                tramites.forEach((i)->{
+                    listTramites.add(i.getStrNombreTramite());
+                });
+            }catch (Exception e){
+                System.out.println(e);
+            }
+            fechasDisable = getFechasInhabiles();
+            vHelp.redireccionar("/vistas/citas/cita.uat");
 
-        List<TramitesTO> tramites = ServicesCitas.getTramitesAPI("http://localhost/siiaServices/apis/getTramites.php",listaDatosAreas);
-
-        tramites.forEach((e)->listTramites.add(e.getStrNombreTramite()));
-//
-//        listTramites.add("Baja Definitiva");
-//        listTramites.add("Baja Temporal");
-//        listTramites.add("Constancia de Expendientes");
-//        listTramites.add("Certificado Carta Pasante");
-//        listTramites.add("Constancia de Estudios");
+        }else{
+            listTramites = Arrays.asList("Seleccione");
+        }
+    }
+    public boolean showTramites(){
+        if(listaDatosAreas!=null){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     public List<String> generarHorarios(int horaInicio, int HoraFin, int DuracionCitas, List<String> horariosReservados){
@@ -213,9 +245,9 @@ public class Citas implements Serializable {
         return number.length() == 1 ? "0"+number : number;
     }
 
-    public String obtenerFechasInhabil(){
-        return "'5/10/2022','5/16/2022'";
-    }
+//    public String obtenerFechasInhabil(){
+//        return "'5/10/2022','5/16/2022'";
+//    }
 
     public void ComprobarFecha(){
         //TODO: Checar la disponibilidad.
@@ -223,6 +255,10 @@ public class Citas implements Serializable {
 
 
         listHorarios = generarHorarios(8,13,25, FromSerGetHorariosRe());
+
+        final ResultadoTO res = new ResultadoTO();
+        res.agregarMensaje(SeveridadMensajeEnum.ALERTA, "comun.label.sumario.msj.iniciar.sesion");
+        vHelp.pintarMensajes(msj, res);
     }
 
     public void AgendarCita(){
