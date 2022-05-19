@@ -106,6 +106,7 @@ public class ServicesCitas {
     }
     public static int addValues(String link, Map<String, String> valores){
         int codeResponde = 0;
+        System.out.println("---- SEND VALUES TO api save [ Run ]");
        try {
            URL url = new URL(link);
            HttpURLConnection http = (HttpURLConnection)url.openConnection();

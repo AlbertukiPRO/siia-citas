@@ -110,7 +110,7 @@ public class Citas implements Serializable {
     private String strHoraValue;
     @NotNull
     private String strDescripcion;
-
+    @NotNull
     private String fechasDisable;
     private Map<String,String> listAreas;
     private List<String> listTramites;
@@ -119,6 +119,9 @@ public class Citas implements Serializable {
     public boolean isRenderDatosAlumno() {
         return renderDatosAlumno;
     }
+
+    private boolean isAgendada;
+
 
     public void setRenderDatosAlumno(boolean renderDatosAlumno) {
         this.renderDatosAlumno = renderDatosAlumno;
@@ -195,7 +198,7 @@ public class Citas implements Serializable {
                 System.out.println(e);
             }
             fechasDisable = getFechasInhabiles();
-            vHelp.redireccionar("/vistas/citas/cita.uat");
+            //vHelp.redireccionar("/vistas/citas/cita.uat");
 
         }else{
             listTramites = Arrays.asList("Seleccione");
@@ -258,6 +261,10 @@ public class Citas implements Serializable {
         final ResultadoTO res = new ResultadoTO();
         res.agregarMensaje(SeveridadMensajeEnum.ALERTA, "comun.label.sumario.msj.iniciar.sesion");
         vHelp.pintarMensajes(msj, res);
+
+        java.util.Date date = new Date(strcalendarValue);
+        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+        strcalendarValue = formatter.format(date);
     }
 
     public void AgendarCita(){
@@ -273,8 +280,28 @@ public class Citas implements Serializable {
         valores.put("hora",strHoraValue);
 
         int codeResponse = ServicesCitas.addValues("http://localhost/siiaServices/apis/Insert.php",valores);
+
+        if (codeResponse == 200){
+            isAgendada = true;
+            pintarMensajeCitaAgendada();
+        }
     }
 
+    public void pintarMensajeCitaAgendada(){
+        if (isAgendada) {
+            isAgendada = false;
+            final ResultadoTO res = new ResultadoTO();
+            res.agregarMensaje(SeveridadMensajeEnum.ALERTA, "comun.msj.citas.citas.ok");
+            vHelp.pintarMensajes(msj, res);
+        }
+    }
+    public boolean isAgendada() {
+        return isAgendada;
+    }
+
+    public void setAgendada(boolean agendada) {
+        isAgendada = agendada;
+    }
     public String getStrDescripcion() {
         return strDescripcion;
     }
