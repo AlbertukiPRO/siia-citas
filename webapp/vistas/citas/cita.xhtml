@@ -8,7 +8,6 @@
                 template="/layouts/template.xhtml">
 
     <ui:define name="content">
-
         <f:metadata>
             <f:viewAction action="#{cita.pintarMensajeCitaAgendada()}" />
         </f:metadata>
@@ -20,6 +19,7 @@
                     <b:container styleClass="panel-body" fluid="true">
                         <legend>Citas</legend>
                         <b:form>
+<!--                            <b:commandButton  onclick="descargarPDF()"  value="Generar PDF" update="@this" styleClass="btn btn-default"></b:commandButton>-->
                             <b:row>
                                 <b:column mediumScreen="6">
                                     <b:selectOneMenu value="#{cita.listaDatosAlumn}" colMd="12" colLg="12" id="selectAlumno"
@@ -85,7 +85,7 @@
 
                                                 <f:ajax event="change" render="selectTramite" execute="@this" listener="#{cita.obtenerTramites}"></f:ajax>
 
-                                                <f:selectItem itemLabel="Seleccione --" itemValue="none" />
+                                                <f:selectItem itemLabel="Seleccione el area" itemValue="none" />
                                                 <f:selectItems value="#{cita.obtenerAreas()}" />
                                             </b:selectOneMenu>
                                         </b:column>
@@ -96,8 +96,10 @@
                                                              label="Seleccione el tramite" labelColLg="12"
                                                              ajax="true" process="@this" >
 
-                                                <f:selectItem itemLabel="(Please select)"  />
-                                                <f:selectItems value="#{cita.listTramites}" var="e" itemValue="#{e}" itemLabel="#{e}"/>
+                                                <f:ajax event="change" render="Fechas" execute="@this"></f:ajax>
+
+                                                <f:selectItem itemLabel="Selecccione su tramite"  />
+                                                <f:selectItems value="#{cita.obtenerTramites()}"/>
                                             </b:selectOneMenu>
                                         </b:column>
                                     </b:row>
@@ -107,18 +109,17 @@
                                 <b:formGroup>
                                     <b:row>
                                         <b:column mediumScreen="6">
-<!--                                            <h:outputText value="Seleccione la fecha de su cita"></h:outputText>-->
+                                            <b:dateTimePicker id="Fechas" format="MM/DD/YYYY" colMd="6" colLg="6" week-days-disabled='6,0' mediumScreen="6" labelMediumScreen="2" ajax="true" value="#{cita.strcalendarValue}" showTime="false" disabledDates="#{cita.fechasDisable}" label="Seleccione la fecha de su cita" labelColMd="12" labelColLg="12">
 
-                                            <b:dateTimePicker format="MM/DD/YYYY" colMd="6" colLg="6" locale="en" week-days-disabled='6,0' mediumScreen="6" labelMediumScreen="2" value="#{cita.strcalendarValue}" showTime="false" disabledDates="#{cita.fechasDisable}" label="Seleccione la fecha de su cita" labelColMd="12" labelColLg="12">
+                                                <f:ajax event="click" render="selectHora" execute="@this"></f:ajax>
                                             </b:dateTimePicker>
 
                                             <b:commandButton value="Comprobar disponibilidad" action="#{cita.ComprobarFecha()}" update="@form" styleClass="btn btn-default"></b:commandButton>
-
                                         </b:column>
                                         <b:column mediumScreen="6">
                                             <b:selectOneMenu value="#{cita.strHoraValue}" colMd="6" colLg="6" id="selectHora"
                                                              label="Seleccione el horario" labelColLg="8"
-                                                             ajax="true" process="@this">
+                                                             ajax="true"  process="@this">
 
                                                 <f:selectItem itemLabel="Seleccione --" itemValue="none" />
                                                 <f:selectItems value="#{cita.listHorarios}"/>
@@ -129,23 +130,32 @@
                                     <b:row>
                                         <b:column mediumScreen="3"></b:column>
                                         <b:column mediumScreen="6">
-                                            <b:inputText value="#{cita.strDescripcion}" colMd="6" colLg="6" label="Ingrese una descripcion del motivo de su cita" ajax="true" placeholder="Escriba aquí"></b:inputText>
+                                            <b:inputText value="#{cita.strDescripcion}" update="@this" colMd="6" colLg="6" label="Ingrese una descripcion del motivo de su cita" ajax="true" placeholder="Escriba aquí"></b:inputText>
                                         </b:column>
                                         <b:column mediumScreen="3"></b:column>
                                     </b:row>
+                                    <h:inputHidden id="idAlumno" value="#{auth.strUsuario}"></h:inputHidden>
                                 </b:formGroup>
                                 <b:row>
                                     <b:column mediumScreen="8"></b:column>
                                     <b:column mediumScreen="2">
-                                        <b:commandButton value="Agendar cita" styleClass="btn btn-default" action="#{cita.AgendarCita()}"></b:commandButton>
+                                        <b:commandButton value="Agendar cita" styleClass="btn btn-default" action="#{cita.AgendarCita()}" ></b:commandButton>
                                     </b:column>
                                 </b:row>
                             </b:container>
+
                         </b:form>
                     </b:container>
                 </b:container>
             </b:panel>
         </b:container>
+        <h:outputScript>
+            function descargarPDF() {
+                var idUser = document.getElementById("idAlumno").value;
+                var url = "http://localhost/siiaServices/reportes/generarPDF.php?id=";
+                window.open(url+idUser);
+            }
+        </h:outputScript>
         <!-- TODO:Agregar el output para los datos del alumno -->
     </ui:define>
 </ui:composition>

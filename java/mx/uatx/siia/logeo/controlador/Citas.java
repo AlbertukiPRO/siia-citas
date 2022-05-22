@@ -3,23 +3,39 @@ package mx.uatx.siia.logeo.controlador;
 import com.ibm.icu.text.SimpleDateFormat;
 import com.sun.istack.NotNull;
 import mx.uatx.siia.citas.CitasHelper;
+import mx.uatx.siia.citas.Reporte;
 import mx.uatx.siia.citas.ServicesCitas;
 import mx.uatx.siia.citas.modelo.Areas.areasBusiness.areaBusiness;
 import mx.uatx.siia.citas.modelo.Tramites.tramitesBusiness.tramiteBusiness;
 import mx.uatx.siia.citas.modelo.citasBusiness.citaBusiness;
+import mx.uatx.siia.citas.pruebas.Prueba;
 import mx.uatx.siia.comun.helper.VistasHelper;
+import mx.uatx.siia.reportes.GenerarReporte;
 import mx.uatx.siia.serviciosUniversitarios.dto.AreasTO;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
 import mx.uatx.siia.serviciosUniversitarios.dto.TramitesTO;
 import mx.uatx.siia.serviciosUniversitarios.enums.SeveridadMensajeEnum;
+import net.bootsfaces.component.ajax.BootsFacesAJAXActionListenerEvent;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
 import org.primefaces.behavior.ajax.AjaxBehavior;
+import org.primefaces.context.RequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.temporal.TemporalAccessor;
@@ -140,23 +156,54 @@ public class Citas implements Serializable {
 
         renderDatosAlumno = true;
 
-
         System.out.println("Cambiando los valores");
     }
 
     private CitasHelper citasHelper;
+    private GenerarReporte generarReporte;
 
     public Citas()  {
         citasHelper  = new CitasHelper();
+        generarReporte = new GenerarReporte();
         listDatosAlumno = Arrays.asList("[20181837] LICENCIATURA EN INGENIERÍA EN COMPUTACIÓN CAMPUS APIZACO (2018)");
         obtenerAreas();
         renderDatosAlumno = false;
         logger.info("Bean Citas { Constructor() }");
     }
 
+    public void ExportarPDF() throws JRException {
+
+        List<Prueba> lista = new ArrayList<Prueba>();
+        lista.add(new Prueba("20181837","Alberto"));
+
+        Map<String, Object> parametros = new HashMap<String, Object>();
+        parametros.put("strMatricula","2018183");
+        parametros.put("strNombre","Alberto Noche Rosas");
+
+        vHelp.llenarYObtenerBytesReporteJasperPDF("src/main/webapp","Reporte.jasper", lista, (HashMap<String, Object>) parametros);
+
+//        Map<String, Object> parametros = new HashMap<String, Object>();
+//        parametros.put("strMatricula","2018183");
+//        parametros.put("strNombre","Alberto Noche Rosas");
+//
+//        File jasperFile = new File(FacesContext.getCurrentInstance().getExternalContext().getRealPath("/Reporte.jasper"));
+//
+//        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperFile.getPath(), parametros);
+//
+//        HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
+//        response.addHeader("Content-Disposition","attachment;filename=ReporteCita.pdf");
+//        ServletOutputStream stream = response.getOutputStream();
+//
+//        JasperExportManager.exportReportToPdfStream(jasperPrint, stream);
+//
+//        stream.flush();
+//        stream.close();
+//        FacesContext.getCurrentInstance().responseComplete();
+    }
+
     private List<String> FromSerGetHorariosRe(){
         System.out.println("------ GET HORARIOS FROM DB  => [ Run ]");
-        List<String> horariosReservados = ServicesCitas.getHorariosAPI("http://localhost/siiaServices/apis/getFechasReservadas.php", strFechaReserva);
+        List<String> horariosReservados = ServicesCitas.getHorariosAPI("http://localhost/siiaServices/apis/getFechasReservadas.php",strFechaReserva,listaDatosAreas);
         return horariosReservados;
     }
 
@@ -183,88 +230,29 @@ public class Citas implements Serializable {
         return citasHelper.getSelectAreas();
     }
 
-    public void obtenerTramites()  {
+    public List<SelectItem> obtenerTramites()  {
         System.out.println("---- GET DATA OF TRAMITES");
-        if(listaDatosAreas!=null){
-            List<TramitesTO> tramites = ServicesCitas.getTramitesAPI("http://localhost/siiaServices/apis/getTramites.php",""+listaDatosAreas.replace(" ","%20"));
-            listTramites = new ArrayList<>();
-            try {
-                System.out.println("--- TRAMITES LIST<TramitesTO>");
-                tramites.forEach((e)-> System.out.println(e.getStrNombreTramite()));
-                tramites.forEach((i)->{
-                    listTramites.add(i.getStrNombreTramite());
-                });
-            }catch (Exception e){
-                System.out.println(e);
-            }
+        if (listaDatosAreas != null){
             fechasDisable = getFechasInhabiles();
-            //vHelp.redireccionar("/vistas/citas/cita.uat");
-
+            return citasHelper.getSelectTramites(listaDatosAreas);
         }else{
-            listTramites = Arrays.asList("Seleccione");
+            return citasHelper.getSelectTramites("1");
         }
+
     }
-    public boolean showTramites(){
-        if(listaDatosAreas!=null){
-            return true;
-        }else{
-            return false;
-        }
-    }
-
-    public List<String> generarHorarios(int horaInicio, int HoraFin, int DuracionCitas, List<String> horariosReservados){
-
-        List<String> listHorarios = new ArrayList<String>();
-
-        int hora = horaInicio;
-        int minuto = 0;
-        int residuo = 0;
-        while (hora<HoraFin){
-            if ( minuto < 59 && hora != HoraFin){
-                String item = formatHora(Integer.toString(hora))+":"+formatHora(Integer.toString(minuto));
-                listHorarios.add(item);
-            }
-            if(minuto<=60){
-                minuto+=DuracionCitas;
-            }else{
-                residuo=minuto-60;
-                minuto=residuo;
-                hora+=1;
-            }
-        }
-        horariosReservados.stream().forEach((item)->{
-            for (int i = 0; i < listHorarios.size(); i++) {
-                if (item.equals(listHorarios.get(i))){
-                    listHorarios.remove(i);
-                }
-            }
-        });
-
-        return listHorarios;
-    }
-
-    public String formatHora(String number){
-        return number.length() == 1 ? "0"+number : number;
-    }
-
-//    public String obtenerFechasInhabil(){
-//        return "'5/10/2022','5/16/2022'";
-//    }
 
     public void ComprobarFecha(){
-        //TODO: Checar la disponibilidad.
         System.out.println("------------Comprobando las disponibilidad de las fechas-----------");
 
-
-        listHorarios = generarHorarios(8,13,25, FromSerGetHorariosRe());
+        listHorarios = CitasHelper.generarHorarios(8,13,25, FromSerGetHorariosRe());
 
         final ResultadoTO res = new ResultadoTO();
-        res.agregarMensaje(SeveridadMensajeEnum.ALERTA, "comun.label.sumario.msj.iniciar.sesion");
+        res.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.fechas.ok");
         vHelp.pintarMensajes(msj, res);
 
-        java.util.Date date = new Date(strcalendarValue);
-        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
-        strcalendarValue = formatter.format(date);
+        vHelp.redireccionar("/vistas/citas/cita.uat");
+
+        setStrcalendarValue(strcalendarValue);
     }
 
     public void AgendarCita(){
@@ -279,9 +267,22 @@ public class Citas implements Serializable {
         valores.put("fecha",strcalendarValue);
         valores.put("hora",strHoraValue);
 
+        System.out.println("PUT [ Save Cita ] WITH -> "+valores);
+
         int codeResponse = ServicesCitas.addValues("http://localhost/siiaServices/apis/Insert.php",valores);
 
-        if (codeResponse == 200){
+        HttpServletResponse res = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
+        HttpServletRequest req = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        String uri = req.getRequestURI();
+        String url = "http://localhost/siiaServices/reportes/generarPDF.php?id="+localstrNombre+","+localstrMatricula;
+        try {
+            res.getWriter().println("<script>open('" + url + "','_blank', 'location=yes,height=600,width=800,scrollbars=yes,status=yes');</script>");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        FacesContext.getCurrentInstance().responseComplete();
+
+        if (codeResponse == 1){
             isAgendada = true;
             pintarMensajeCitaAgendada();
         }
@@ -289,12 +290,12 @@ public class Citas implements Serializable {
 
     public void pintarMensajeCitaAgendada(){
         if (isAgendada) {
-            isAgendada = false;
             final ResultadoTO res = new ResultadoTO();
-            res.agregarMensaje(SeveridadMensajeEnum.ALERTA, "comun.msj.citas.citas.ok");
+            res.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.citas.ok");
             vHelp.pintarMensajes(msj, res);
         }
     }
+
     public boolean isAgendada() {
         return isAgendada;
     }
@@ -338,7 +339,7 @@ public class Citas implements Serializable {
     }
 
     public void setStrcalendarValue(String strcalendarValue) {
-        this.strcalendarValue = strcalendarValue;
+        this.strcalendarValue = CitasHelper.formatDate(strcalendarValue);
     }
     public String getListaDatosTramites() {
         return listaDatosTramites;

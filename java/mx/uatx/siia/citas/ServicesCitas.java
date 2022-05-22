@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -82,19 +81,18 @@ public class ServicesCitas {
         return lista;
     }
 
-    public static List<String> getHorariosAPI(String link, String fecha){
+    public static List<String> getHorariosAPI(String link, String fecha, String idArea){
 
         System.out.println("--- GET HORARIOS => [Run]");
 
         List<String> lista;
-
         try {
-            String resultado = readUrl(link+"?fecha="+fecha);
+            String resultado = readUrl(link+"?fecha="+fecha+"&idarea="+idArea);
 
             if (!resultado.equals("0")){
                 lista = Arrays.asList(resultado.split(","));
             }else{
-                lista = new ArrayList<>();
+                lista = Collections.emptyList();
             }
 
         } catch (Exception e) {
@@ -132,7 +130,8 @@ public class ServicesCitas {
                br = new BufferedReader(new InputStreamReader(http.getErrorStream()));
                String strCurrentLine;
                while ((strCurrentLine = br.readLine()) != null) {
-                   System.out.println(strCurrentLine);
+                   System.out.println("Buffer: "+strCurrentLine);
+                   codeResponde = Integer.parseInt(strCurrentLine);
                }
            }
 
@@ -141,9 +140,7 @@ public class ServicesCitas {
 //
 //           for (Map.Entry<String,List<String>> entry : header.entrySet())
 //               System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
-
-           codeResponde = http.getResponseCode();
-           System.out.println(http.getResponseCode() + " " + http.getResponseMessage() );
+           System.out.println("Code response server and sms: "+http.getResponseCode() + " " + http.getResponseMessage() );
 
            http.disconnect();
 
