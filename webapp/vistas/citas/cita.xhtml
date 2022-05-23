@@ -40,12 +40,19 @@
                                     </b:commandButton>
                                 </b:column>
                                 <b:column mediumScreen="1">
-                                    <b:button value="Buscar Citas" styleClass="btn btn-default">
-                                    </b:button>
+                                    <b:commandButton title="Buscar Citas" action="#{misictas.UpdateValores(auth.strNombreUsuarioLogin,auth.strUsuario)}" styleClass="btn btn-default">
+                                        <f:ajax event="click" render="miscitas" execute="@this" listener="#{misictas.GetCitas}"></f:ajax>
+                                    </b:commandButton>
                                 </b:column>
                             </b:row>
+                            <b:container id="miscitas" rendered="#{misictas.IsRender()}">
+                                <legend>
+                                    Mis Citas
+                                </legend>
+
+                            </b:container>
                             <!--TODO: RENDER DEL MODO nueva CITA-->
-                            <b:container update="selectAlumno" rendered="#{cita.renderDatosAlumno}">
+                            <b:container rendered="#{cita.renderDatosAlumno}">
                                 <legend>Datos de la cita</legend>
                                 <br/>
                                 <b:container fluid="true">

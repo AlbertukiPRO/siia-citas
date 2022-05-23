@@ -1,6 +1,7 @@
 package mx.uatx.siia.citas;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.*;
+import mx.uatx.siia.citas.modelo.MisCitas;
 import mx.uatx.siia.serviciosUniversitarios.dto.AreasTO;
 import mx.uatx.siia.serviciosUniversitarios.dto.CitasTO;
 import mx.uatx.siia.serviciosUniversitarios.dto.TramitesTO;
@@ -80,7 +81,6 @@ public class ServicesCitas {
         System.out.println("Finish Horarios Reservados => [value] = "+lista.toString());
         return lista;
     }
-
     public static List<String> getHorariosAPI(String link, String fecha, String idArea){
 
         System.out.println("--- GET HORARIOS => [Run]");
@@ -150,6 +150,19 @@ public class ServicesCitas {
         return codeResponde;
     }
 
+    public static List<MisCitas> getMisCitas(String url, String strUser){
+        List<MisCitas> misCitas;
+
+        String strJson = readUrl(url+"id="+strUser);
+
+        System.out.println("----- FINISH GET MIS CITAS ---");
+        Type listType = new TypeToken<List<MisCitas>>(){}.getType();
+
+        misCitas = new Gson().fromJson(strJson,listType);
+
+
+        return misCitas;
+    }
     private static String readUrl(String urlString)  {
         System.out.println("----- GET DATA FROM URL => [Run]");
         BufferedReader reader = null;
@@ -177,4 +190,6 @@ public class ServicesCitas {
             }
         }
     }
+
+
 }

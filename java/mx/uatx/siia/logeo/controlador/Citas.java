@@ -1,27 +1,15 @@
 package mx.uatx.siia.logeo.controlador;
 
-import com.ibm.icu.text.SimpleDateFormat;
 import com.sun.istack.NotNull;
 import mx.uatx.siia.citas.CitasHelper;
-import mx.uatx.siia.citas.Reporte;
 import mx.uatx.siia.citas.ServicesCitas;
-import mx.uatx.siia.citas.modelo.Areas.areasBusiness.areaBusiness;
-import mx.uatx.siia.citas.modelo.Tramites.tramitesBusiness.tramiteBusiness;
 import mx.uatx.siia.citas.modelo.citasBusiness.citaBusiness;
 import mx.uatx.siia.citas.pruebas.Prueba;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.reportes.GenerarReporte;
-import mx.uatx.siia.serviciosUniversitarios.dto.AreasTO;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
-import mx.uatx.siia.serviciosUniversitarios.dto.TramitesTO;
 import mx.uatx.siia.serviciosUniversitarios.enums.SeveridadMensajeEnum;
-import net.bootsfaces.component.ajax.BootsFacesAJAXActionListenerEvent;
 import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import org.primefaces.behavior.ajax.AjaxBehavior;
-import org.primefaces.context.RequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,15 +18,10 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.time.Instant;
-import java.time.temporal.TemporalAccessor;
 import java.util.*;
 
 
