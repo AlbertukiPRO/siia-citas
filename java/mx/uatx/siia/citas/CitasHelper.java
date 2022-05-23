@@ -1,6 +1,7 @@
 package mx.uatx.siia.citas;
 
 import com.ibm.icu.text.SimpleDateFormat;
+import mx.uatx.siia.citas.modelo.MisCitas;
 import mx.uatx.siia.serviciosUniversitarios.dto.AreasTO;
 import mx.uatx.siia.serviciosUniversitarios.dto.TramitesTO;
 
@@ -75,6 +76,11 @@ public class CitasHelper {
         }
 
         return listHorarios;
+    }
+
+    public static List<MisCitas> getDataMisCitas(String url, String strUser){
+        List<MisCitas> listMisCitas = ServicesCitas.getMisCitas(url,strUser);
+        return listMisCitas;
     }
 
     public static String formatHora(String number){

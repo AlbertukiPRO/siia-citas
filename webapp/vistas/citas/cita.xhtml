@@ -40,8 +40,8 @@
                                     </b:commandButton>
                                 </b:column>
                                 <b:column mediumScreen="1">
-                                    <b:commandButton title="Buscar Citas" action="#{misictas.UpdateValores(auth.strNombreUsuarioLogin,auth.strUsuario)}" styleClass="btn btn-default">
-                                        <f:ajax event="click" render="miscitas" execute="@this" listener="#{misictas.GetCitas}"></f:ajax>
+                                    <b:commandButton title="Buscar Citas" value="Buscar Cita" action="#{misictas.UpdateValores(auth.strNombreUsuarioLogin,auth.strUsuario)}" styleClass="btn btn-default" onclick="location.reload();">
+                                        <f:ajax event="click" render="miscitas" execute="@this"></f:ajax>
                                     </b:commandButton>
                                 </b:column>
                             </b:row>
@@ -49,11 +49,28 @@
                                 <legend>
                                     Mis Citas
                                 </legend>
-
+                                <b:container>
+                                    <b:row>
+                                        <b:column largeScreen="10" mediumScreen="10" smallScreen="10">
+                                            <b:dataTable value="#{misictas.listMisCitas}" var="item">
+                                                <b:dataTableColumn value="#{item.strIdCita}" label="ID"></b:dataTableColumn>
+                                                <b:dataTableColumn value="#{item.strDescripcionCita}" label="Datos Cita"></b:dataTableColumn>
+                                                <b:dataTableColumn value="#{item.area}" label="Area"></b:dataTableColumn>
+                                                <b:dataTableColumn value="#{item.tramite}" label="Tramite"></b:dataTableColumn>
+                                                <b:dataTableColumn value="#{item.strRepuesta}" label="Retroalimentación"></b:dataTableColumn>
+                                                <b:dataTableColumn value="#{item.strFechaHoraReservada}" label="Fecha y Hora"></b:dataTableColumn>
+                                                <b:dataTableColumn  value="#{item.strEstatus}" label="Estatus"></b:dataTableColumn>
+                                                <b:dataTableColumn label="Cancelar" >
+                                                    <b:commandButton icon="pencil" iconSize="1x" rendered="#{misictas.isCancelable(item.strEstatus)}" styleClass="btn btn-default"></b:commandButton>
+                                                </b:dataTableColumn>
+                                            </b:dataTable>
+                                        </b:column>
+                                    </b:row>
+                                </b:container>
                             </b:container>
                             <!--TODO: RENDER DEL MODO nueva CITA-->
                             <b:container rendered="#{cita.renderDatosAlumno}">
-                                <legend>Datos de la cita</legend>
+                                <legend>Formulario nueva cita</legend>
                                 <br/>
                                 <b:container fluid="true">
                                     <b:row>

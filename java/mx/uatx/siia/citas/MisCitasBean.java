@@ -1,5 +1,6 @@
 package mx.uatx.siia.citas;
 
+import mx.uatx.siia.citas.modelo.MisCitas;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +9,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 @ManagedBean(name = "misictas")
@@ -32,6 +35,9 @@ public class MisCitasBean implements Serializable {
     private String strLocalMatricula;
     private String strLocalNombre;
 
+    private List<MisCitas> listMisCitas;
+
+
 
     public MisCitasBean(){
         System.out.println("Build Constructor Mis Citas");
@@ -42,16 +48,26 @@ public class MisCitasBean implements Serializable {
         renderMisCitas = true;
         strLocalMatricula = matricula;
         strLocalNombre = nombre;
+        GetCitas();
     }
 
     public void GetCitas(){
         System.out.println("--- GET CITAS ---");
+        listMisCitas = CitasHelper.getDataMisCitas("http://localhost/siiaServices/apis/misCitas.php",strLocalMatricula);
+        vHelp.redireccionar("/vistas/citas/cita.uat");
     }
 
     public boolean IsRender(){
-        return true;
+        return this.renderMisCitas;
     }
 
+    public boolean isCancelable(String estatus){
+        if (estatus.equals("Agendada")){
+            return true;
+        }else{
+            return false;
+        }
+    }
 
     public ResourceBundle getMsj() {
         return msj;
@@ -77,5 +93,28 @@ public class MisCitasBean implements Serializable {
         this.renderMisCitas = renderMisCitas;
     }
 
+    public String getStrLocalMatricula() {
+        return strLocalMatricula;
+    }
+
+    public void setStrLocalMatricula(String strLocalMatricula) {
+        this.strLocalMatricula = strLocalMatricula;
+    }
+
+    public String getStrLocalNombre() {
+        return strLocalNombre;
+    }
+
+    public void setStrLocalNombre(String strLocalNombre) {
+        this.strLocalNombre = strLocalNombre;
+    }
+
+    public List<MisCitas> getListMisCitas() {
+        return listMisCitas;
+    }
+
+    public void setListMisCitas(List<MisCitas> listMisCitas) {
+        this.listMisCitas = listMisCitas;
+    }
 
 }

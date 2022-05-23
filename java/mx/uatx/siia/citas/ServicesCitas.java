@@ -153,18 +153,17 @@ public class ServicesCitas {
     public static List<MisCitas> getMisCitas(String url, String strUser){
         List<MisCitas> misCitas;
 
-        String strJson = readUrl(url+"id="+strUser);
+        String strJson = readUrl(url+"?id="+strUser);
 
         System.out.println("----- FINISH GET MIS CITAS ---");
         Type listType = new TypeToken<List<MisCitas>>(){}.getType();
 
         misCitas = new Gson().fromJson(strJson,listType);
 
-
         return misCitas;
     }
     private static String readUrl(String urlString)  {
-        System.out.println("----- GET DATA FROM URL => [Run]");
+        System.out.println("----- GET DATA FROM URL => ["+urlString+"]");
         BufferedReader reader = null;
         try {
             URL url = new URL(urlString);
