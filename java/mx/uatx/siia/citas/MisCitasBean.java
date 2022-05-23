@@ -30,13 +30,36 @@ public class MisCitasBean implements Serializable {
 
     /*LOCAL ATTRIBUTES*/
 
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public String getLocalArea() {
+        return localArea;
+    }
+
+    public void setLocalArea(String localArea) {
+        this.localArea = localArea;
+    }
+
+    public String getLocalTramite() {
+        return localTramite;
+    }
+
+    public void setLocalTramite(String localTramite) {
+        this.localTramite = localTramite;
+    }
+
     private String idUser;
     private boolean renderMisCitas;
     private String strLocalMatricula;
     private String strLocalNombre;
 
-    private List<MisCitas> listMisCitas;
 
+    private List<MisCitas> listMisCitas;
+    private String localArea;
+    private String localTramite;
+    private String motivoCancelación;
 
 
     public MisCitasBean(){
@@ -69,6 +92,15 @@ public class MisCitasBean implements Serializable {
         }
     }
 
+    public void SetModalCancelar(String area, String tramite){
+        localArea =  area;
+        localTramite = tramite;
+    }
+
+    public void Cancelar(){
+
+    }
+
     public ResourceBundle getMsj() {
         return msj;
     }
@@ -91,6 +123,14 @@ public class MisCitasBean implements Serializable {
 
     public void setRenderMisCitas(boolean renderMisCitas) {
         this.renderMisCitas = renderMisCitas;
+    }
+
+    public String getMotivoCancelación() {
+        return motivoCancelación;
+    }
+
+    public void setMotivoCancelación(String motivoCancelación) {
+        this.motivoCancelación = motivoCancelación;
     }
 
     public String getStrLocalMatricula() {

@@ -61,7 +61,7 @@
                                                 <b:dataTableColumn value="#{item.strFechaHoraReservada}" label="Fecha y Hora"></b:dataTableColumn>
                                                 <b:dataTableColumn  value="#{item.strEstatus}" label="Estatus"></b:dataTableColumn>
                                                 <b:dataTableColumn label="Cancelar" >
-                                                    <b:commandButton icon="pencil" iconSize="1x" rendered="#{misictas.isCancelable(item.strEstatus)}" styleClass="btn btn-default"></b:commandButton>
+                                                    <b:commandButton icon="pencil" iconSize="1x" rendered="#{misictas.isCancelable(item.strEstatus)}" styleClass="btn btn-default" actionListener="#{misictas.SetModalCancelar(item.area,item.tramite)}"></b:commandButton>
                                                 </b:dataTableColumn>
                                             </b:dataTable>
                                         </b:column>
@@ -173,6 +173,21 @@
                 </b:container>
             </b:panel>
         </b:container>
+
+        <b:modal id="modalCancelar" title="Cancelar Cita" styleClass="modalInformativo">
+            <p>Esta a punto de cancelar su cita con el area de <h:outputText value="#{misictas.localArea}"></h:outputText> con el objetivo de  <h:outputText value="#{misictas.localTramite}"></h:outputText> </p>
+            <h:form>
+                <b:inputText placeholder="Escribe aquí" value="#{misictas.motivoCancelación}"></b:inputText>
+
+                <b:commandButton title="Cancelar" value="Cancelar" action="#{misictas.Cancelar()}" styleClass="btn btn-default">
+                </b:commandButton>
+            </h:form>
+            <f:facet name="footer">
+                <b:button value="Close" dismiss="modal" />
+                <b:button value="Ok" look="primary" dismiss="modal" />
+            </f:facet>
+        </b:modal>
+
         <h:outputScript>
             function descargarPDF() {
                 var idUser = document.getElementById("idAlumno").value;
