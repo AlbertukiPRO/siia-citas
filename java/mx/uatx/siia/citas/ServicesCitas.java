@@ -162,6 +162,9 @@ public class ServicesCitas {
 
         return misCitas;
     }
+
+
+
     private static String readUrl(String urlString)  {
         System.out.println("----- GET DATA FROM URL => ["+urlString+"]");
         BufferedReader reader = null;

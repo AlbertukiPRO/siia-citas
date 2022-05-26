@@ -60,7 +60,7 @@ public class MisCitasBean implements Serializable {
     private String localArea;
     private String localTramite;
     private String motivoCancelación;
-
+    private String anoActual;
 
     public MisCitasBean(){
         System.out.println("Build Constructor Mis Citas");
@@ -72,12 +72,12 @@ public class MisCitasBean implements Serializable {
         strLocalMatricula = matricula;
         strLocalNombre = nombre;
         GetCitas();
+        vHelp.redireccionar("/vistas/citas/cita.uat");
     }
 
     public void GetCitas(){
         System.out.println("--- GET CITAS ---");
         listMisCitas = CitasHelper.getDataMisCitas("http://localhost/siiaServices/apis/misCitas.php",strLocalMatricula);
-        vHelp.redireccionar("/vistas/citas/cita.uat");
     }
 
     public boolean IsRender(){
@@ -98,7 +98,7 @@ public class MisCitasBean implements Serializable {
     }
 
     public void Cancelar(){
-
+        System.out.println("--- CANCELAR CITA--");
     }
 
     public ResourceBundle getMsj() {

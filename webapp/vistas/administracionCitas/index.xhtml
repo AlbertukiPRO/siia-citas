@@ -1,52 +1,81 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:b="http://bootsfaces.net/ui"
-      xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui">
-
-<h:head>
-    <title>SIIA</title>
-    <link rel="stylesheet" type="text/css" href="/SIIA/resources/css/adminCitas.css" />
-
-</h:head>
-<h:body>
-    <header>
-        <b:container styleClass="menuHeader">
-            <b:container styleClass="activeMenu">
-                <h4><h:outputText value="Tablero"></h:outputText></h4>
-            </b:container>
-            <b:container >
-                <h4><h:outputText value="Linea de Tiempo"></h:outputText></h4>
-            </b:container>
-            <b:container >
-                <h4><h:outputText value="Reportes"></h:outputText></h4>
-            </b:container>
-        </b:container>
-
-        <b:container styleClass="profile">
-            <figure>
-                <img src="https://i.pinimg.com/originals/1f/8e/66/1f8e6642fa0dc8d2b5135c319c6b911e.jpg" alt="" />
-            </figure>
-            <b:container styleClass="dataprofile">
-                <h4><h:outputText value="Lic. Anita Gomez"></h:outputText></h4>
-                <span><h:outputText value="Servicios Escolares"></h:outputText></span>
-            </b:container>
-        </b:container>
-    </header>
-    <main>
-        <b:container styleClass="calendar">
-            <div>
-                <b:container styleClass="titleCalendar">
-                    <p>Calendario</p>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:b="http://bootsfaces.net/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="/layouts/template.xhtml">
+    <ui:define name="content">
+        <header>
+            <b:container styleClass="menuHeader">
+                <b:container styleClass="activeMenu">
+                    <h4><h:outputText value="Tablero"></h:outputText></h4>
                 </b:container>
-                <b:container>
-                    <b:commandButton styleClass="btn btn-default" value="Regarcar" icon="fa-rotate-left"></b:commandButton>
+                <b:container >
+                    <h4><h:outputText value="Linea de Tiempo"></h:outputText></h4>
                 </b:container>
-            </div>
-        </b:container>
-    </main>
-</h:body>
-</html>
+                <b:container >
+                    <h4><h:outputText value="Reportes"></h:outputText></h4>
+                </b:container>
+            </b:container>
+
+            <b:container styleClass="profile">
+                <figure>
+                    <img src="https://i.pinimg.com/originals/1f/8e/66/1f8e6642fa0dc8d2b5135c319c6b911e.jpg" alt="" />
+                </figure>
+                <b:container styleClass="dataprofile">
+                    <span><h:outputText value="Lic. Anita Gomez"></h:outputText></span>
+                    <span><h:outputText value="Servicios Escolares"></h:outputText></span>
+                </b:container>
+            </b:container>
+        </header>
+        <main>
+            <h:form>
+                <b:container styleClass="calendar">
+                    <b:container styleClass="div">
+                        <b:row>
+                            <b:column largeScreen="4" mediumScreen="4">
+                                <b:container styleClass="titleCalendar">
+                                    <p>Calendario</p>
+                                </b:container>
+                            </b:column>
+                            <b:column mediumScreen="1" largeScreen="1">
+                                <b:commandButton styleClass="btn btn-default btnReload" mediumScreen="1" value="Recargar" icon="reload"></b:commandButton>
+                            </b:column>
+                        </b:row>
+                    </b:container>
+                    <b:container styleClass="scroll">
+                        <b:row>
+                            <b:column largeScreen="1" mediumScreen="1" smallScreen="1">
+                                <h:outputText value="#{admin.anoActual}"></h:outputText>
+                            </b:column>
+                            <b:column largeScreen="5" mediumScreen="5">
+                                <ui:repeat value="#{admin.listMeses}" var="item">
+                                    <p:commandButton styleClass="#{item == admin.mesActual ? 'itemDate':'btn btn-default'}" value="#{item}" action="#{admin.RefrescarFechas(item)}" update="@form">
+                                    </p:commandButton>
+                                </ui:repeat>
+                            </b:column>
+                        </b:row>
+                    </b:container>
+                    <br/>
+                    <b:container id="fechaslist" largeScreen="5" mediumScreen="5">
+                        <label>Fechas</label>
+                        <b:row>
+                            <b:column styleClass="scroll">
+                                <ui:repeat value="#{admin.listDias}" var="fecha">
+                                    <p:commandButton value="#{fecha}" styleClass="#{fecha == admin.today ? 'dateSelected':'itemDate'}" action=""></p:commandButton>
+                                </ui:repeat>
+                            </b:column>
+                        </b:row>
+                    </b:container>
+                    <br/>
+                    <b:container id="PanelCitas">
+
+                    </b:container>
+                </b:container>
+            </h:form>
+        </main>
+    </ui:define>
+</ui:composition>

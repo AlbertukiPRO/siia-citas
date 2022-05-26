@@ -95,6 +95,10 @@ main {
     align-items: center;
 }
 
+main form {
+    width: min-content;
+}
+
 main .calendar {
     box-shadow: 0 0 0.5rem #ECECEC;
     width: 55%;
@@ -111,16 +115,31 @@ main .config {
     border-radius: 9px;
 }
 
-main .calendar div {
-    border-bottom: 0.5px #C4C4C4 solid;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
 .calendar .titleCalendar {
     padding: 0px 35px;
+    width: min-content;
 }
+
+.btn
+{
+    font-size: 11px;
+    font-weight: none;
+    font-family: Roboto;
+    padding: 4px 12px;
+
+}
+
+.btn-default {
+    background-image: linear-gradient(to bottom, #a80000, #a80000);
+    border: 0px;
+}
+
+.btn-default:hover {
+    background-image: linear-gradient(to bottom, #a80000, #ff0000);
+    background-color: #82133d;
+    border: 0px;
+}
+
 
 .titleCalendar p {
     font-family: sans-serif;
@@ -132,7 +151,7 @@ main .calendar div {
     border-bottom: 3px #82133d solid;
 }
 
-.calendar div .btnReload {
+.calendar .div .btnReload {
     width: min-content;
     height: min-content;
     padding: 5px 10px;
@@ -153,4 +172,57 @@ main .calendar div {
 
 .btnReload span {
     margin-left: 15px;
+}
+
+.Meses {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+}
+
+.itemMes {
+    border-radius: 9px;
+    background-color: #82133d;
+    color: white;
+    font-size: 12px;
+    padding: 5px;
+    margin: 0px 15px;
+    cursor: pointer;
+}
+
+.scroll {
+    height: 80px;
+    max-width: 800px;
+    overflow-x: scroll;
+    white-space: nowrap;
+}
+
+.itemDate{
+    font-size: 13px;
+    text-transform: uppercase;
+    padding: 3px;
+    margin-left: 5px;
+}
+
+.dateSelected {
+    background-color: #82133d;
+    padding: 3pt;
+    margin-left: 6px;
+    color: white;
+}
+
+.panelCitas {
+        width: 100%;
+}
+
+.panelCitas .titlepanel {
+    position: relative;
+    display: inline-block;
+}
+
+.titlepanel h5 {
+    position: absolute;
+    bottom: 9px;
+    left: 50px;
 }

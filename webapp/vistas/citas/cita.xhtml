@@ -60,10 +60,12 @@
                                                 <b:dataTableColumn value="#{item.strRepuesta}" label="Retroalimentación"></b:dataTableColumn>
                                                 <b:dataTableColumn value="#{item.strFechaHoraReservada}" label="Fecha y Hora"></b:dataTableColumn>
                                                 <b:dataTableColumn  value="#{item.strEstatus}" label="Estatus"></b:dataTableColumn>
-                                                <b:dataTableColumn label="Cancelar" >
-                                                    <b:commandButton icon="pencil" iconSize="1x" rendered="#{misictas.isCancelable(item.strEstatus)}" styleClass="btn btn-default" actionListener="#{misictas.SetModalCancelar(item.area,item.tramite)}"></b:commandButton>
+                                                <b:dataTableColumn label="Cancelar" rendered="#{misictas.isCancelable(item.strEstatus)}" >
+                                                    <b:commandButton icon="pencil" iconSize="1x" styleClass="btn btn-default" onclick="$('.modalCancelar').modal()" action="#{misictas.SetModalCancelar(item.area,item.tramite)}"></b:commandButton>
+                                                    <h:inputHidden value="#{misictas.localTramite}" id="tramite"></h:inputHidden>
                                                 </b:dataTableColumn>
                                             </b:dataTable>
+
                                         </b:column>
                                     </b:row>
                                 </b:container>
@@ -174,7 +176,7 @@
             </b:panel>
         </b:container>
 
-        <b:modal id="modalCancelar" title="Cancelar Cita" styleClass="modalInformativo">
+        <b:modal id="modalCancelar" title="Cancelar Cita" styleClass="modalCancelar">
             <p>Esta a punto de cancelar su cita con el area de <h:outputText value="#{misictas.localArea}"></h:outputText> con el objetivo de  <h:outputText value="#{misictas.localTramite}"></h:outputText> </p>
             <h:form>
                 <b:inputText placeholder="Escribe aquí" value="#{misictas.motivoCancelación}"></b:inputText>
@@ -183,10 +185,15 @@
                 </b:commandButton>
             </h:form>
             <f:facet name="footer">
-                <b:button value="Close" dismiss="modal" />
-                <b:button value="Ok" look="primary" dismiss="modal" />
+                <b:button value="Cerrar" dismiss="modal" />
+                <b:button value="Estoy de acuerdo" look="btn btn-default" dismiss="modal" />
             </f:facet>
         </b:modal>
+        <script>
+            $(document).ready(function () {
+                $('.modalCancelar').modal();
+            });
+        </script>
 
         <h:outputScript>
             function descargarPDF() {
