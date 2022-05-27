@@ -65,14 +65,47 @@
                         <b:row>
                             <b:column styleClass="scroll">
                                 <ui:repeat value="#{admin.listDias}" var="fecha">
-                                    <p:commandButton value="#{fecha}" styleClass="#{fecha == admin.today ? 'dateSelected':'itemDate'}" action=""></p:commandButton>
+                                    <p:commandButton value="#{fecha}" styleClass="#{fecha == admin.today ? 'dateSelected':'itemDate'}"></p:commandButton>
                                 </ui:repeat>
                             </b:column>
                         </b:row>
                     </b:container>
                     <br/>
                     <b:container id="PanelCitas">
-
+                        <b:container styleClass="titlepanel">
+                            <h:outputText value="#{admin.strDia}"></h:outputText>
+                            <h:outputText value="#{admin.today}"></h:outputText>
+                        </b:container>
+                        <b:container styleClass="contenpanel">
+                           <b:container styleClass="hora">
+                               <label><h:outputText value="9:45"></h:outputText></label>
+                           </b:container>
+                            <b:container styleClass="circles">
+                                <b:container styleClass="mayor"></b:container>
+                                <b:container styleClass="minicircle"></b:container>
+                                <b:container styleClass="minicircle"></b:container>
+                                <b:container styleClass="minicircle"></b:container>
+                                <b:container styleClass="minicircle"></b:container>
+                            </b:container>
+                            <b:container styleClass="contenido">
+                                <b:container styleClass="subcontenido">
+                                    <b:container styleClass="title_subcont">
+                                        <h6>Asunto:</h6>
+                                        <h6>Departamento:</h6>
+                                    </b:container>
+                                    <b:container styleClass="descrip_subcont">
+                                        <h6>
+                                           <h:outputText value="Correcion documentos"></h:outputText>
+                                           <h:outputText value="Servicios Escolares"></h:outputText>
+                                        </h6>
+                                    </b:container>
+                                    <p><h:outputText value="20181837"></h:outputText></p>
+                                    <figure>
+                                        <img src="https://qph.fs.quoracdn.net/main-thumb-582682478-200-brnqarmxvoghbimyylsupjelucaavxfd.jpeg"/>
+                                    </figure>
+                                </b:container>
+                            </b:container>
+                        </b:container>
                     </b:container>
                 </b:container>
             </h:form>

@@ -8,12 +8,11 @@ import org.springframework.web.context.annotation.SessionScope;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 @SessionScope
 @ManagedBean(name = "admin")
@@ -44,7 +43,7 @@ public class AdminCitasBean implements Serializable {
     private List<String> listDias;
     private int today;
     private String mesActual;
-
+    private String strDia;
 
     public AdminCitasBean(){
         listMeses = Arrays.asList("Enero", "Febrero", "Marzo","Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre","Octubre", "Noviembre", "Diciembre");
@@ -57,6 +56,25 @@ public class AdminCitasBean implements Serializable {
         System.out.println("--- Month => "+mesActual);
 
         GetCitasFromDia(today);
+
+        getDayString();
+    }
+
+    private void getDayString(){
+
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+            Date dt1=format.parse("05/26/2022");
+            DateFormat format2=new SimpleDateFormat("EEEE");
+            String finalDay=format2.format(dt1);
+            System.out.println(finalDay);
+
+            this.strDia = finalDay;
+        }catch (Exception e){
+            System.out.println(e);
+        }
+
+
     }
 
     public void GenerarFechas(int mes){
@@ -176,6 +194,14 @@ public class AdminCitasBean implements Serializable {
     public void setMesActual(String mesActual) {
         this.mesActual = mesActual;
     }
+    public String getStrDia() {
+        return strDia;
+    }
+
+    public void setStrDia(String strDia) {
+        this.strDia = strDia;
+    }
+
 
 
     public List<String> getListDias() {
