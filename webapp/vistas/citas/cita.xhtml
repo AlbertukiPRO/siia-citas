@@ -40,8 +40,7 @@
                                     </b:commandButton>
                                 </b:column>
                                 <b:column mediumScreen="1">
-                                    <b:commandButton title="Buscar Citas" value="Buscar Cita" action="#{misictas.UpdateValores(auth.strNombreUsuarioLogin,auth.strUsuario)}" styleClass="btn btn-default" onclick="location.reload();">
-                                        <f:ajax event="click" render="miscitas" execute="@this"></f:ajax>
+                                    <b:commandButton title="Buscar Citas" value="Buscar Cita" action="#{misictas.UpdateValores(auth.strNombreUsuarioLogin,auth.strUsuario)}" styleClass="btn btn-default" update="@form">
                                     </b:commandButton>
                                 </b:column>
                             </b:row>
@@ -191,7 +190,9 @@
         </b:modal>
         <script>
             $(document).ready(function () {
-                $('.modalCancelar').modal();
+                function showModal() {
+                    $('.modalCancelar').modal();
+                }
             });
         </script>
 

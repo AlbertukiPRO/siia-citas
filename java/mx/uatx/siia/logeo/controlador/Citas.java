@@ -13,9 +13,7 @@ import net.sf.jasperreports.engine.JRException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.SessionScoped;
+import javax.faces.bean.*;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +24,7 @@ import java.util.*;
 
 
 @ManagedBean(name = "cita")
-@SessionScoped
+@RequestScoped
 public class Citas implements Serializable {
     /**
      * serialVersionUID

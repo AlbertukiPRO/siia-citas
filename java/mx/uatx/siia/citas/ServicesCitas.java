@@ -163,7 +163,16 @@ public class ServicesCitas {
         return misCitas;
     }
 
+    public static List<MisCitas> getCitasFromArea(String url, String strArea, String dia){
+        List<MisCitas> misCitas;
 
+        String strJson = readUrl(url+"?idArea="+strArea+"&dia="+dia);
+        System.out.println("---- GET CITAS DEL AREA");
+        Type lisType = new TypeToken<List<MisCitas>>(){}.getType();
+        misCitas = new Gson().fromJson(strJson, lisType);
+
+        return misCitas;
+    }
 
     private static String readUrl(String urlString)  {
         System.out.println("----- GET DATA FROM URL => ["+urlString+"]");

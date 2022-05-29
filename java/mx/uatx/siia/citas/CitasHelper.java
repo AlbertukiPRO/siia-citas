@@ -79,6 +79,7 @@ public class CitasHelper {
     }
 
     public static List<MisCitas> getDataMisCitas(String url, String strUser){
+        System.out.println("--- GET CITAS FROM [ "+url+"] ---");
         List<MisCitas> listMisCitas = ServicesCitas.getMisCitas(url,strUser);
         return listMisCitas;
     }

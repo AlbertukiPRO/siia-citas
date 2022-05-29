@@ -1,5 +1,6 @@
 package mx.uatx.siia.citas;
 
+import mx.uatx.siia.citas.modelo.MisCitas;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,15 +8,20 @@ import org.springframework.web.context.annotation.SessionScope;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.RequestScoped;
+import javax.xml.transform.Result;
 import java.io.Serializable;
+import java.sql.ResultSet;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-@SessionScope
 @ManagedBean(name = "admin")
+@RequestScoped
 public class AdminCitasBean implements Serializable {
 
     /**
@@ -44,10 +50,13 @@ public class AdminCitasBean implements Serializable {
     private int today;
     private String mesActual;
     private String strDia;
+    private String strIdArea;
+    private List<MisCitas> listCitas;
 
     public AdminCitasBean(){
         listMeses = Arrays.asList("Enero", "Febrero", "Marzo","Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre","Octubre", "Noviembre", "Diciembre");
         GenerarFechas(4);
+        strIdArea = "1";
         LocalDate todaylocal = LocalDate.now();
         today = todaylocal.getDayOfMonth();
         mesActual = GetIndexMes(todaylocal.getMonthValue()-1);
@@ -55,9 +64,9 @@ public class AdminCitasBean implements Serializable {
         System.out.println("--- Today => "+today);
         System.out.println("--- Month => "+mesActual);
 
-        GetCitasFromDia(today);
-
         getDayString();
+        obtenerCitasGlobales();
+
     }
 
     private void getDayString(){
@@ -73,8 +82,20 @@ public class AdminCitasBean implements Serializable {
         }catch (Exception e){
             System.out.println(e);
         }
+    }
 
+    public void obtenerCitasGlobales(){
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        LocalDateTime now = LocalDateTime.now();
+        listCitas = ServicesCitas.getCitasFromArea("http://localhost/siiaServices/apis/misCitas.php",strIdArea,dtf.format(now));
+    }
 
+    public void obtenerCitasFromDia(String dia){
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        LocalDateTime now = LocalDateTime.now();
+        String fecha = dtf.format(now);
+        String subStrin[] = fecha.split("/");
+        listCitas = ServicesCitas.getCitasFromArea("http://localhost/siiaServices/apis/misCitas.php",strIdArea,subStrin[0]+"/"+dia+"/"+subStrin[2]);
     }
 
     public void GenerarFechas(int mes){
@@ -86,14 +107,6 @@ public class AdminCitasBean implements Serializable {
             listDias.add(Integer.toString(i));
         }
         System.out.println("--- FECHAS GENERADAS : "+listDias);
-    }
-
-    public void GetCitasFromDia(int dia){
-
-        System.out.println("--GET CITAS FROM DIA");
-
-
-
     }
 
     public void RefrescarFechas(String mes){
@@ -202,7 +215,13 @@ public class AdminCitasBean implements Serializable {
         this.strDia = strDia;
     }
 
+    public List<MisCitas> getListCitas() {
+        return listCitas;
+    }
 
+    public void setListCitas(List<MisCitas> listCitas) {
+        this.listCitas = listCitas;
+    }
 
     public List<String> getListDias() {
         return listDias;

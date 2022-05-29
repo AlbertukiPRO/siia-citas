@@ -7,14 +7,13 @@ import org.slf4j.LoggerFactory;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.SessionScoped;
+import javax.faces.bean.RequestScoped;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
 @ManagedBean(name = "misictas")
-@SessionScoped
+@RequestScoped
 public class MisCitasBean implements Serializable {
 
     /**
@@ -72,11 +71,9 @@ public class MisCitasBean implements Serializable {
         strLocalMatricula = matricula;
         strLocalNombre = nombre;
         GetCitas();
-        vHelp.redireccionar("/vistas/citas/cita.uat");
     }
 
     public void GetCitas(){
-        System.out.println("--- GET CITAS ---");
         listMisCitas = CitasHelper.getDataMisCitas("http://localhost/siiaServices/apis/misCitas.php",strLocalMatricula);
     }
 
