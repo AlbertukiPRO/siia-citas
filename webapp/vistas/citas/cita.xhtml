@@ -36,7 +36,7 @@
                             <b:row>
                                 <b:column mediumScreen="8"></b:column>
                                 <b:column mediumScreen="1">
-                                    <b:commandButton styleClass="btn btn-default"  action="#{cita.updateValues(auth.strNombreUsuarioLogin,auth.strUsuario)}" title="Nueva cita" onclick="location.reload();" value="Nueva cita">
+                                    <b:commandButton styleClass="btn btn-default"  action="#{cita.updateValues(auth.strNombreUsuarioLogin,auth.strUsuario)}" title="Nueva cita" update="@form" value="Nueva cita">
                                     </b:commandButton>
                                 </b:column>
                                 <b:column mediumScreen="1">
@@ -134,17 +134,17 @@
                                 <b:formGroup>
                                     <b:row>
                                         <b:column mediumScreen="6">
-                                            <b:dateTimePicker id="Fechas" format="MM/DD/YYYY" colMd="6" colLg="6" week-days-disabled='6,0' mediumScreen="6" labelMediumScreen="2" ajax="true" value="#{cita.strcalendarValue}" showTime="false" disabledDates="#{cita.fechasDisable}" label="Seleccione la fecha de su cita" labelColMd="12" labelColLg="12">
+                                            <b:dateTimePicker id="Fechas" format="MM/DD/YYYY"  colMd="6" colLg="6" week-days-disabled='6,0' mediumScreen="6" labelMediumScreen="2" ajax="true" value="#{cita.strcalendarValue}" showTime="false" disabledDates="#{cita.fechasDisable}" label="Seleccione la fecha de su cita" labelColMd="12" labelColLg="12">
 
-                                                <f:ajax event="click" render="selectHora" execute="@this"></f:ajax>
+                                                <f:ajax event="click" execute="@this" listener="#{cita.ComprobarFecha()}"></f:ajax>
                                             </b:dateTimePicker>
 
-                                            <b:commandButton value="Comprobar disponibilidad" action="#{cita.ComprobarFecha()}" update="@form" styleClass="btn btn-default"></b:commandButton>
+                                            <b:commandButton value="Comprobar disponibilidad" update="selectHora" styleClass="btn btn-default"></b:commandButton>
                                         </b:column>
                                         <b:column mediumScreen="6">
                                             <b:selectOneMenu value="#{cita.strHoraValue}" colMd="6" colLg="6" id="selectHora"
                                                              label="Seleccione el horario" labelColLg="8"
-                                                             ajax="true"  process="@this">
+                                                             ajax="true" process="@this">
 
                                                 <f:selectItem itemLabel="Seleccione --" itemValue="none" />
                                                 <f:selectItems value="#{cita.listHorarios}"/>
@@ -155,7 +155,7 @@
                                     <b:row>
                                         <b:column mediumScreen="3"></b:column>
                                         <b:column mediumScreen="6">
-                                            <b:inputText value="#{cita.strDescripcion}" update="@this" colMd="6" colLg="6" label="Ingrese una descripcion del motivo de su cita" ajax="true" placeholder="Escriba aquí"></b:inputText>
+                                            <b:inputText value="#{cita.strDescripcion}"  colMd="6" colLg="6" label="Ingrese una descripcion del motivo de su cita" ajax="true" placeholder="Escriba aquí"></b:inputText>
                                         </b:column>
                                         <b:column mediumScreen="3"></b:column>
                                     </b:row>

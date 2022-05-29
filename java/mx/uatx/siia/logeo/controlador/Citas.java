@@ -231,8 +231,6 @@ public class Citas implements Serializable {
         res.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.fechas.ok");
         vHelp.pintarMensajes(msj, res);
 
-        vHelp.redireccionar("/vistas/citas/cita.uat");
-
         setStrcalendarValue(strcalendarValue);
     }
 

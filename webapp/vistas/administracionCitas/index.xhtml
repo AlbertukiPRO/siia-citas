@@ -32,94 +32,109 @@
             </b:container>
         </header>
         <b:row>
-            <b:column span="2"></b:column>
             <b:column span="5">
-                <main>
-                    <h:form>
-                        <b:container styleClass="calendar">
-                            <b:container styleClass="div">
-                                <b:row>
-                                    <b:column largeScreen="4" mediumScreen="4">
-                                        <b:container styleClass="titleCalendar">
-                                            <p>Calendario</p>
-                                        </b:container>
-                                    </b:column>
-                                    <b:column mediumScreen="4" largeScreen="4">
-                                        <b:commandButton styleClass="btn btn-default" mediumScreen="1" value="Recargar" iconAwesome="fa-solid fa-rotate-right"></b:commandButton>
-                                    </b:column>
-                                </b:row>
-                            </b:container>
-                            <b:container styleClass="scroll" fluid="true">
-                                <b:row>
-                                    <b:column largeScreen="1" mediumScreen="1" smallScreen="1">
-                                        <h:outputText value="#{admin.anoActual}"></h:outputText>
-                                    </b:column>
-                                    <b:column largeScreen="1" mediumScreen="1">
-                                        <ui:repeat value="#{admin.listMeses}" var="item">
-                                            <p:commandButton styleClass="#{item == admin.mesActual ? 'itemDate':'btn btn-default'}" value="#{item}" action="#{admin.RefrescarFechas(item)}" update="@form">
-                                            </p:commandButton>
-                                        </ui:repeat>
-                                    </b:column>
-                                </b:row>
-                            </b:container>
-                            <br/>
-                            <b:column span="2"></b:column>
-                            <b:container id="fechaslist" largeScreen="5" mediumScreen="5">
-                                <label>Fechas</label>
-                                <b:row>
-                                    <b:column styleClass="scroll" rendered="#{admin.listCitas.size()!=0}">
-                                        <ui:repeat value="#{admin.listDias}" var="fecha">
-                                            <p:commandButton ajax="true" value="#{fecha}" styleClass="#{fecha == admin.today ? 'dateSelected':'itemDate'}" action="#{admin.obtenerCitasFromDia(fecha)}" update="@form"></p:commandButton>
-                                        </ui:repeat>
-                                    </b:column>
-
-                                </b:row>
-                            </b:container>
-                            <br/>
-                            <b:column rendered="#{admin.listCitas.size() == null}">
-                                <h:outputText value="Sin citas para hoy"></h:outputText>
-                            </b:column>
-                            <b:container id="PanelCitas" rendered="#{admin.listCitas!=null}">
-                                <ui:repeat value="#{admin.listCitas}" var="e">
-                                    <b:container styleClass="titlepanel">
-                                        <h:outputText value="#{admin.strDia}"></h:outputText>
-                                        <h:outputText value="#{admin.today}"></h:outputText>
-                                    </b:container>
-                                    <b:container styleClass="contenpanel">
-                                        <b:container styleClass="hora">
-                                            <label><h:outputText value="#{e.strFechaHoraReservada}"></h:outputText></label>
-                                        </b:container>
-                                        <b:container styleClass="circles">
-                                            <b:container styleClass="mayor"></b:container>
-                                            <b:container styleClass="minicircle"></b:container>
-                                            <b:container styleClass="minicircle"></b:container>
-                                            <b:container styleClass="minicircle"></b:container>
-                                            <b:container styleClass="minicircle"></b:container>
-                                        </b:container>
-                                        <b:container styleClass="contenido">
-                                            <b:container styleClass="subcontenido">
-                                                <b:container styleClass="title_subcont">
-                                                    <h6>Asunto:</h6>
-                                                    <h6>Departamento:</h6>
-                                                </b:container>
-                                                <b:container styleClass="descrip_subcont">
-                                                    <h6>
-                                                        <h:outputText value="#{e.area}"></h:outputText>
-                                                        <h:outputText value="#{e.tramite}"></h:outputText>
-                                                    </h6>
-                                                </b:container>
-                                                <p><h:outputText value="#{e.strUser}"></h:outputText></p>
-                                                <figure>
-                                                    <img src="https://qph.fs.quoracdn.net/main-thumb-582682478-200-brnqarmxvoghbimyylsupjelucaavxfd.jpeg"/>
-                                                </figure>
+                <b:container styleClass="panel panel-default">
+                    <main>
+                        <h:form>
+                            <b:container styleClass="calendar">
+                                <b:container styleClass="div">
+                                    <b:row>
+                                        <b:column largeScreen="4" mediumScreen="4">
+                                            <b:container styleClass="titleCalendar">
+                                                <p>Calendario</p>
                                             </b:container>
+                                        </b:column>
+                                        <b:column mediumScreen="4" largeScreen="4">
+                                            <b:commandButton styleClass="btn btn-default" mediumScreen="1" value="Recargar" iconAwesome="fa-solid fa-rotate-right"></b:commandButton>
+                                        </b:column>
+                                    </b:row>
+                                </b:container>
+                                <b:container styleClass="scroll" fluid="true">
+                                    <b:row>
+                                        <b:column largeScreen="4" mediumScreen="4">
+                                            <h:outputText value="#{admin.anoActual}"></h:outputText>
+                                        </b:column>
+                                        <b:column largeScreen="1" mediumScreen="1">
+                                            <ui:repeat value="#{admin.listMeses}" var="item">
+                                                <p:commandButton styleClass="#{item == admin.mesActual ? 'itemDate':'btn btn-default'}" value="#{item}" action="#{admin.RefrescarFechas(item)}" update="@form">
+                                                </p:commandButton>
+                                            </ui:repeat>
+                                        </b:column>
+                                    </b:row>
+                                </b:container>
+                                <br/>
+                                <b:column span="2"></b:column>
+                                <b:container id="fechaslist" largeScreen="5" mediumScreen="5">
+                                    <label>Fechas</label>
+                                    <b:row>
+                                        <b:column styleClass="scroll" rendered="#{admin.listCitas.size()!=0}">
+                                            <ui:repeat value="#{admin.listDias}" var="fecha">
+                                                <p:commandButton ajax="true" value="#{fecha}" styleClass="#{fecha == admin.today ? 'dateSelected':'itemDate'}" action="#{admin.obtenerCitasFromDia(fecha)}" update="@form"></p:commandButton>
+                                            </ui:repeat>
+                                        </b:column>
+
+                                    </b:row>
+                                </b:container>
+                                <br/>
+                                <b:column rendered="#{admin.listCitas.size() == null}">
+                                    <h:outputText value="Sin citas para hoy" style="font-size: 25px;font-weight: bold;padding: 15px; text-align: center"></h:outputText>
+                                </b:column>
+                                <b:container id="PanelCitas"  styleClass="panelCitas panel-body" rendered="#{admin.listCitas!=null}">
+                                    <ui:repeat value="#{admin.listCitas}" var="e">
+                                        <b:container styleClass="titlepanel">
+                                            <h3>
+                                                <h:outputText value="#{admin.strDia}"></h:outputText>
+                                            </h3>
+                                            <h5>
+                                                <h:outputText value="#{admin.today}"></h:outputText>
+                                            </h5>
                                         </b:container>
-                                    </b:container>
-                                </ui:repeat>
+                                        <b:container styleClass="contenpanel">
+                                            <b:row>
+                                                <b:column span="1">
+                                                    <b:container styleClass="hora">
+                                                        <label><h:outputText value="#{e.strFechaHoraReservada}"></h:outputText></label>
+                                                    </b:container>
+                                                </b:column>
+                                                <b:column span="2">
+                                                    <b:container styleClass="circles" style="width: 50px;">
+                                                        <b:container styleClass="mayor"></b:container>
+                                                        <b:container styleClass="minicircle"></b:container>
+                                                        <b:container styleClass="minicircle"></b:container>
+                                                        <b:container styleClass="minicircle"></b:container>
+                                                        <b:container styleClass="minicircle"></b:container>
+                                                    </b:container>
+                                                </b:column>
+                                                <b:column span="6">
+                                                    <b:container styleClass="contenido">
+                                                        <b:container styleClass="subcontenido" fluid="true">
+                                                            <b:container styleClass="title_subcont" fluid="true">
+                                                                <h4>Asunto:</h4>
+                                                                <h4>Departamento:</h4>
+                                                            </b:container>
+                                                            <b:container styleClass="descrip_subcont" style="width: 200px;">
+                                                                <h4>
+                                                                    <h:outputText value="#{e.area}"></h:outputText>
+                                                                </h4>
+                                                                <h4>
+                                                                    <h:outputText value="#{e.tramite}"></h:outputText>
+                                                                </h4>
+                                                            </b:container>
+                                                            <p><h:outputText value="#{e.strUser}"></h:outputText></p>
+                                                            <figure>
+                                                                <img src="https://qph.fs.quoracdn.net/main-thumb-582682478-200-brnqarmxvoghbimyylsupjelucaavxfd.jpeg"/>
+                                                            </figure>
+                                                        </b:container>
+                                                    </b:container>
+                                                </b:column>
+                                            </b:row>
+                                        </b:container>
+                                    </ui:repeat>
+                                </b:container>
                             </b:container>
-                        </b:container>
-                    </h:form>
-                </main>
+                        </h:form>
+                    </main>
+                </b:container>
             </b:column>
         </b:row>
     </ui:define>
