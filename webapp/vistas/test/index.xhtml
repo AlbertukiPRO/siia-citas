@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:b="http://bootsfaces.net/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://java.sun.com/jsf/core"
+                template="/layouts/template.xhtml">
+
+    <ui:define name="content">
+        <b:container fluid="true">
+            <b:panel title="Citas" largeScreen="6" collapsible="false">
+                <b:container styleClass="panel-body">
+                    <legend>Citas</legend>
+                    <b:form>
+                        <!--
+                        Uno es el listener y otro es el action:
+                        -->
+                        <b:commandButton value="Nueva cita"
+                                         action="#{test.updateForm}"
+                                         styleClass="btn btn-default">
+                        </b:commandButton>
+
+                        <b:formGroup>
+                            <b:selectOneMenu value="#{test.valueComboAreas}"
+                                             colMd="12" colLg="12"
+                                             id="comboAreas"
+                                             renderLabel="Lista de areas"
+                                             label="Seleccione una Area"
+                                             labelColLg="12"
+                                             rendered="#{test.hasDataAreas}"
+                                             ajax="true"
+                                             update="selectTramite"
+                                             process="@this">
+
+                                <f:selectItem itemLabel="Seleccione una area" value="none" itemValue="none" />
+                                <f:selectItems value="#{test.obtenerAreas()}" />
+
+                                <f:ajax
+                                        event="change"
+                                        execute="@this"
+                                        listener="#{test.showTramite}" >
+                                </f:ajax>
+                            </b:selectOneMenu>
+                        </b:formGroup>
+                        <b:formGroup>
+                            <b:selectOneMenu value="#{test.valueComboTramites}"
+                                             colMd="6" colLg="6"
+                                             rendered="#{test.hasDataTramites}"
+                                             id="selectTramite"
+                                             label="Seleccione el tramite"
+                                             labelColLg="12"
+                                             ajax="true"
+                                             process="@this">
+
+                                <f:selectItem itemLabel="Seleccione un tramite" value="none" itemValue="none" />
+                                <f:selectItems value="#{test.obtenerTramites()}" />
+
+                                <f:ajax
+                                        event="change"
+                                        execute="@this"
+                                        listener="#{test.showNext}">
+                                </f:ajax>
+                            </b:selectOneMenu>
+                        </b:formGroup>
+                    </b:form>
+                </b:container>
+            </b:panel>
+        </b:container>
+    </ui:define>
+</ui:composition>
