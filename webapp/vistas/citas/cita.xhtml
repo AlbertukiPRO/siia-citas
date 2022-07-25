@@ -27,7 +27,7 @@
                                                      onchange="console.log('before the change');" ajax="true" process="@this">
 
                                         <f:selectItem itemLabel="(Please select)" itemValue="none" />
-                                        <f:selectItems value="#{cita.listDatosAlumno}" var="c" itemValue="#{c}" itemLabel="#{c}"/>
+                                        <f:selectItems value="#{cita.listDatosAlumno}" var="c"  itemValue="#{c}" itemLabel="#{c}"/>
                                     </b:selectOneMenu>
                                 </b:column>
                                 <b:column mediumScreen="6"></b:column>
@@ -44,6 +44,7 @@
                                     </b:commandButton>
                                 </b:column>
                             </b:row>
+                            <!-- TODO : RENDER DEL MODO MIS CITAS -->
                             <b:container id="miscitas" rendered="#{misictas.IsRender()}">
                                 <legend>
                                     Mis Citas
@@ -69,7 +70,7 @@
                                     </b:row>
                                 </b:container>
                             </b:container>
-                            <!--TODO: RENDER DEL MODO nueva CITA-->
+                            <!-- TODO: RENDER DEL MODO nueva CITA-->
                             <b:container rendered="#{cita.renderDatosAlumno}">
                                 <legend>Formulario nueva cita</legend>
                                 <br/>
@@ -104,19 +105,31 @@
                                     <b:row>
                                         <!-- COMBOX OF Areas -->
                                         <b:column mediumScreen="6">
-                                            <b:selectOneMenu value="#{cita.listaDatosAreas}" colMd="6" colLg="6" id="selectArea"
-                                                             label="Seleccione el area" labelColLg="12"
-                                                             ajax="true" process="@this">
+                                            <b:selectOneMenu
+                                                    value="#{cita.listaDatosAreas}"
+                                                    colMd="6" colLg="6" id="selectArea"
+                                                    label="Seleccione el area" labelColLg="12"
+                                                    ajax="true"
+                                                    process="@this">
 
-                                                <f:ajax event="change" render="selectTramite" execute="@this" listener="#{cita.obtenerTramites}"></f:ajax>
+                                                <f:ajax
+                                                        event="change"
+                                                        render="selectTramite"
+                                                        execute="@this"
+                                                        listener="#{cita.obtenerTramites}">
+                                                </f:ajax>
 
-                                                <f:selectItem itemLabel="Seleccione el area" itemValue="none" />
-                                                <f:selectItems value="#{cita.obtenerAreas()}" />
+                                                <f:selectItem
+                                                        itemLabel="Seleccione el area"
+                                                        itemValue="none" />
+                                                <f:selectItems
+                                                        value="#{cita.obtenerAreas()}" />
                                             </b:selectOneMenu>
                                         </b:column>
 
+                                        <!-- TODO REACTIVAR EL COMBO DE LAS FECHAS -->
                                         <!-- Combo Box of Tramites -->
-                                        <b:column mediumScreen="6" >
+                                        <b:column mediumScreen="6">
                                             <b:selectOneMenu value="#{cita.listaDatosTramites}" colMd="6" colLg="6" id="selectTramite"
                                                              label="Seleccione el tramite" labelColLg="12"
                                                              ajax="true" process="@this" >
