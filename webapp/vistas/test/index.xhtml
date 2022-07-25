@@ -4,7 +4,8 @@
                 xmlns:b="http://bootsfaces.net/ui"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://java.sun.com/jsf/core"
                 template="/layouts/template.xhtml">
 
     <ui:define name="content">
@@ -17,36 +18,38 @@
                         Uno es el listener y otro es el action:
                         -->
                         <b:commandButton value="Nueva cita"
-                                         action="#{test.updateForm}"
+                                         action="#{citabean.renderDataAlumno()}"
                                          styleClass="btn btn-default">
                         </b:commandButton>
-
+                        <br/>
                         <b:formGroup>
-                            <b:selectOneMenu value="#{test.valueComboAreas}"
-                                             colMd="12" colLg="12"
+                            <!--               COMBO DE AREAS             -->
+                            <b:selectOneMenu value="#{citabean.strCurrentArea}"
+                                             colMd="6" colLg="6"
                                              id="comboAreas"
                                              renderLabel="Lista de areas"
                                              label="Seleccione una Area"
                                              labelColLg="12"
-                                             rendered="#{test.hasDataAreas}"
+                                             rendered="#{citabean.hasDataAreas}"
                                              ajax="true"
-                                             update="selectTramite"
+                                             update="@form"
                                              process="@this">
 
                                 <f:selectItem itemLabel="Seleccione una area" value="none" itemValue="none" />
-                                <f:selectItems value="#{test.obtenerAreas()}" />
+                                <f:selectItems value="#{citabean.returnAreasList()}" />
 
                                 <f:ajax
                                         event="change"
                                         execute="@this"
-                                        listener="#{test.showTramite}" >
+                                        listener="#{citabean.listenerPostAreas}" >
                                 </f:ajax>
                             </b:selectOneMenu>
                         </b:formGroup>
                         <b:formGroup>
-                            <b:selectOneMenu value="#{test.valueComboTramites}"
+                            <!--               COMBO DE TRAMITES             -->
+                            <b:selectOneMenu value="#{citabean.strCurrentTramite}"
                                              colMd="6" colLg="6"
-                                             rendered="#{test.hasDataTramites}"
+                                             rendered="#{citabean.hasDataTramites}"
                                              id="selectTramite"
                                              label="Seleccione el tramite"
                                              labelColLg="12"
@@ -54,14 +57,37 @@
                                              process="@this">
 
                                 <f:selectItem itemLabel="Seleccione un tramite" value="none" itemValue="none" />
-                                <f:selectItems value="#{test.obtenerTramites()}" />
+                                <f:selectItems value="#{citabean.listTramites()}" />
 
                                 <f:ajax
                                         event="change"
                                         execute="@this"
-                                        listener="#{test.showNext}">
+                                        listener="#{citabean.listenerPostTramites}">
                                 </f:ajax>
                             </b:selectOneMenu>
+                        </b:formGroup>
+                        <b:formGroup>
+                            <!--               DATE PICKER FECHAS             -->
+                            <b:dateTimePicker
+                                    id="Fechas"
+                                    format="MM/DD/YYYY"
+                                    colMd="6" colLg="6"
+                                    rendered="#{citabean.hasDataTramites}"
+                                    week-days-disabled='6,0'
+                                    weekDaysDisabled="0,5"
+                                    mediumScreen="6" labelMediumScreen="2"
+                                    ajax="true"
+                                    value="#{citabean.strCurrentCalendar}"
+                                    showTime="false"
+                                    disabledDates="#{citabean.strFechasDisableCalendar}"
+                                    label="Seleccione la fecha de su cita"
+                                    labelColMd="12" labelColLg="12">
+
+                                <f:ajax event="click" execute="@this" listener="#{citabean.ComprobarHorario()}"></f:ajax>
+                            </b:dateTimePicker>
+                            <b:commandButton value="Comprobar disponibilidad" update="selectHora" styleClass="btn btn-default"></b:commandButton>
+<!--                            TODO: Implementar los campos restantes.
+-->
                         </b:formGroup>
                     </b:form>
                 </b:container>
