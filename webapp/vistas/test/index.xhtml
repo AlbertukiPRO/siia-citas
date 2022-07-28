@@ -3,9 +3,7 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:b="http://bootsfaces.net/ui"
                 xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:p="http://java.sun.com/jsf/core"
                 template="/layouts/template.xhtml">
 
     <ui:define name="content">
@@ -35,13 +33,13 @@
                                              update="@form"
                                              process="@this">
 
-                                <f:selectItem itemLabel="Seleccione una area" value="none" itemValue="none" />
-                                <f:selectItems value="#{citabean.returnAreasList()}" />
+                                <f:selectItem itemLabel="Seleccione una area" value="none" itemValue="none"/>
+                                <f:selectItems value="#{citabean.returnAreasList()}"/>
 
                                 <f:ajax
                                         event="change"
                                         execute="@this"
-                                        listener="#{citabean.listenerPostAreas}" >
+                                        listener="#{citabean.listenerPostAreas}">
                                 </f:ajax>
                             </b:selectOneMenu>
                         </b:formGroup>
@@ -56,8 +54,8 @@
                                              ajax="true"
                                              process="@this">
 
-                                <f:selectItem itemLabel="Seleccione un tramite" value="none" itemValue="none" />
-                                <f:selectItems value="#{citabean.listTramites()}" />
+                                <f:selectItem itemLabel="Seleccione un tramite" value="none" itemValue="none"/>
+                                <f:selectItems value="#{citabean.returnTramitesList()}"/>
 
                                 <f:ajax
                                         event="change"
@@ -83,10 +81,12 @@
                                     label="Seleccione la fecha de su cita"
                                     labelColMd="12" labelColLg="12">
 
-                                <f:ajax event="click" execute="@this" listener="#{citabean.ComprobarHorario()}"></f:ajax>
+                                <f:ajax event="click" execute="@this"
+                                        listener="#{citabean.ComprobarHorario()}"></f:ajax>
                             </b:dateTimePicker>
-                            <b:commandButton value="Comprobar disponibilidad" update="selectHora" styleClass="btn btn-default"></b:commandButton>
-<!--                            TODO: Implementar los campos restantes.
+                            <b:commandButton rendered="#{citabean.hasDataAreas}" value="Comprobar disponibilidad"
+                                             styleClass="btn btn-default"></b:commandButton>
+                            <!--                            TODO: Implementar los campos restantes.
 -->
                         </b:formGroup>
                     </b:form>

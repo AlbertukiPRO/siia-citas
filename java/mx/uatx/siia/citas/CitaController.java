@@ -6,9 +6,7 @@ import mx.uatx.siia.citas.modelo.areas.business.AreasBusiness;
 import mx.uatx.siia.citas.modelo.citasBusiness.MethodsGenerics;
 import mx.uatx.siia.citas.modelo.enums.URLs;
 import mx.uatx.siia.comun.helper.VistasHelper;
-import mx.uatx.siia.serviciosUniversitarios.dto.AreasTO;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
-import mx.uatx.siia.serviciosUniversitarios.dto.TramitesTO;
 import mx.uatx.siia.serviciosUniversitarios.enums.SeveridadMensajeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +16,8 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.model.SelectItem;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -85,14 +84,23 @@ public class CitaController implements Serializable {
 
         /**
          * @return => List<String> with Dates saved in the DATABASE
+         * Servicio para obtener horarios de la db para quitarlos de la lista.
+         * Servicio es para obtener las fechas desactivadas en el calendar element BootFaces.
          */
-        setListHorariosShow((List<String>) areasBusiness.obtenerHorariosFromDB(URLs.FechasReservadas.getValor(), getStrCurrentArea()));
 
-        List<String> listHorarios = MethodsGenerics.generarHorarios(8,13, 25, getListHorariosShow());
-        setStrFechasDisableCalendar(MethodsGenerics.formattingStringFechasCalendar(listHorarios));
+        ResultadoTO resultadoF = areasBusiness.obtenerFechasFromDB(URLs.FechasReservadas.getValor(), getStrCurrentArea());
+        setStrFechasDisableCalendar((MethodsGenerics.formattingStringFechasCalendar((List<String>) resultadoF.getObjeto())));
 
-        System.out.println("[VALUE] de Areas => "+getStrCurrentArea());
-        System.out.println("[VALUE] de Horarios Reservados => "+getStrFechasDisableCalendar());
+        setStrCurrentCalendar(MethodsGenerics.getCurrentDate());
+
+        ResultadoTO resultadoH = areasBusiness.obtenerHorariosFromDB(URLs.HorariosReservados.getValor(), getStrCurrentCalendar(), getStrCurrentArea());
+        String cadena = (String) resultadoH.getObjeto();
+        List<String> horas = Arrays.asList(cadena.split(","));
+        List<String> listHorarios = MethodsGenerics.generarHorarios(8,13, 25, horas);
+        setListHorariosShow(listHorarios);
+
+        System.out.println("[VALUE] de Fechas Reservadas => "+getStrFechasDisableCalendar());
+        System.out.println("[VALUE] de Horarios Reservados => "+getListHorariosShow());
 
         hasDataTramites = res.isBlnValido();
     }
@@ -121,12 +129,15 @@ public class CitaController implements Serializable {
     }
 
     /**
+     * @return List => SelectItem para el elemento SelectOneMenu de Bootfaces
+     */
+    public List<SelectItem> returnTramitesList() {
+        return getListTramites();
+    }
+    /**
      * @apiNote  Function que comparar los horarios reservados con el horario solicitado por usuario;
      */
     public void ComprobarHorario(){
-        /**
-         * TODO: Implementar la logica para reservar temporalmente la reserva del usuario.
-         */
         System.out.println("Comprobar Horario");
     }
 
