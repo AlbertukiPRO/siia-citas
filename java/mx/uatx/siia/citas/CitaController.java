@@ -45,13 +45,21 @@ public class CitaController implements Serializable {
     private List<String> ListHorariosShow;
     private boolean hasDataAreas = false;
     private boolean hasDataTramites = false;
-    private String strFechasDisableCalendar;
+    @NotNull
+    private String strFechasDisableCalendar = null;
     @NotNull
     private String strCurrentArea = null;
     @NotNull
     private String strCurrentTramite = null;
     @NotNull
     private String strCurrentCalendar = null;
+    @NotNull
+    private String strCurrentHora = null;
+    @NotNull
+    private String strMotivoCita = null;
+
+    private String strLocalNombreUser;
+    private String strLocalMatricula;
 
     /**
      * @BusinessProperties
@@ -108,7 +116,11 @@ public class CitaController implements Serializable {
         System.out.println("[VALUE] de Tramites => "+getStrCurrentTramite());
     }
 
-    public void renderDataAlumno(){
+    public void renderDataAlumno(String name, String matricula){
+
+        this.strLocalNombreUser = name;
+        this.strLocalMatricula = matricula;
+
         setListAreas(returnAreasList());
 
         final ResultadoTO res = new ResultadoTO();
@@ -134,6 +146,14 @@ public class CitaController implements Serializable {
     public List<SelectItem> returnTramitesList() {
         return getListTramites();
     }
+
+    /**
+     * @return {List} => Strings con los horarios finales y disponibles.
+     */
+    public List<String> returnHorariosList(){
+        return getListHorariosShow();
+    }
+
     /**
      * @apiNote  Function que comparar los horarios reservados con el horario solicitado por usuario;
      */
@@ -237,5 +257,33 @@ public class CitaController implements Serializable {
 
     public void setStrCurrentCalendar(String strCurrentCalendar) {
         this.strCurrentCalendar = strCurrentCalendar;
+    }
+
+    public String getStrCurrentHora() {return strCurrentHora;}
+
+    public String getStrMotivoCita() {
+        return strMotivoCita;
+    }
+
+    public void setStrMotivoCita(String strMotivoCita) {
+        this.strMotivoCita = strMotivoCita;
+    }
+
+    public void setStrCurrentHora(String strCurrentHora) {this.strCurrentHora = strCurrentHora;}
+
+    public String getStrLocalNombreUser() {
+        return strLocalNombreUser;
+    }
+
+    public void setStrLocalNombreUser(String strLocalNombreUser) {
+        this.strLocalNombreUser = strLocalNombreUser;
+    }
+
+    public String getStrLocalMatricula() {
+        return strLocalMatricula;
+    }
+
+    public void setStrLocalMatricula(String strLocalMatricula) {
+        this.strLocalMatricula = strLocalMatricula;
     }
 }
