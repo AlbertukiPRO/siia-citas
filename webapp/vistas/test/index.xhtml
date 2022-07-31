@@ -9,41 +9,42 @@
 
     <ui:define name="content">
         <b:container fluid="true">
-            <b:panel title="Citas" largeScreen="6" collapsible="false">
+<!--            6-->
+            <b:panel title="Citas" largeScreen="8" collapsible="false">
                 <b:container styleClass="panel-body" fluid="true">
                     <legend>Citas</legend>
-                    <b:form style="display:flex;justify-content: space-between;">
-                        <!-- Seccion Izquierda FORMULARIO -->
+                    <b:form>
                         <b:row>
-                            <b:column mediumScreen="12" largeScreen="12" smallScreen="12" style="width:75%;">
-                                <b:row>
-                                    <b:column mediumScreen="4"></b:column>
-                                    <b:column mediumScreen="2">
-                                        <b:commandButton value="Nueva cita"
-                                                         action="#{citabean.renderDataAlumno(auth.strNombreUsuarioLogin, auth.strUsuario)}"
-                                                         title="Nueva cita"
-                                                         styleClass="btn btn-default">
-                                        </b:commandButton>
-                                    </b:column>
-                                    <b:column mediumScreen="3" largeScreen="3" smallScreen="0"></b:column>
-                                    <b:column mediumScreen="2">
-                                        <b:commandButton title="Buscar Citas"
-                                                         value="Buscar Cita"
-                                                         action="#{misictas.UpdateValores(auth.strNombreUsuarioLogin,auth.strUsuario)}"
-                                                         styleClass="btn btn-default" update="@form">
-                                        </b:commandButton>
-                                    </b:column>
-                                </b:row>
-                                <br/>
-                                <br/>
-                                <br/>
+                            <b:column mediumScreen="7" smallScreen="12"></b:column>
+                            <b:column mediumScreen="2" smallScreen="12">
+                                <b:commandButton value="Nueva cita"
+                                                 action="#{citabean.renderDataAlumno(auth.strNombreUsuarioLogin, auth.strUsuario)}"
+                                                 title="Nueva cita"
+                                                 styleClass="btn btn-default">
+                                </b:commandButton>
+                            </b:column>
+                            <b:column mediumScreen="1" largeScreen="1" smallScreen="12"></b:column>
+                            <b:column mediumScreen="2" smallScreen="12">
+                                <b:commandButton title="Buscar Citas"
+                                                 value="Buscar Cita"
+                                                 action="#{misictas.UpdateValores(auth.strNombreUsuarioLogin,auth.strUsuario)}"
+                                                 styleClass="btn btn-default" update="@form">
+                                </b:commandButton>
+                            </b:column>
+                        </b:row>
+                        <br/>
+                        <br/>
+                        <br/>
 
+                        <b:row>
+                            <b:column mediumScreen="6" largeScreen="6" smallScreen="12">
+                                <!-- Seccion Izquierda FORMULARIO -->
                                 <b:row>
                                     <b:formGroup>
                                         <!--               COMBO DE AREAS             -->
                                         <b:row>
                                             <b:selectOneMenu value="#{citabean.strCurrentArea}"
-                                                             colMd="12" colLg="12"
+                                                             colMd="12" colLg="12" colSm="12"
                                                              id="comboAreas"
                                                              label="Seleccione un Area"
                                                              labelColLg="12"
@@ -67,7 +68,7 @@
                                         <!--               COMBO DE TRAMITES             -->
                                         <b:row>
                                             <b:selectOneMenu value="#{citabean.strCurrentTramite}"
-                                                             colMd="12" colLg="12"
+                                                             colMd="12" colLg="12" colSm="12"
                                                              rendered="#{citabean.hasDataTramites}"
                                                              id="selectTramite"
                                                              labelStyle="text-aling:left;"
@@ -94,82 +95,149 @@
                                                     id="Fechas"
                                                     weekDaysDisabled="0"
                                                     format="MM/DD/YYYY"
-                                                    colMd="6" colLg="6"
+                                                    colMd="12" colLg="12" colSm="12"
                                                     rendered="#{citabean.hasDataTramites}"
-                                                    mediumScreen="6" labelMediumScreen="2"
+                                                    mediumScreen="12" labelMediumScreen="12"
                                                     ajax="true"
                                                     value="#{citabean.strCurrentCalendar}"
                                                     showTime="false"
                                                     disabledDates="#{citabean.strFechasDisableCalendar}"
                                                     label="Seleccione la fecha de su cita"
-                                                    labelColMd="6" labelColLg="6">
+                                                    labelColMd="12" labelColLg="12">
 
                                                 <f:ajax event="click" execute="@this"
                                                         listener="#{citabean.ComprobarHorario()}"></f:ajax>
                                             </b:dateTimePicker>
-                                            <b:commandButton rendered="#{citabean.hasDataAreas}" action="#{citabean.ComprobarHorario()}" value="Comprobar disponibilidad"
-                                                             styleClass="btn btn-default"></b:commandButton>
+                                            <b:row>
+                                                <b:column smallScreen="12" largeScreen="2" mediumScreen="2"></b:column>
+                                                <b:column smallScreen="12" largeScreen="8" mediumScreen="8">
+                                                    <b:commandButton rendered="#{citabean.hasDataAreas}"
+                                                                     action="#{citabean.ComprobarHorario()}"
+                                                                     value="Comprobar disponibilidad"
+                                                                     styleClass="btn btn-default"></b:commandButton>
+                                                </b:column>
+                                            </b:row>
                                         </b:formGroup>
-                                        <h:outputText>hola</h:outputText>
                                     </b:row>
                                     <b:row>
                                         <b:formGroup>
                                             <!--          ComboBox de los horarios                  -->
                                             <b:selectOneMenu value="#{citabean.strCurrentHora}"
-                                                             colMd="12" colLg="12"
+                                                             colMd="12" colLg="12" colSm="12"
                                                              rendered="#{citabean.hasDataAreas}"
                                                              id="selectHorarios"
                                                              label="Seleccione el horario de su cita"
                                                              labelColLg="12"
                                                              ajax="true"
+                                                             update="combohoras"
                                                              process="@this">
 
                                                 <f:selectItem itemLabel="Seleccione su horario" value="none" itemValue="none"></f:selectItem>
                                                 <f:selectItems value="#{citabean.returnHorariosList()}"></f:selectItems>
 
+<!--                                                <f:ajax-->
+<!--                                                        event="change"-->
+<!--                                                        execute="combohoras">-->
+<!--                                                </f:ajax>-->
                                             </b:selectOneMenu>
                                         </b:formGroup>
                                     </b:row>
-                                   <b:row>
-                                       <b:formGroup>
-                                           <b:inputTextarea value="#{citabean.strMotivoCita}"
-                                                            colLg="12" colMd="12" colSm="12"
-                                                            rendered="#{citabean.hasDataAreas}"
-                                                            label="Ingrese el motivo de su cita"
-                                                            ajax="true"
-                                           >
-                                           </b:inputTextarea>
-                                           <h:inputHidden id="idAlumno" value="#{auth.strUsuario}"></h:inputHidden>
-                                       </b:formGroup>
-                                   </b:row>
+                                    <b:row>
+                                        <b:formGroup>
+                                            <b:inputTextarea value="#{citabean.strMotivoCita}"
+                                                             colLg="12" colMd="12" colSm="12"
+                                                             rendered="#{citabean.hasDataAreas}"
+                                                             label="Ingrese el motivo de su cita"
+                                                             ajax="true"
+                                            >
+                                            </b:inputTextarea>
+                                            <h:inputHidden id="idAlumno" value="#{auth.strUsuario}"></h:inputHidden>
+                                        </b:formGroup>
+                                    </b:row>
                                 </b:row>
+                            </b:column>
+                            <b:column mediumScreen="1" largeScreen="1" smallScreen="12"></b:column>
+                            <b:column mediumScreen="5" largeScreen="5" smallScreen="5">
+                                <!-- Seccion Dereacha Datos de la cita -->
+                                <b:row rendered="#{citabean.hasDataAreas}">
+                                    <h5><b>Resumen cita</b></h5>
+                                    <br/>
+                                    <br/>
+                                    <b:column mediumScreen="7" largeScreen="7" smallScreen="12">
+                                        <b:inputText readonly="true"
+                                                     label="Matricula:"
+                                                     labelStyle="width:100px;"
+                                                     value="#{citabean.strLocalMatricula}"
+                                                     labelColMd="4">
+                                            <f:facet name="prepend">
+                                                <b:iconAwesome name="tag"></b:iconAwesome>
+                                            </f:facet>
+                                        </b:inputText>
+                                    </b:column>
+                                    <b:column  mediumScreen="12" largeScreen="12"  smallScreen="12">
+                                        <b:inputText readonly="true"
+                                                     label="Nombre Usuario"
+                                                     labelStyle="width:100px"
+                                                     value="#{citabean.strLocalNombreUser}">
+                                            <f:facet name="prepend">
+                                                <b:iconAwesome name="user"></b:iconAwesome>
+                                            </f:facet>
+                                        </b:inputText>
+                                    </b:column>
 
+                                    <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
+                                        <b:inputText readonly="true"
+                                                     label="Area:"
+                                                     labelStyle="width:100px"
+                                                     labelColMd="4"
+                                                     value="#{citabean.strLocalArea}">
+                                            <f:facet name="prepend">
+                                                <b:iconAwesome name="bank"></b:iconAwesome>
+                                            </f:facet>
+                                        </b:inputText>
+                                    </b:column>
+
+                                    <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
+                                        <b:inputText readonly="true"
+                                                     label="Tramite:"
+                                                     labelColMd="4"
+                                                     labelStyle="width:100px"
+                                                     value="#{citabean.strCurrentTramite}">
+                                            <f:facet name="prepend">
+                                                <b:iconAwesome name="archive"></b:iconAwesome>
+                                            </f:facet>
+                                        </b:inputText>
+                                    </b:column>
+
+                                    <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
+                                        <b:inputText readonly="true"
+                                                     label="Fecha Cita:"
+                                                     labelColMd="4"
+                                                     labelStyle="width:100px"
+                                                     value="#{citabean.strCurrentCalendar}">
+                                            <f:facet name="prepend">
+                                                <b:iconAwesome name="calendar"></b:iconAwesome>
+                                            </f:facet>
+                                        </b:inputText>
+                                    </b:column>
+
+                                    <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
+                                        <b:inputText readonly="true"
+                                                     id="combohoras"
+                                                     label="Hora Cita:"
+                                                     labelColMd="4"
+                                                     labelStyle="width:100px"
+                                                     value="#{citabean.strCurrentHora}">
+                                            <f:facet name="prepend">
+                                                <b:iconAwesome name="clock-o"></b:iconAwesome>
+                                            </f:facet>
+                                        </b:inputText>
+                                    </b:column>
+                                </b:row>
+                                <br/>
                             </b:column>
                         </b:row>
 
-
-                        <!-- Seccion Dereacha Datos de la cita -->
-                        <b:row rendered="#{citabean.hasDataAreas}">
-
-                            <h5><b>Resumen cita</b></h5>
-                            <br/>
-                            <br/>
-                            <b:column mediumScreen="7" largeScreen="7" smallScreen="12">
-                                <b:inputText readonly="true"
-                                             label="Matricula:"
-                                             labelStyle="width:100px;"
-                                             colSm="12"
-                                             colXs="12"
-                                             value="#{citabean.strLocalMatricula}"
-                                             colLg="12"
-                                             labelColMd="5">
-                                    <f:facet name="prepend">
-                                        <b:iconAwesome name="user"></b:iconAwesome>
-                                    </f:facet>
-                                </b:inputText>
-                            </b:column>
-                        </b:row>
-                        <br/>
                     </b:form>
                 </b:container>
             </b:panel>

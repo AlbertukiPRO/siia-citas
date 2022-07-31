@@ -8,15 +8,16 @@ import mx.uatx.siia.citas.modelo.enums.URLs;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
 import mx.uatx.siia.serviciosUniversitarios.enums.SeveridadMensajeEnum;
+import org.omnifaces.util.selectitems.SelectItemsUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 import java.io.Serializable;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -60,6 +61,11 @@ public class CitaController implements Serializable {
 
     private String strLocalNombreUser;
     private String strLocalMatricula;
+    private String strLocalArea;
+    private String strLocalTramite;
+    private String strLocalFecha;
+    private String strLocalHorario;
+    private String strLocalDescripcion;
 
     /**
      * @BusinessProperties
@@ -111,9 +117,18 @@ public class CitaController implements Serializable {
         System.out.println("[VALUE] de Horarios Reservados => "+getListHorariosShow());
 
         hasDataTramites = res.isBlnValido();
+        setStrLocalArea(listAreas.get(Integer.parseInt(getStrCurrentArea())-1).getLabel());
+
     }
-    public void listenerPostTramites(){
+    public void listenerPostTramites(ActionEvent event){
         System.out.println("[VALUE] de Tramites => "+getStrCurrentTramite());
+
+//        int indexList = listTramites.indexOf();
+
+        //TODO: Implemnar el id seriado desde el 0 en el SelectItem
+        System.out.println(event.toString());
+
+        setStrLocalTramite(String.valueOf(listTramites.get(Integer.parseInt(String.valueOf(listTramites.indexOf(getStrCurrentTramite()))))));
     }
 
     public void renderDataAlumno(String name, String matricula){
@@ -285,5 +300,45 @@ public class CitaController implements Serializable {
 
     public void setStrLocalMatricula(String strLocalMatricula) {
         this.strLocalMatricula = strLocalMatricula;
+    }
+
+    public String getStrLocalArea() {
+        return strLocalArea;
+    }
+
+    public void setStrLocalArea(String strLocalArea) {
+        this.strLocalArea = strLocalArea;
+    }
+
+    public String getStrLocalTramite() {
+        return strLocalTramite;
+    }
+
+    public void setStrLocalTramite(String strLocalTramite) {
+        this.strLocalTramite = strLocalTramite;
+    }
+
+    public String getStrLocalFecha() {
+        return strLocalFecha;
+    }
+
+    public void setStrLocalFecha(String strLocalFecha) {
+        this.strLocalFecha = strLocalFecha;
+    }
+
+    public String getStrLocalHorario() {
+        return strLocalHorario;
+    }
+
+    public void setStrLocalHorario(String strLocalHorario) {
+        this.strLocalHorario = strLocalHorario;
+    }
+
+    public String getStrLocalDescripcion() {
+        return strLocalDescripcion;
+    }
+
+    public void setStrLocalDescripcion(String strLocalDescripcion) {
+        this.strLocalDescripcion = strLocalDescripcion;
     }
 }
