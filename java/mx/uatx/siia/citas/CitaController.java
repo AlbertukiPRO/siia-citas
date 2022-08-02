@@ -4,18 +4,17 @@ import com.sun.istack.NotNull;
 import mx.uatx.siia.citas.modelo.Tramites.business.TramitesBusiness;
 import mx.uatx.siia.citas.modelo.areas.business.AreasBusiness;
 import mx.uatx.siia.citas.modelo.citasBusiness.MethodsGenerics;
+import mx.uatx.siia.citas.modelo.enums.Requisitos;
 import mx.uatx.siia.citas.modelo.enums.URLs;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
 import mx.uatx.siia.serviciosUniversitarios.enums.SeveridadMensajeEnum;
-import org.omnifaces.util.selectitems.SelectItemsUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 import java.io.Serializable;
 import java.util.Arrays;
@@ -105,8 +104,6 @@ public class CitaController implements Serializable {
         ResultadoTO resultadoF = areasBusiness.obtenerFechasFromDB(URLs.FechasReservadas.getValor(), getStrCurrentArea());
         setStrFechasDisableCalendar((MethodsGenerics.formattingStringFechasCalendar((List<String>) resultadoF.getObjeto())));
 
-        setStrCurrentCalendar(MethodsGenerics.getCurrentDate());
-
         ResultadoTO resultadoH = areasBusiness.obtenerHorariosFromDB(URLs.HorariosReservados.getValor(), getStrCurrentCalendar(), getStrCurrentArea());
         String cadena = (String) resultadoH.getObjeto();
         List<String> horas = Arrays.asList(cadena.split(","));
@@ -120,15 +117,13 @@ public class CitaController implements Serializable {
         setStrLocalArea(listAreas.get(Integer.parseInt(getStrCurrentArea())-1).getLabel());
 
     }
-    public void listenerPostTramites(ActionEvent event){
+    public void listenerPostTramites(){
         System.out.println("[VALUE] de Tramites => "+getStrCurrentTramite());
 
-//        int indexList = listTramites.indexOf();
-
-        //TODO: Implemnar el id seriado desde el 0 en el SelectItem
-        System.out.println(event.toString());
-
-        setStrLocalTramite(String.valueOf(listTramites.get(Integer.parseInt(String.valueOf(listTramites.indexOf(getStrCurrentTramite()))))));
+        for (SelectItem list : listTramites){
+            if ( list.getValue() == strCurrentTramite )
+                setStrLocalTramite(list.getLabel());
+        }
     }
 
     public void renderDataAlumno(String name, String matricula){
@@ -174,6 +169,20 @@ public class CitaController implements Serializable {
      */
     public void ComprobarHorario(){
         System.out.println("Comprobar Horario");
+    }
+
+    public String getLink(){
+
+        /*
+         * TODO CREAR un servicio para obtener el url del los requisitos del tramite.
+         */
+        Requisitos[] lista = Requisitos.values();
+
+        for (Requisitos requisitos : lista) {
+            System.out.println(requisitos.toString());
+        }
+
+        return "google.com";
     }
 
     /**

@@ -15,16 +15,15 @@
                     <legend>Citas</legend>
                     <b:form>
                         <b:row>
-                            <b:column mediumScreen="7" smallScreen="12"></b:column>
-                            <b:column mediumScreen="2" smallScreen="12">
+                            <b:column mediumScreen="9" smallScreen="12"></b:column>
+                            <b:column mediumScreen="1" smallScreen="12">
                                 <b:commandButton value="Nueva cita"
                                                  action="#{citabean.renderDataAlumno(auth.strNombreUsuarioLogin, auth.strUsuario)}"
                                                  title="Nueva cita"
                                                  styleClass="btn btn-default">
                                 </b:commandButton>
                             </b:column>
-                            <b:column mediumScreen="1" largeScreen="1" smallScreen="12"></b:column>
-                            <b:column mediumScreen="2" smallScreen="12">
+                            <b:column mediumScreen="1" smallScreen="12">
                                 <b:commandButton title="Buscar Citas"
                                                  value="Buscar Cita"
                                                  action="#{misictas.UpdateValores(auth.strNombreUsuarioLogin,auth.strUsuario)}"
@@ -75,6 +74,7 @@
                                                              label="Seleccione el tramite"
                                                              labelColLg="12"
                                                              ajax="true"
+                                                             update="Tramite"
                                                              process="@this">
 
                                                 <f:selectItem itemLabel="Seleccione un tramite" value="none" itemValue="none"/>
@@ -89,42 +89,44 @@
                                         </b:row>
                                     </b:formGroup>
                                     <b:row>
-                                        <b:formGroup>
-                                            <!--               DATE PICKER FECHAS             -->
-                                            <b:dateTimePicker
-                                                    id="Fechas"
-                                                    weekDaysDisabled="0"
-                                                    format="MM/DD/YYYY"
-                                                    colMd="12" colLg="12" colSm="12"
-                                                    rendered="#{citabean.hasDataTramites}"
-                                                    mediumScreen="12" labelMediumScreen="12"
-                                                    ajax="true"
-                                                    value="#{citabean.strCurrentCalendar}"
-                                                    showTime="false"
-                                                    disabledDates="#{citabean.strFechasDisableCalendar}"
-                                                    label="Seleccione la fecha de su cita"
-                                                    labelColMd="12" labelColLg="12">
+                                        <b:column>
+                                            <b:formGroup>
+                                                <!--               DATE PICKER FECHAS             -->
+                                                <b:dateTimePicker
+                                                        id="Fechas"
+                                                        weekDaysDisabled="0"
+                                                        format="MM/DD/YYYY"
+                                                        colMd="6" colLg="6" colSm="12"
+                                                        rendered="#{citabean.hasDataTramites}"
+                                                        mediumScreen="6" labelMediumScreen="12"
+                                                        ajax="true"
+                                                        value="#{citabean.strCurrentCalendar}"
+                                                        showTime="false"
+                                                        disabledDates="#{citabean.strFechasDisableCalendar}"
+                                                        label="Seleccione la fecha de su cita"
+                                                        labelColMd="12" labelColLg="12">
+                                                </b:dateTimePicker>
+                                            </b:formGroup>
+                                        </b:column>
 
-                                                <f:ajax event="click" execute="@this"
-                                                        listener="#{citabean.ComprobarHorario()}"></f:ajax>
-                                            </b:dateTimePicker>
-                                            <b:row>
-                                                <b:column smallScreen="12" largeScreen="2" mediumScreen="2"></b:column>
-                                                <b:column smallScreen="12" largeScreen="8" mediumScreen="8">
-                                                    <b:commandButton rendered="#{citabean.hasDataAreas}"
-                                                                     action="#{citabean.ComprobarHorario()}"
-                                                                     value="Comprobar disponibilidad"
-                                                                     styleClass="btn btn-default"></b:commandButton>
-                                                </b:column>
-                                            </b:row>
-                                        </b:formGroup>
+                                        <b:column smallScreen="12" largeScreen="4" mediumScreen="4">
+                                            <b:commandButton rendered="#{citabean.hasDataTramites}"
+                                                             ajax="true"
+                                                             action="#{citabean.ComprobarHorario()}"
+                                                             value="Comprobar disponibilidad"
+                                                             update="combohoras"
+                                                             styleClass="btn btn-default">
+                                            </b:commandButton>
+                                        </b:column>
                                     </b:row>
+                                    <br/>
+                                    <br/>
                                     <b:row>
                                         <b:formGroup>
                                             <!--          ComboBox de los horarios                  -->
                                             <b:selectOneMenu value="#{citabean.strCurrentHora}"
                                                              colMd="12" colLg="12" colSm="12"
-                                                             rendered="#{citabean.hasDataAreas}"
+                                                             rendered="#{citabean.hasDataTramites}"
                                                              id="selectHorarios"
                                                              label="Seleccione el horario de su cita"
                                                              labelColLg="12"
@@ -134,11 +136,6 @@
 
                                                 <f:selectItem itemLabel="Seleccione su horario" value="none" itemValue="none"></f:selectItem>
                                                 <f:selectItems value="#{citabean.returnHorariosList()}"></f:selectItems>
-
-<!--                                                <f:ajax-->
-<!--                                                        event="change"-->
-<!--                                                        execute="combohoras">-->
-<!--                                                </f:ajax>-->
                                             </b:selectOneMenu>
                                         </b:formGroup>
                                     </b:row>
@@ -146,7 +143,7 @@
                                         <b:formGroup>
                                             <b:inputTextarea value="#{citabean.strMotivoCita}"
                                                              colLg="12" colMd="12" colSm="12"
-                                                             rendered="#{citabean.hasDataAreas}"
+                                                             rendered="#{citabean.hasDataTramites}"
                                                              label="Ingrese el motivo de su cita"
                                                              ajax="true"
                                             >
@@ -157,10 +154,10 @@
                                 </b:row>
                             </b:column>
                             <b:column mediumScreen="1" largeScreen="1" smallScreen="12"></b:column>
-                            <b:column mediumScreen="5" largeScreen="5" smallScreen="5">
+                            <b:column mediumScreen="5" largeScreen="5" smallScreen="5" rendered="#{citabean.hasDataTramites}">
                                 <!-- Seccion Dereacha Datos de la cita -->
-                                <b:row rendered="#{citabean.hasDataAreas}">
-                                    <h5><b>Resumen cita</b></h5>
+                                <b:row rendered="#{citabean.hasDataTramites}">
+                                    <h5><h:outputText value="Resumen cita"></h:outputText></h5>
                                     <br/>
                                     <br/>
                                     <b:column mediumScreen="7" largeScreen="7" smallScreen="12">
@@ -178,6 +175,7 @@
                                         <b:inputText readonly="true"
                                                      label="Nombre Usuario"
                                                      labelStyle="width:100px"
+                                                     labelColMd="4"
                                                      value="#{citabean.strLocalNombreUser}">
                                             <f:facet name="prepend">
                                                 <b:iconAwesome name="user"></b:iconAwesome>
@@ -200,9 +198,10 @@
                                     <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
                                         <b:inputText readonly="true"
                                                      label="Tramite:"
+                                                     id="Tramite"
                                                      labelColMd="4"
                                                      labelStyle="width:100px"
-                                                     value="#{citabean.strCurrentTramite}">
+                                                     value="#{citabean.strLocalTramite}">
                                             <f:facet name="prepend">
                                                 <b:iconAwesome name="archive"></b:iconAwesome>
                                             </f:facet>
@@ -233,11 +232,19 @@
                                             </f:facet>
                                         </b:inputText>
                                     </b:column>
+                                    <br/>
+                                    <br/>
+                                    <h5><h:outputText>Requisitos de tramite:</h:outputText></h5>
+                                    <b:label severity="primary" value="#{msj['comun.label.citas.requisitosLabel']}">
+                                    </b:label>
+                                    <b:listLinks>
+                                        <b:navLink href="#{citabean.getLink()}" value="Ver requisitos para mi tramite"></b:navLink>
+                                    </b:listLinks>
+                                    <br/>
                                 </b:row>
                                 <br/>
                             </b:column>
                         </b:row>
-
                     </b:form>
                 </b:container>
             </b:panel>
