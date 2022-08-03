@@ -44,11 +44,16 @@ public class ServicesCitas {
     public static List<AreasTO> getAreasAPI(String url){
         List<AreasTO> listaAreas;
         String strJson = readUrl(url);
-        System.out.println("----- FINISH GET AREAS [ Value ] => "+strJson);
-        Type listType = new TypeToken<List<AreasTO>>(){}.getType();
+        if (!strJson.isEmpty()){
+            System.out.println("----- FINISH GET AREAS [ Value ] => "+strJson);
+            Type listType = new TypeToken<List<AreasTO>>(){}.getType();
 
-        listaAreas = new Gson().fromJson(strJson,listType);
+            listaAreas = new Gson().fromJson(strJson,listType);
 
+        }else{
+            listaAreas = new ArrayList<>();
+            listaAreas.add(new AreasTO("1", "No se logro obtener los datos"));
+        }
         return listaAreas;
     }
 
@@ -83,7 +88,7 @@ public class ServicesCitas {
     }
     public static List<String> getHorariosAPI(String link, String fecha, String idArea){
 
-        System.out.println("--- GET HORARIOS => [Run]");
+        System.out.println("--- GET HORARIOS => ["+link+"?fecha="+fecha+"&idarea="+idArea+"]");
 
         List<String> lista;
         try {
@@ -174,8 +179,8 @@ public class ServicesCitas {
         return misCitas;
     }
 
-    private static String readUrl(String urlString)  {
-        System.out.println("----- GET DATA FROM URL => ["+urlString+"]");
+    private static String readUrl(String urlString) {
+        System.out.println("----- GET DATA FROM URL => [" + urlString + "]");
         BufferedReader reader = null;
         try {
             URL url = new URL(urlString);
@@ -186,11 +191,11 @@ public class ServicesCitas {
             while ((read = reader.read(chars)) != -1)
                 buffer.append(chars, 0, read);
 
-            System.out.println("----- FINISH DATA FROM URL => [Value] ="+ buffer);
+            System.out.println("----- FINISH DATA FROM URL => [Value] =" + buffer);
 
             return buffer.toString();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("----------------- THROW EXCEPTION ------------- " + e);
         } finally {
             if (reader != null) {
                 try {
@@ -200,6 +205,7 @@ public class ServicesCitas {
                 }
             }
         }
+        return "";
     }
 
 

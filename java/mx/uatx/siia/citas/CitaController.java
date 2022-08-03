@@ -14,20 +14,20 @@ import org.slf4j.LoggerFactory;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.SessionScoped;
+import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
 /**
  * @author Alberto Noche Rosas
+ * @date 02/08/2022
  * @apiNote Bean para el manejo del frontend del módulo citas.
  */
 
 @ManagedBean(name = "citabean")
-@SessionScoped
+@ViewScoped
 public class CitaController implements Serializable {
 
     /**
@@ -45,6 +45,7 @@ public class CitaController implements Serializable {
     private List<String> ListHorariosShow;
     private boolean hasDataAreas = false;
     private boolean hasDataTramites = false;
+    private boolean hasDataLink = false;
     @NotNull
     private String strFechasDisableCalendar = null;
     @NotNull
@@ -104,14 +105,8 @@ public class CitaController implements Serializable {
         ResultadoTO resultadoF = areasBusiness.obtenerFechasFromDB(URLs.FechasReservadas.getValor(), getStrCurrentArea());
         setStrFechasDisableCalendar((MethodsGenerics.formattingStringFechasCalendar((List<String>) resultadoF.getObjeto())));
 
-        ResultadoTO resultadoH = areasBusiness.obtenerHorariosFromDB(URLs.HorariosReservados.getValor(), getStrCurrentCalendar(), getStrCurrentArea());
-        String cadena = (String) resultadoH.getObjeto();
-        List<String> horas = Arrays.asList(cadena.split(","));
-        List<String> listHorarios = MethodsGenerics.generarHorarios(8,13, 25, horas);
-        setListHorariosShow(listHorarios);
 
         System.out.println("[VALUE] de Fechas Reservadas => "+getStrFechasDisableCalendar());
-        System.out.println("[VALUE] de Horarios Reservados => "+getListHorariosShow());
 
         hasDataTramites = res.isBlnValido();
         setStrLocalArea(listAreas.get(Integer.parseInt(getStrCurrentArea())-1).getLabel());
@@ -124,6 +119,7 @@ public class CitaController implements Serializable {
             if ( list.getValue() == strCurrentTramite )
                 setStrLocalTramite(list.getLabel());
         }
+        hasDataLink = true;
     }
 
     public void renderDataAlumno(String name, String matricula){
@@ -136,6 +132,7 @@ public class CitaController implements Serializable {
         final ResultadoTO res = new ResultadoTO();
         res.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.areas.succesful");
         vHelp.pintarMensajes(msj, res);
+        res.cleaner();
 
         hasDataAreas = true;
     }
@@ -169,20 +166,70 @@ public class CitaController implements Serializable {
      */
     public void ComprobarHorario(){
         System.out.println("Comprobar Horario");
+        ResultadoTO resultadoH = areasBusiness.obtenerHorariosFromDB(URLs.HorariosReservados.getValor(), MethodsGenerics.formatDate(getStrCurrentCalendar()), getStrCurrentArea());
+        List<String> horas = (List<String>) resultadoH.getObjeto();
+        List<String> listHorarios = MethodsGenerics.generarHorarios(8,13, 25, horas);
+        System.out.println("|----- New list horarios =>"+listHorarios);
+
+        setListHorariosShow(listHorarios);
+
+        final ResultadoTO res = new ResultadoTO();
+        if (resultadoH.isBlnValido() && !horas.isEmpty())
+        {
+            res.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.fechas.ok");
+        }
+        else{
+            res.agregarMensaje(SeveridadMensajeEnum.ALERTA, "comun.msj.citas.fechas.loaderror");
+        }
+        vHelp.pintarMensajes(msj, res);
+        res.cleaner();
+
+
+    }
+
+    public String fechaFormatCita(){
+
+        if (getStrCurrentCalendar() != null){
+            strLocalFecha = getStrCurrentCalendar();
+            return MethodsGenerics.formatDate(getStrCurrentCalendar());
+        } else
+            return "Vació";
     }
 
     public String getLink(){
-
-        /*
-         * TODO CREAR un servicio para obtener el url del los requisitos del tramite.
-         */
+        String link = "";
         Requisitos[] lista = Requisitos.values();
 
         for (Requisitos requisitos : lista) {
-            System.out.println(requisitos.toString());
+            String[] data = requisitos.getUrl();
+            if (strCurrentTramite != null){
+                if (strCurrentTramite.equals(data[1])){
+                    link=data[0];
+                }
+            }
         }
 
-        return "google.com";
+        return link;
+    }
+
+    public void agendarCita(){
+        String[] strindate = strLocalFecha.split(" ");
+        if (strindate[0].equals("Sat") || strindate[0].equals("Sun")){
+            final ResultadoTO res = new ResultadoTO();
+            res.agregarMensaje(SeveridadMensajeEnum.ALERTA, "comun.msj.citas.daysnotfound");
+            vHelp.pintarMensajes(msj, res);
+            res.cleaner();
+        }
+
+
+        System.out.println(
+                        strCurrentArea+'\n'+
+                        strCurrentTramite+'\n'+
+                        strLocalMatricula+'\n'+
+                        strCurrentHora+'\n'+
+                        strLocalFecha+'\n'+
+                        strLocalNombreUser
+        );
     }
 
     /**
@@ -345,6 +392,14 @@ public class CitaController implements Serializable {
 
     public String getStrLocalDescripcion() {
         return strLocalDescripcion;
+    }
+
+    public boolean isHasDataLink() {
+        return hasDataLink;
+    }
+
+    public void setHasDataLink(boolean hasDataLink) {
+        this.hasDataLink = hasDataLink;
     }
 
     public void setStrLocalDescripcion(String strLocalDescripcion) {
