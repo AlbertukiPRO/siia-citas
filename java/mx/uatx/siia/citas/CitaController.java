@@ -4,6 +4,7 @@ import com.sun.istack.NotNull;
 import mx.uatx.siia.citas.modelo.Tramites.business.TramitesBusiness;
 import mx.uatx.siia.citas.modelo.areas.business.AreasBusiness;
 import mx.uatx.siia.citas.modelo.citasBusiness.MethodsGenerics;
+import mx.uatx.siia.citas.modelo.citasBusiness.CitaBusiness;
 import mx.uatx.siia.citas.modelo.enums.Requisitos;
 import mx.uatx.siia.citas.modelo.enums.URLs;
 import mx.uatx.siia.comun.helper.VistasHelper;
@@ -15,9 +16,15 @@ import org.slf4j.LoggerFactory;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
@@ -46,6 +53,7 @@ public class CitaController implements Serializable {
     private boolean hasDataAreas = false;
     private boolean hasDataTramites = false;
     private boolean hasDataLink = false;
+    private boolean isCitaAgendada = false;
     @NotNull
     private String strFechasDisableCalendar = null;
     @NotNull
@@ -73,9 +81,10 @@ public class CitaController implements Serializable {
 
     @ManagedProperty("#{areasBusiness}")
     private AreasBusiness areasBusiness;
-
     @ManagedProperty("#{tramitesBusiness}")
     private TramitesBusiness tramitesBusiness;
+    @ManagedProperty("#{citaBusiness}")
+    private CitaBusiness citaBusiness;
     @ManagedProperty("#{msj}")
     private ResourceBundle msj;
     private final VistasHelper vHelp = new VistasHelper();
@@ -132,7 +141,6 @@ public class CitaController implements Serializable {
         final ResultadoTO res = new ResultadoTO();
         res.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.areas.succesful");
         vHelp.pintarMensajes(msj, res);
-        res.cleaner();
 
         hasDataAreas = true;
     }
@@ -182,7 +190,6 @@ public class CitaController implements Serializable {
             res.agregarMensaje(SeveridadMensajeEnum.ALERTA, "comun.msj.citas.fechas.loaderror");
         }
         vHelp.pintarMensajes(msj, res);
-        res.cleaner();
 
 
     }
@@ -215,21 +222,66 @@ public class CitaController implements Serializable {
     public void agendarCita(){
         String[] strindate = strLocalFecha.split(" ");
         if (strindate[0].equals("Sat") || strindate[0].equals("Sun")){
-            final ResultadoTO res = new ResultadoTO();
-            res.agregarMensaje(SeveridadMensajeEnum.ALERTA, "comun.msj.citas.daysnotfound");
-            vHelp.pintarMensajes(msj, res);
-            res.cleaner();
-        }
+            try {
+                final ResultadoTO res = new ResultadoTO();
+                res.agregarMensaje(SeveridadMensajeEnum.ALERTA, "comun.msj.citas.daysnotfound");
+                vHelp.pintarMensajes(msj, res);
+            }catch (Exception e){
+                System.out.println("-- EXCEPTION IN MSJ");
+                System.out.println(e);
+            }
+        }else{
+            Map<String, String> valores = new HashMap<>();
 
+            valores.put("matricula",strLocalMatricula);
+            valores.put("idtramite",strCurrentTramite);
+            valores.put("idarea",strCurrentArea);
+            valores.put("descripcion",strMotivoCita);
+            valores.put("fecha",MethodsGenerics.formatDate(strLocalFecha));
+            valores.put("hora",strCurrentHora);
+
+
+            System.out.println("PUT [ Save Cita ] WITH -> "+valores);
+
+            ResultadoTO resultado = citaBusiness.agendarCita(valores, URLs.AgendarCita.getValor());
+            int codeResponse = (int) resultado.getObjeto();
+
+            /**
+             * @see  todo Metodo provicional hasta que tenga la implementacion correcta de los PDFs
+             */
+            HttpServletResponse res = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
+            HttpServletRequest req = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+            String url = "http://localhost/siiaServices/reportes/generarPDF.php?id="+strLocalNombreUser+","+strLocalMatricula;
+            try {
+                res.getWriter().println("<script>open('" + url + "','_blank', 'location=yes,height=600,width=800,scrollbars=yes,status=yes');</script>");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            FacesContext.getCurrentInstance().responseComplete();
+
+            if (codeResponse == 200){
+                isCitaAgendada = true;
+                pintarMensajeCitaAgendada();
+                vHelp.redireccionar("index.uat");
+            }
+        }
 
         System.out.println(
                         strCurrentArea+'\n'+
                         strCurrentTramite+'\n'+
                         strLocalMatricula+'\n'+
                         strCurrentHora+'\n'+
-                        strLocalFecha+'\n'+
+                        MethodsGenerics.formatDate(strLocalFecha)+'\n'+
                         strLocalNombreUser
         );
+    }
+
+    public void pintarMensajeCitaAgendada(){
+        if (isCitaAgendada) {
+            final ResultadoTO res = new ResultadoTO();
+            res.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.citas.ok");
+            vHelp.pintarMensajes(msj, res);
+        }
     }
 
     /**
@@ -260,6 +312,14 @@ public class CitaController implements Serializable {
 
     public boolean isHasDataAreas() {
         return hasDataAreas;
+    }
+
+    public CitaBusiness getCitaBusiness() {
+        return citaBusiness;
+    }
+
+    public void setCitaBusiness(CitaBusiness citaBusiness) {
+        this.citaBusiness = citaBusiness;
     }
 
     public void setHasDataAreas(boolean hasDataAreas) {
@@ -400,6 +460,14 @@ public class CitaController implements Serializable {
 
     public void setHasDataLink(boolean hasDataLink) {
         this.hasDataLink = hasDataLink;
+    }
+
+    public boolean isCitaAgendada() {
+        return isCitaAgendada;
+    }
+
+    public void setCitaAgendada(boolean citaAgendada) {
+        isCitaAgendada = citaAgendada;
     }
 
     public void setStrLocalDescripcion(String strLocalDescripcion) {

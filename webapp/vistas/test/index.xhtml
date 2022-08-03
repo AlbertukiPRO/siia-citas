@@ -12,18 +12,20 @@
 <!--            6-->
             <b:panel title="Citas" largeScreen="8" collapsible="false">
                 <b:container styleClass="panel-body" fluid="true">
-                    <legend>Citas</legend>
-                    <b:form>
+                    <legend>Citas <b:iconAwesome name="info" onclick="showModalWellcome()"></b:iconAwesome> </legend>
+                    <b:form id="form">
                         <b:row>
                             <b:column mediumScreen="9" smallScreen="12"></b:column>
                             <b:column mediumScreen="1" smallScreen="12">
                                 <b:commandButton value="Nueva cita"
                                                  action="#{citabean.renderDataAlumno(auth.strNombreUsuarioLogin, auth.strUsuario)}"
                                                  title="Nueva cita"
+                                                 ajax="true"
+                                                 update=":form:contenido"
                                                  styleClass="btn btn-default">
                                 </b:commandButton>
                             </b:column>
-                            <b:column mediumScreen="1" smallScreen="12">
+                            <b:column mediumScreen="1" smallScreen="12" >
                                 <b:commandButton title="Buscar Citas"
                                                  value="Buscar Cita"
                                                  action="#{misictas.UpdateValores(auth.strNombreUsuarioLogin,auth.strUsuario)}"
@@ -31,18 +33,14 @@
                                 </b:commandButton>
                             </b:column>
                         </b:row>
-
                         <b:container style="margin-top:25px"></b:container>
-
                         <b:row>
                             <b:container>
                                 <b:navCommandLink href="index.uat" value="Reinicar formulario"  iconAwesome="refresh" iconAlign="right"></b:navCommandLink>
                             </b:container>
                         </b:row>
-
                         <b:container style="margin-top:25px"></b:container>
-
-                        <b:row>
+                        <b:row id="contenido">
                             <b:column mediumScreen="6" largeScreen="6" smallScreen="12">
                                 <!-- Seccion Izquierda FORMULARIO -->
                                 <b:row>
@@ -117,13 +115,13 @@
                                             </b:formGroup>
                                         </b:column>
 
-                                        <b:column smallScreen="12" largeScreen="4" mediumScreen="4" style="margin-top:15px">
-                                           <b:navCommandLink style="color:white !important"
+                                        <b:column smallScreen="12" largeScreen="4" mediumScreen="4" style="margin-top:18px">
+                                           <b:navCommandLink style="color:white !important; text-transform:none;"
                                                    rendered="#{citabean.hasDataTramites}"
                                                    action="#{citabean.ComprobarHorario()}"
                                                    value="Comprobar disponibilidad"
                                                    update="@form"
-                                                   styleClass="btn btn-default"
+                                                   styleClass="btn"
                                            ></b:navCommandLink>
                                         </b:column>
                                     </b:row>
@@ -243,16 +241,22 @@
                                     </b:column>
                                 </b:row>
                                 <b:row>
-                                    <b:container id="linkgo" rendered="#{citabean.hasDataLink}" style="margin-top:15px">
-                                        <h5><h:outputText value="Requisitos de tramite:"></h:outputText></h5>
-                                        <b:label severity="primary" style="font-size:10px;margin-top:10px" value="#{msj['comun.label.citas.requisitosLabel']}">
-                                        </b:label>
-                                        <a href="#{citabean.getLink()}" target="_blank">Ver requisitos</a>
-                                    </b:container>
+                                  <b:column smallScreen="12" mediumScreen="3" largeScreen="3">
+                                      <b:container id="linkgo" rendered="#{citabean.hasDataLink}" style="margin-top:15px;width:300px">
+                                          <h5><h:outputText value="Requisitos de tramite:" style="color:#5E0723;font-weight: bold;"></h:outputText></h5>
+                                          <b:label severity="primary" style="font-size:10px;margin-top:10px" value="#{msj['comun.label.citas.requisitosLabel']}">
+                                          </b:label>
+                                          <a href="#{citabean.getLink()}" target="_blank">Ver requisitos</a>
+                                      </b:container>
+                                  </b:column>
                                 </b:row>
                                 <br/>
-                                <b:container style="margin-top:15px">
-                                    <b:commandButton styleClass="btn" value="Agendar cita" action="#{citabean.agendarCita()}" ajax="true"></b:commandButton>
+                                <b:container style="margin-top:15px;width:10px">
+                                    <b:commandButton styleClass="btn btn-default"
+                                                     value="Agendar cita"
+                                                     action="#{citabean.agendarCita()}"
+                                                     ajax="true">
+                                    </b:commandButton>
                                 </b:container>
                             </b:column>
                         </b:row>
@@ -260,13 +264,77 @@
                 </b:container>
             </b:panel>
         </b:container>
-        <h:outputScript>
-            $(function () {
-                $('#Fechas').datetimepicker({
-                    inline: true,
-                    daysOfWeekDisabled: [0, 6]
-                })
-            })
-        </h:outputScript>
+        <b:modal id="modalCancelar" title="Cancelar Cita" styleClass="modalCancelar">
+            <p>Esta a punto de cancelar su cita con el area de <h:outputText value="#{misictas.localArea}"></h:outputText> con el objetivo de  <h:outputText value="#{misictas.localTramite}"></h:outputText> </p>
+            <h:form>
+                <b:inputText placeholder="Escribe aquí" value="#{misictas.motivoCancelación}"></b:inputText>
+
+                <b:commandButton title="Cancelar" value="Cancelar" action="#{misictas.Cancelar()}" styleClass="btn btn-default">
+                </b:commandButton>
+            </h:form>
+            <f:facet name="footer">
+                <b:button value="Cerrar" dismiss="modal" />
+                <b:button value="Estoy de acuerdo" look="btn btn-default" dismiss="modal" />
+            </f:facet>
+        </b:modal>
+        <b:modal id="modalWellcome" title="Bienvenido al modulo de citas" styleClass="modal">
+            <b:well>
+                <h3>Bienvenido al nuevo modulo de citas</h3>
+                <p>
+                    En este nuevo modulo podras agendar tus citas con las diferentes areas de la univerisad. <br/>
+                    <h:outputText value="¿Como se usa?" style="font-weight: bold;"></h:outputText>
+                </p>
+                <b:carousel id="carrucelitems" startAnimation="false" showIndicators="true" wrap="false">
+                    <b:carouselItem>
+                        <h:graphicImage library="imagenes" name="citas/selectArea.png" alt="img areas"></h:graphicImage>
+                        <b:carouselCaption>
+                            <h5>Selecciona el area o departamento el en cual nesitas una cita</h5>
+                        </b:carouselCaption>
+                    </b:carouselItem>
+
+                    <b:carouselItem>
+                        <h:graphicImage library="imagenes" name="citas/selecTramite.png" alt="img areas"></h:graphicImage>
+                        <b:carouselCaption>
+                            <h5>Selecciona el tramite que vas a realizar</h5>
+                        </b:carouselCaption>
+                    </b:carouselItem>
+
+                    <b:carouselItem>
+                        <h:graphicImage library="imagenes" name="citas/calendar.png" alt="img areas"></h:graphicImage>
+                        <b:carouselCaption>
+                            <h5>Elige una fecha y da clik en comprobar disponibilidad</h5>
+                        </b:carouselCaption>
+                    </b:carouselItem>
+
+                    <b:carouselItem>
+                        <h:graphicImage library="imagenes" name="citas/selectHora.png" alt="img areas"></h:graphicImage>
+                        <b:carouselCaption>
+                            <h5>Elige un horario dentro de los disponibles si la lista esta vacias elige otra fecha</h5>
+                        </b:carouselCaption>
+                    </b:carouselItem>
+
+                    <b:carouselItem>
+                        <h:graphicImage library="imagenes" name="citas/resumencita.png" alt="img areas"></h:graphicImage>
+                        <b:carouselCaption>
+                            <h5>Esto es un resumen de tu cita comprueba que los datos son correctos antes de agendar</h5>
+                        </b:carouselCaption>
+                    </b:carouselItem>
+                </b:carousel>
+
+            </b:well>
+
+            <f:facet name="footer">
+                <b:button value="Lo tengo!" look="btn btn-default" dismiss="modal" />
+            </f:facet>
+        </b:modal>
+        <script>
+            $(document).ready(function () {
+                const showModalCancelarCita = () => $('.modalCancelar').modal();
+
+                const showModalWellcome = () => $('#modalWellcome').modal();
+
+                showModalWellcome();
+            });
+        </script>
     </ui:define>
 </ui:composition>
