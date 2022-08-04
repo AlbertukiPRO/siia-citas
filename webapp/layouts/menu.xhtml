@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:b="http://bootsfaces.net/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+	<b:form id="idFormMenusGlobales">
+		<b:navBar>
+			<b:navbarLinks>
+
+				<b:navLink href="#{msj['comun.menu.home.url']}"
+					rendered="#{auth.estaLogueado()}" value="#{msj['comun.menu.home']}" />
+				<b:dropMenu rendered="#{auth.estaLogueado()}"
+					value="#{msj['comun.menu.serviciosEscolares.menuservicios']}">
+					<b:navCommandLink process="@this" update="@form"
+						rendered="#{auth.estaLogueado() and auth.hasRole('SolicitarServicio')}"
+						value="#{msj['comun.menu.servicios.solicitarServ']}"
+						action="#{solicitarPeticionesControlador.inicializar()}" />
+
+					<b:navCommandLink href="#{msj['comun.menu.servicios.solicitarCita.url']}" process="@this" update="@form"
+									  rendered="#{auth.estaLogueado() and auth.hasRole('SolicitarServicio')}"
+									  value="#{msj['comun.menu.servicios.solicitarCita']}"
+									  onclick="location.href = 'http://localhost:8081/SIIA/vistas/test/index.uat'" />
+
+					<b:navCommandLink process="@this" update="@form"
+						rendered="#{auth.estaLogueado() and auth.hasRole('AdministrarMesaAyuda')}"
+						value="#{msj['serviciosUniversitario.admMesaAyuda.menu']}"
+						action="#{administrarTableroPeticionesControlador.inicializar()}" />
+				</b:dropMenu>
+			</b:navbarLinks>
+		</b:navBar>
+	</b:form>
+</ui:composition>
