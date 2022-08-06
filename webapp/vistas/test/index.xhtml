@@ -29,7 +29,9 @@
                                 <b:commandButton title="Buscar Citas"
                                                  value="Buscar Cita"
                                                  action="#{misictas.UpdateValores(auth.strNombreUsuarioLogin,auth.strUsuario)}"
-                                                 styleClass="btn btn-default" update="@form">
+                                                 ajax="true"
+                                                 update="@form"
+                                                 styleClass="btn btn-default">
                                 </b:commandButton>
                             </b:column>
                         </b:row>
@@ -40,6 +42,35 @@
                             </b:container>
                         </b:row>
                         <b:container style="margin-top:25px"></b:container>
+
+                        <!-- IMPLEMENTACION PARA UNA MOSTRAR CITAS -->
+                        <b:row id="miscitas" rendered="#{misictas.renderMisCitas}">
+                            <b:container >
+                                <legend>
+                                    Mis Citas
+                                </legend>
+                                <b:container>
+                                    <b:row>
+                                        <b:column largeScreen="10" mediumScreen="10" smallScreen="10">
+                                            <b:dataTable value="#{misictas.listMisCitas}" var="item">
+                                                <b:dataTableColumn value="#{item.strIdCita}" label="ID"></b:dataTableColumn>
+                                                <b:dataTableColumn value="#{item.strDescripcionCita}" label="Datos Cita"></b:dataTableColumn>
+                                                <b:dataTableColumn value="#{item.area}" label="Area"></b:dataTableColumn>
+                                                <b:dataTableColumn value="#{item.tramite}" label="Tramite"></b:dataTableColumn>
+                                                <b:dataTableColumn value="#{item.strRepuesta}" label="Retroalimentación"></b:dataTableColumn>
+                                                <b:dataTableColumn value="#{item.strFechaHoraReservada}" label="Fecha y Hora"></b:dataTableColumn>
+                                                <b:dataTableColumn  value="#{item.strEstatus}" label="Estatus"></b:dataTableColumn>
+                                                <b:dataTableColumn label="Cancelar" rendered="#{misictas.isCancelable(item.strEstatus)}" >
+                                                    <b:commandButton icon="pencil" iconSize="1x" styleClass="btn btn-default" onclick="$('.modalCancelar').modal()" action="#{misictas.SetModalCancelar(item.area,item.tramite)}"></b:commandButton>
+                                                    <h:inputHidden value="#{misictas.localTramite}" id="tramite"></h:inputHidden>
+                                                </b:dataTableColumn>
+                                            </b:dataTable>
+                                        </b:column>
+                                    </b:row>
+                                </b:container>
+                            </b:container>
+                        </b:row>
+                        <!-- IMPLEMENTACION PARA UNA NUEVA CITA -->
                         <b:row id="contenido">
                             <b:column mediumScreen="6" largeScreen="6" smallScreen="12">
                                 <!-- Seccion Izquierda FORMULARIO -->
@@ -267,7 +298,7 @@
         <b:modal id="modalCancelar" title="Cancelar Cita" styleClass="modalCancelar">
             <p>Esta a punto de cancelar su cita con el area de <h:outputText value="#{misictas.localArea}"></h:outputText> con el objetivo de  <h:outputText value="#{misictas.localTramite}"></h:outputText> </p>
             <h:form>
-                <b:inputText placeholder="Escribe aquí" value="#{misictas.motivoCancelación}"></b:inputText>
+                <b:inputText placeholder="Escribe aquí" value="#{misictas.motivoCancelacion}"></b:inputText>
 
                 <b:commandButton title="Cancelar" value="Cancelar" action="#{misictas.Cancelar()}" styleClass="btn btn-default">
                 </b:commandButton>

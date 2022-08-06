@@ -8,6 +8,7 @@ import mx.uatx.siia.citas.modelo.citasBusiness.CitaBusiness;
 import mx.uatx.siia.citas.modelo.enums.Requisitos;
 import mx.uatx.siia.citas.modelo.enums.URLs;
 import mx.uatx.siia.comun.helper.VistasHelper;
+import mx.uatx.siia.logeo.helper.SessionHelper;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
 import mx.uatx.siia.serviciosUniversitarios.enums.SeveridadMensajeEnum;
 import org.slf4j.Logger;
@@ -260,6 +261,7 @@ public class CitaController implements Serializable {
             FacesContext.getCurrentInstance().responseComplete();
 
             if (codeResponse == 200){
+                System.out.println("|------------------ CODE RESPONSE : "+codeResponse);
                 isCitaAgendada = true;
                 pintarMensajeCitaAgendada();
                 vHelp.redireccionar("index.uat");
@@ -278,6 +280,7 @@ public class CitaController implements Serializable {
 
     public void pintarMensajeCitaAgendada(){
         if (isCitaAgendada) {
+            System.out.println("|-------------- Cita agendada --------------------|");
             final ResultadoTO res = new ResultadoTO();
             res.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.citas.ok");
             vHelp.pintarMensajes(msj, res);
