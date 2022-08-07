@@ -8,7 +8,6 @@ import mx.uatx.siia.citas.modelo.citasBusiness.CitaBusiness;
 import mx.uatx.siia.citas.modelo.enums.Requisitos;
 import mx.uatx.siia.citas.modelo.enums.URLs;
 import mx.uatx.siia.comun.helper.VistasHelper;
-import mx.uatx.siia.logeo.helper.SessionHelper;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
 import mx.uatx.siia.serviciosUniversitarios.enums.SeveridadMensajeEnum;
 import org.slf4j.Logger;
@@ -55,6 +54,7 @@ public class CitaController implements Serializable {
     private boolean hasDataTramites = false;
     private boolean hasDataLink = false;
     private boolean isCitaAgendada = false;
+    private boolean hasCalendar = false;
     @NotNull
     private String strFechasDisableCalendar = null;
     @NotNull
@@ -130,24 +130,23 @@ public class CitaController implements Serializable {
                 setStrLocalTramite(list.getLabel());
         }
         hasDataLink = true;
+        hasCalendar = true;
     }
 
     public void renderDataAlumno(String name, String matricula){
 
+        if (matricula != null){
+            ResultadoTO resultado = citaBusiness.numeroCitas(URLs.GetNumCitas.getValor(), matricula);
+            System.out.println("GET: value from numCitas => "+ resultado.getObjeto());
+        }
+
         this.strLocalNombreUser = name;
         this.strLocalMatricula = matricula;
-
-        setListAreas(returnAreasList());
-
-        final ResultadoTO res = new ResultadoTO();
-        res.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.areas.succesful");
-        vHelp.pintarMensajes(msj, res);
 
         hasDataAreas = true;
     }
 
     /**
-     *
      * @return List => SelectItem para el elemento SelectOneMenu de Bootfaces
      */
     public List<SelectItem> returnAreasList(){
@@ -331,6 +330,14 @@ public class CitaController implements Serializable {
 
     public String getStrCurrentArea() {
         return strCurrentArea;
+    }
+
+    public boolean isHasCalendar() {
+        return hasCalendar;
+    }
+
+    public void setHasCalendar(boolean hasCalendar) {
+        this.hasCalendar = hasCalendar;
     }
 
     public void setStrCurrentArea(String strCurrentArea) {
