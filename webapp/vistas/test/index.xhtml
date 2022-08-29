@@ -4,16 +4,14 @@
                 xmlns:b="http://bootsfaces.net/ui"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:p="http://primefaces.org/ui"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 template="/layouts/template.xhtml">
-
     <ui:define name="content">
         <b:container fluid="true">
 <!--            6-->
             <b:panel title="Citas" largeScreen="8" collapsible="false">
                 <b:container styleClass="panel-body" fluid="true">
-                    <legend>Citas <b:iconAwesome name="info" onclick="showModalWellcome()"></b:iconAwesome> </legend>
+                    <legend>Citas <b:iconAwesome name="info" styleClass="btn" onclick="showModalWellcome()"></b:iconAwesome> </legend>
                     <b:form id="formid">
                         <b:row>
                             <b:column mediumScreen="9" smallScreen="12"></b:column>
@@ -22,8 +20,9 @@
                                                  action="#{citabean.renderDataAlumno(auth.strNombreUsuarioLogin, auth.strUsuario)}"
                                                  title="Nueva cita"
                                                  ajax="true"
+                                                 disabled="#{citabean.btnLookNewCita}"
                                                  tooltip="Formulario para agendar una cita"
-                                                 update=":formid:contenido:areasselect"
+                                                 update=":formid:contenido:areasselect :formid:contenido:growluno"
                                                  styleClass="btn btn-default">
                                 </b:commandButton>
                             </b:column>
@@ -31,6 +30,7 @@
                                 <b:commandButton title="Buscar Citas"
                                                  value="Buscar Cita"
                                                  ajax="true"
+                                                 disabled="#{misictas.btnLookForCitas}"
                                                  action="#{misictas.UpdateValores(auth.strNombreUsuarioLogin,auth.strUsuario)}"
                                                  update="@form"
                                                  styleClass="btn btn-default">
@@ -38,11 +38,6 @@
                             </b:column>
                         </b:row>
                         <b:container style="margin-top:25px"></b:container>
-                        <b:row>
-                            <b:container>
-                                <b:navCommandLink href="index.uat" value="Reinicar formulario"  iconAwesome="refresh" iconAlign="right"></b:navCommandLink>
-                            </b:container>
-                        </b:row>
                         <b:container style="margin-top:25px"></b:container>
 
                         <!-- IMPLEMENTACION PARA UNA MOSTRAR CITAS -->
@@ -63,7 +58,7 @@
                                                 <b:dataTableColumn value="#{item.strFechaHoraReservada}" label="Fecha y Hora"></b:dataTableColumn>
                                                 <b:dataTableColumn  value="#{item.strEstatus}" label="Estatus"></b:dataTableColumn>
                                                 <b:dataTableColumn label="Cancelar" rendered="#{misictas.isCancelable(item.strEstatus)}" >
-                                                    <b:commandButton icon="pencil" iconSize="1x" styleClass="btn btn-default" onclick="$('.modalCancelar').modal()" action="#{misictas.SetModalCancelar(item.area,item.tramite)}"></b:commandButton>
+                                                    <b:navCommandLink icon="pencil" iconSize="1x" styleClass="btn btn-default" onclick="$('#modalCancelar').modal()" action="#{misictas.SetModalCancelar(item.area,item.tramite)}"></b:navCommandLink>
                                                     <h:inputHidden value="#{misictas.localTramite}" id="tramite"></h:inputHidden>
                                                 </b:dataTableColumn>
                                             </b:dataTable>
@@ -74,6 +69,7 @@
                         </b:row>
                         <!-- IMPLEMENTACION PARA UNA NUEVA CITA -->
                         <b:row id="contenido">
+                            <!-- Seccion Izquuerda Form de la cita -->
                             <b:column mediumScreen="6" largeScreen="6" smallScreen="12">
                                 <!-- Seccion Izquierda FORMULARIO -->
                                 <b:row>
@@ -82,7 +78,6 @@
                                         <b:row>
                                             <b:selectOneMenu value="#{citabean.strCurrentArea}"
                                                              colMd="12" colLg="12" colSm="12"
-                                                             id="comboAreas"
                                                              label="Seleccione un Area"
                                                              required="true"
                                                              requiredMessage="#{msj['comun.msj.citas.selectarearq']}"
@@ -101,19 +96,19 @@
                                             </b:selectOneMenu>
                                         </b:row>
                                     </b:formGroup>
-                                    <b:formGroup id="trami">
+                                    <b:formGroup id="trami" >
                                         <!--               COMBO DE TRAMITES             -->
                                         <b:row>
                                             <b:selectOneMenu value="#{citabean.strCurrentTramite}"
                                                              colMd="12" colLg="12" colSm="12"
-                                                             rendered="#{citabean.hasDataTramites}"
                                                              id="selectTramite"
                                                              labelStyle="text-aling:left;"
                                                              label="Seleccione el tramite"
                                                              labelColLg="12"
                                                              ajax="true"
+                                                             rendered="#{citabean.hasDataAreas}"
                                                              required="true"
-                                                             update="@form:**:Fechas"
+                                                             update="@form"
                                             >
 
                                                 <f:selectItem itemLabel="Seleccione un tramite" value="none" itemValue="none"/>
@@ -128,11 +123,14 @@
                                     </b:formGroup>
                                     <b:row>
                                         <b:column smallScreen="12" largeScreen="7" mediumScreen="7">
-                                            <b:formGroup id="Fechas" rendered="#{citabean.hasCalendar}">
+                                            <b:formGroup id="fechas" styleClass="calend" rendered="#{citabean.hasCalendar}">
                                                 <!--               DATE PICKER FECHAS             -->
                                                 <b:dateTimePicker
-                                                        weekDaysDisabled="0"
+                                                        id="datepicker"
+                                                        weekDaysDisabled="[0,6]"
                                                         format="MM/DD/YYYY"
+                                                        maxDate="#{citabean.tomaxDate}"
+                                                        minDate="#{citabean.tominDate}"
                                                         colMd="12" colLg="12" colSm="12"
                                                         mediumScreen="6" labelMediumScreen="12"
                                                         value="#{citabean.strCurrentCalendar}"
@@ -145,28 +143,33 @@
                                         </b:column>
 
                                         <b:column smallScreen="12" largeScreen="4" mediumScreen="4" style="margin-top:18px">
+                                            <b:growl id="growluno"
+                                                     globalOnly="true"
+                                                     showDetail="true"
+                                                     allowDismiss="true"
+                                                     severity="info"/>
+
                                            <b:navCommandLink style="color:white !important; text-transform:none;"
-                                                   action="#{citabean.ComprobarHorario()}"
+                                                   action="#{citabean.ComprobarHorario()}" rendered="#{citabean.hasCalendar}"
                                                    value="Comprobar disponibilidad"
-                                                   update="@form"
-                                                   styleClass="btn"
+                                                   update="growluno @form"
+                                                   styleClass="btn" ajax="true"
                                            ></b:navCommandLink>
                                         </b:column>
                                     </b:row>
                                     <br/>
                                     <br/>
                                     <b:row>
-                                        <b:formGroup>
+                                        <b:formGroup id="horas">
                                             <!--          ComboBox de los horarios                  -->
                                             <b:selectOneMenu value="#{citabean.strCurrentHora}"
                                                              colMd="12" colLg="12" colSm="12"
-                                                             rendered="false"
+                                                             rendered="#{citabean.hasHorarios}"
                                                              id="selectHorarios"
                                                              label="Seleccione el horario de su cita"
                                                              labelColLg="12"
                                                              ajax="true"
-                                                             update="combohoras"
-                                                             process="@this">
+                                                             update="@form">
 
                                                 <f:selectItem itemLabel="Seleccione su horario" value="none" itemValue="none"></f:selectItem>
                                                 <f:selectItems value="#{citabean.returnHorariosList()}"></f:selectItems>
@@ -177,7 +180,7 @@
                                         <b:formGroup>
                                             <b:inputTextarea value="#{citabean.strMotivoCita}"
                                                              colLg="12" colMd="12" colSm="12"
-                                                             rendered="false"
+                                                             rendered="#{citabean.hasHorarios}"
                                                              label="Ingrese el motivo de su cita *"
                                                              ajax="true"
                                             >
@@ -187,11 +190,13 @@
                                     </b:row>
                                 </b:row>
                             </b:column>
+                            <!-- Seperador -->
                             <b:column mediumScreen="1" largeScreen="1" smallScreen="12"></b:column>
+                            <!-- Seccion Dereacha Datos de la cita -->
                             <b:column mediumScreen="5" largeScreen="5" smallScreen="5" rendered="#{citabean.hasDataTramites}">
-                                <!-- Seccion Dereacha Datos de la cita -->
-                                <b:row rendered="#{citabean.hasDataTramites}">
-                                    <h5><h:outputText value="Resumen cita"></h:outputText></h5>
+
+                                <b:row id="panel" rendered="#{citabean.hasDataTramites}">
+                                    <h5><h:outputText style="color:#5E0723;font-weight: bold;" value="Resumen cita"></h:outputText></h5>
                                     <br/>
                                     <br/>
                                     <b:column mediumScreen="7" largeScreen="7" smallScreen="12">
@@ -268,9 +273,10 @@
                                         </b:inputText>
                                     </b:column>
                                 </b:row>
+                                <span class="separador" />
                                 <b:row>
                                   <b:column smallScreen="12" mediumScreen="3" largeScreen="3">
-                                      <b:container id="linkgo" rendered="#{citabean.hasDataLink}" style="margin-top:15px;width:300px">
+                                      <b:container id="linkgo" rendered="#{citabean.hasHorarios}" style="margin-top:15px;width:300px">
                                           <h5><h:outputText value="Requisitos de tramite:" style="color:#5E0723;font-weight: bold;"></h:outputText></h5>
                                           <b:label severity="primary" style="font-size:10px;margin-top:10px" value="#{msj['comun.label.citas.requisitoslabel']}">
                                           </b:label>
@@ -279,21 +285,25 @@
                                   </b:column>
                                 </b:row>
                                 <br/>
-                                <b:container style="margin-top:15px;width:10px">
-                                    <b:commandButton styleClass="btn btn-default"
-                                                     value="Agendar cita"
-                                                     action="#{citabean.agendarCita()}"
-                                                     ajax="true">
-                                    </b:commandButton>
-                                </b:container>
+                                <b:row>
+                                    <span class="separador" />
+                                    <b:column mediumScreen="12" largeScreen="12" smallScreen="12">
+                                        <b:container style="margin-top:15px;width:10px">
+                                            <b:commandButton styleClass="btn btn-default"
+                                                             value="Agendar cita"
+                                                             action="#{citabean.agendarCitabtn()}">
+                                            </b:commandButton>
+                                        </b:container>
+                                    </b:column>
+                                </b:row>
                             </b:column>
                         </b:row>
                     </b:form>
                 </b:container>
             </b:panel>
         </b:container>
-        <b:modal id="modalCancelar" title="Cancelar Cita" styleClass="modalCancelar">
-            <p>Esta a punto de cancelar su cita con el area de <h:outputText value="#{misictas.localArea}"></h:outputText> con el objetivo de  <h:outputText value="#{misictas.localTramite}"></h:outputText> </p>
+        <b:modal id="modalCancelar" title="Cancelar Cita" styleClass="modalCancelar modal">
+            <p>Esta a punto de cancelar su cita con el area de <h:outputText value="#{citabean.strLocalArea}"></h:outputText> con el objetivo de  <h:outputText value="#{misictas.localTramite}"></h:outputText> </p>
             <h:form>
                 <b:inputText placeholder="Escribe aquí" value="#{misictas.motivoCancelacion}"></b:inputText>
 
@@ -355,13 +365,14 @@
             </f:facet>
         </b:modal>
         <script>
-            $(document).ready(function () {
-                const showModalCancelarCita = () => $('.modalCancelar').modal();
+            const showModalWellcome = () => $('#modalWellcome').modal();
 
-                const showModalWellcome = () => $('#modalWellcome').modal();
+            $(document).ready(function () {
 
                 showModalWellcome();
             });
+
+
         </script>
     </ui:define>
 </ui:composition>

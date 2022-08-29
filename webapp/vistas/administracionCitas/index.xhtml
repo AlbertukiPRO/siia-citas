@@ -8,29 +8,42 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 template="/layouts/template.xhtml">
     <ui:define name="content">
-        <header>
-            <b:container styleClass="menuHeader">
-                <b:container styleClass="activeMenu">
-                    <h4><h:outputText value="Tablero"></h:outputText></h4>
-                </b:container>
-                <b:container >
-                    <h4><h:outputText value="Administrar"></h:outputText></h4>
-                </b:container>
-                <b:container >
-                    <h4><h:outputText value="Reportes"></h:outputText></h4>
-                </b:container>
-            </b:container>
+<!--        <b:form id="menuadmincitas">-->
+<!--            <b:navBar brand="Incio" brandHref="#" fluid="true">-->
+<!--                <b:navbarLinks>-->
+<!--                    <b:navLink value="Link" href="#">Linea del tiempo</b:navLink>-->
+<!--                    <b:dropMenu value="Reportes" iconAwesome="fa-briefcase">-->
+<!--                        <b:navLink value="rp1" href="#">Reporte 1</b:navLink>-->
+<!--                        <b:navLink value="rp2" href="#">Reporte 2</b:navLink>-->
+<!--                        <b:navLink value="rp3" href="#">Reporte 3</b:navLink>-->
+<!--                        <b:navLink value="rp3" href="#">Reporte 4</b:navLink>-->
+<!--                        <b:navLink value="rp3" href="#">Reporte 5</b:navLink>-->
+<!--                    </b:dropMenu>-->
+<!--                    <b:navLink value="Calendario" href="#"></b:navLink>-->
+<!--                    <b:navLink value="Horarios" href="#"></b:navLink>-->
+<!--                    <b:navLink value="Tramites" href="#"></b:navLink>-->
+<!--                </b:navbarLinks>-->
+<!--            </b:navBar>-->
+<!--        </b:form>-->
+<!--        <b:container styleClass="separador"></b:container>-->
+<!--        <b:container styleClass="separador"></b:container>-->
+<!--        <b:container>-->
+<!--            <b:row>-->
+<!--                <b:column>-->
+<!--                    <h:outputText value="Mes ant."></h:outputText>-->
+<!--                    <b:iconAwesome value="fa-chevron-left"></b:iconAwesome>-->
+<!--                </b:column>-->
 
-            <b:container styleClass="profile">
-                <figure>
-                    <img src="https://i.pinimg.com/originals/1f/8e/66/1f8e6642fa0dc8d2b5135c319c6b911e.jpg" alt="" />
-                </figure>
-                <b:container styleClass="dataprofile">
-                    <span><h:outputText value="Lic. Anita Gomez"></h:outputText></span>
-                    <span><h:outputText value="Servicios Escolares"></h:outputText></span>
-                </b:container>
-            </b:container>
-        </header>
+<!--                <b:column>-->
+<!--                    <h:outputText value="Agosto 2022" style="font-size: 25px"></h:outputText>-->
+<!--                </b:column>-->
+
+<!--                <b:column>-->
+<!--                    <h:outputText value="Mes siguiente."></h:outputText>-->
+<!--                    <b:iconAwesome value="fa-chevron-right"></b:iconAwesome>-->
+<!--                </b:column>-->
+<!--            </b:row>-->
+<!--        </b:container>-->
         <b:row>
             <b:column span="5">
                 <b:container styleClass="panel panel-default">
@@ -56,7 +69,7 @@
                                         </b:column>
                                         <b:column largeScreen="1" mediumScreen="1">
                                             <ui:repeat value="#{admin.listMeses}" var="item">
-                                                <p:commandButton styleClass="#{item == admin.mesActual ? 'itemDate':'btn btn-default'}" value="#{item}" action="#{admin.RefrescarFechas(item)}" update="@form">
+                                                <p:commandButton styleClass="#{item == admin.mesActual ? 'itemDate':'btn-default'}" value="#{item}" action="#{admin.RefrescarFechas(item)}" update="@form">
                                                 </p:commandButton>
                                             </ui:repeat>
                                         </b:column>

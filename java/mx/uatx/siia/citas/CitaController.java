@@ -3,8 +3,8 @@ package mx.uatx.siia.citas;
 import com.sun.istack.NotNull;
 import mx.uatx.siia.citas.modelo.Tramites.business.TramitesBusiness;
 import mx.uatx.siia.citas.modelo.areas.business.AreasBusiness;
-import mx.uatx.siia.citas.modelo.citasBusiness.MethodsGenerics;
 import mx.uatx.siia.citas.modelo.citasBusiness.CitaBusiness;
+import mx.uatx.siia.citas.modelo.citasBusiness.MethodsGenerics;
 import mx.uatx.siia.citas.modelo.enums.Requisitos;
 import mx.uatx.siia.citas.modelo.enums.URLs;
 import mx.uatx.siia.comun.helper.VistasHelper;
@@ -13,12 +13,12 @@ import mx.uatx.siia.serviciosUniversitarios.enums.SeveridadMensajeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serializable;
@@ -33,9 +33,9 @@ import java.util.ResourceBundle;
  * @apiNote Bean para el manejo del frontend del módulo citas.
  */
 
-@ManagedBean(name = "citabean")
 @ViewScoped
-public class CitaController implements Serializable {
+@ManagedBean(name = "citabean")
+public class CitaController extends CitaBusiness implements Serializable {
 
     /**
      * SerialVersion
@@ -52,9 +52,11 @@ public class CitaController implements Serializable {
     private List<String> ListHorariosShow;
     private boolean hasDataAreas = false;
     private boolean hasDataTramites = false;
-    private boolean hasDataLink = false;
+    private boolean hasHorarios = false;
     private boolean isCitaAgendada = false;
     private boolean hasCalendar = false;
+    private boolean isForHidden = false;
+    private boolean btnLookNewCita = false;
     @NotNull
     private String strFechasDisableCalendar = null;
     @NotNull
@@ -75,10 +77,13 @@ public class CitaController implements Serializable {
     private String strLocalFecha;
     private String strLocalHorario;
     private String strLocalDescripcion;
+    private String tomaxDate;
+    private String tominDate;
 
     /**
      * @BusinessProperties
      */
+
 
     @ManagedProperty("#{areasBusiness}")
     private AreasBusiness areasBusiness;
@@ -88,35 +93,17 @@ public class CitaController implements Serializable {
     private CitaBusiness citaBusiness;
     @ManagedProperty("#{msj}")
     private ResourceBundle msj;
-    private final VistasHelper vHelp = new VistasHelper();
-
-
-    /**
-     * @Methods Locales llamadas por la IU
-     */
-
+    final private VistasHelper vHelp = new VistasHelper();
 
     /**
      * @Listeners para el evento de CHANGE del SelectOneMenu de la IU
      */
     public void listenerPostAreas(){
         /**
-         * @return => List<SelectItem> with Object().values[id,nombre]
+         * @return  => List<SelectItem> with Object().values[id,nombre]
          */
         ResultadoTO res = tramitesBusiness.obtenerTramites(URLs.Tramites.getValor(), getStrCurrentArea());
         setListTramites((List<SelectItem>) res.getObjeto());
-
-        /**
-         * @return => List<String> with Dates saved in the DATABASE
-         * Servicio para obtener horarios de la db para quitarlos de la lista.
-         * Servicio es para obtener las fechas desactivadas en el calendar element BootFaces.
-         */
-
-        ResultadoTO resultadoF = areasBusiness.obtenerFechasFromDB(URLs.FechasReservadas.getValor(), getStrCurrentArea());
-        setStrFechasDisableCalendar((MethodsGenerics.formattingStringFechasCalendar((List<String>) resultadoF.getObjeto())));
-
-
-        System.out.println("[VALUE] de Fechas Reservadas => "+getStrFechasDisableCalendar());
 
         hasDataTramites = res.isBlnValido();
         setStrLocalArea(listAreas.get(Integer.parseInt(getStrCurrentArea())-1).getLabel());
@@ -129,29 +116,49 @@ public class CitaController implements Serializable {
             if ( list.getValue() == strCurrentTramite )
                 setStrLocalTramite(list.getLabel());
         }
-        hasDataLink = true;
-        hasCalendar = true;
+
+        ResultadoTO resultadoF = areasBusiness.obtenerFechasFromDB(URLs.FechasReservadas.getValor(), getStrCurrentArea());
+        /**
+         * @apiNote Se crea el string con las fechas desactivadas.
+         */
+
+        setStrFechasDisableCalendar((
+                MethodsGenerics.formattingStringFechasCalendar(
+                        (List<String>) resultadoF.getObjeto()
+                )
+        ));
+
+        tomaxDate = MethodsGenerics.lessOneDay((long) 60, false);
+        tominDate = MethodsGenerics.lessOneDay((long) 30, true);
+
+        hasHorarios = true; hasCalendar = true;
     }
 
     public void renderDataAlumno(String name, String matricula){
 
         if (matricula != null){
             ResultadoTO resultado = citaBusiness.numeroCitas(URLs.GetNumCitas.getValor(), matricula);
-            System.out.println("GET: value from numCitas => "+ resultado.getObjeto());
+
+            if (resultado.getObjeto().equals("0")){
+                this.strLocalNombreUser = name;
+                this.strLocalMatricula = matricula;
+                hasDataAreas = true;
+            }else {
+                isForHidden = true;
+                mostrarNotification(FacesMessage.SEVERITY_FATAL, "ERROR:", " Ups! Parece que ya tienes una cita.");
+            }
         }
-
-        this.strLocalNombreUser = name;
-        this.strLocalMatricula = matricula;
-
-        hasDataAreas = true;
     }
 
     /**
      * @return List => SelectItem para el elemento SelectOneMenu de Bootfaces
      */
     public List<SelectItem> returnAreasList(){
-        ResultadoTO resultado = areasBusiness.obtenerAreas(URLs.Areas.getValor());
-        setListAreas((List<SelectItem>) resultado.getObjeto());
+
+        if (listAreas == null){
+            ResultadoTO resultado = areasBusiness.obtenerAreas(URLs.Areas.getValor());
+            setListAreas((List<SelectItem>) resultado.getObjeto());
+        }
         return getListAreas();
     }
 
@@ -173,7 +180,7 @@ public class CitaController implements Serializable {
      * @apiNote  Function que comparar los horarios reservados con el horario solicitado por usuario;
      */
     public void ComprobarHorario(){
-        System.out.println("Comprobar Horario");
+        System.out.println("Comprobar Horario para la fecha => [ "+ getStrCurrentCalendar() +" ]");
         ResultadoTO resultadoH = areasBusiness.obtenerHorariosFromDB(URLs.HorariosReservados.getValor(), MethodsGenerics.formatDate(getStrCurrentCalendar()), getStrCurrentArea());
         List<String> horas = (List<String>) resultadoH.getObjeto();
         List<String> listHorarios = MethodsGenerics.generarHorarios(8,13, 25, horas);
@@ -181,17 +188,10 @@ public class CitaController implements Serializable {
 
         setListHorariosShow(listHorarios);
 
-        final ResultadoTO res = new ResultadoTO();
         if (resultadoH.isBlnValido() && !horas.isEmpty())
-        {
-            res.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.fechas.ok");
-        }
-        else{
-            res.agregarMensaje(SeveridadMensajeEnum.ALERTA, "comun.msj.citas.fechas.loaderror");
-        }
-        vHelp.pintarMensajes(msj, res);
-
-
+            mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Fechas reservada correctamente");
+        else
+           mostrarNotification(FacesMessage.SEVERITY_WARN, "WARN:", "No se pudo obtener los horarios para esta fecha intenta con otra");
     }
 
     public String fechaFormatCita(){
@@ -219,7 +219,7 @@ public class CitaController implements Serializable {
         return link;
     }
 
-    public void agendarCita(){
+    public void agendarCitabtn(){
         String[] strindate = strLocalFecha.split(" ");
         if (strindate[0].equals("Sat") || strindate[0].equals("Sun")){
             try {
@@ -246,12 +246,9 @@ public class CitaController implements Serializable {
             ResultadoTO resultado = citaBusiness.agendarCita(valores, URLs.AgendarCita.getValor());
             int codeResponse = (int) resultado.getObjeto();
 
-            /**
-             * @see  todo Metodo provicional hasta que tenga la implementacion correcta de los PDFs
-             */
             HttpServletResponse res = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
-            HttpServletRequest req = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
             String url = "http://localhost/siiaServices/reportes/generarPDF.php?id="+strLocalNombreUser+","+strLocalMatricula;
+
             try {
                 res.getWriter().println("<script>open('" + url + "','_blank', 'location=yes,height=600,width=800,scrollbars=yes,status=yes');</script>");
             } catch (IOException e) {
@@ -262,8 +259,7 @@ public class CitaController implements Serializable {
             if (codeResponse == 200){
                 System.out.println("|------------------ CODE RESPONSE : "+codeResponse);
                 isCitaAgendada = true;
-                pintarMensajeCitaAgendada();
-                vHelp.redireccionar("index.uat");
+                mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Tu cita se agendo correctamente, espera el comprobante");
             }
         }
 
@@ -277,13 +273,9 @@ public class CitaController implements Serializable {
         );
     }
 
-    public void pintarMensajeCitaAgendada(){
-        if (isCitaAgendada) {
-            System.out.println("|-------------- Cita agendada --------------------|");
-            final ResultadoTO res = new ResultadoTO();
-            res.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.citas.ok");
-            vHelp.pintarMensajes(msj, res);
-        }
+    public void mostrarNotification(FacesMessage.Severity severity, String title, String msg){
+        FacesContext.getCurrentInstance().
+                addMessage(null, new FacesMessage(severity, title, msg));
     }
 
     /**
@@ -464,12 +456,12 @@ public class CitaController implements Serializable {
         return strLocalDescripcion;
     }
 
-    public boolean isHasDataLink() {
-        return hasDataLink;
+    public boolean isHasHorarios() {
+        return hasHorarios;
     }
 
-    public void setHasDataLink(boolean hasDataLink) {
-        this.hasDataLink = hasDataLink;
+    public void setHasHorarios(boolean hasHorarios) {
+        this.hasHorarios = hasHorarios;
     }
 
     public boolean isCitaAgendada() {
@@ -480,7 +472,38 @@ public class CitaController implements Serializable {
         isCitaAgendada = citaAgendada;
     }
 
+    public boolean isForHidden() {
+        return isForHidden;
+    }
+
+    public void setForHidden(boolean forHidden) {
+        isForHidden = forHidden;
+    }
+
     public void setStrLocalDescripcion(String strLocalDescripcion) {
         this.strLocalDescripcion = strLocalDescripcion;
+    }
+
+    public String getTomaxDate() {
+        return tomaxDate;
+    }
+    public void setTomaxDate(String tomaxDate) {
+        this.tomaxDate = tomaxDate;
+    }
+
+    public String getTominDate() {
+        return tominDate;
+    }
+
+    public void setTominDate(String tominDate) {
+        this.tominDate = tominDate;
+    }
+
+    public boolean isBtnLookNewCita() {
+        return btnLookNewCita;
+    }
+
+    public void setBtnLookNewCita(boolean btnLookNewCita) {
+        this.btnLookNewCita = btnLookNewCita;
     }
 }

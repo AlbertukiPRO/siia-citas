@@ -1,19 +1,23 @@
 package mx.uatx.siia.citas;
 
 import mx.uatx.siia.citas.modelo.MisCitas;
+import mx.uatx.siia.citas.modelo.citasBusiness.CitaBusiness;
+import mx.uatx.siia.citas.modelo.enums.URLs;
 import mx.uatx.siia.comun.helper.VistasHelper;
+import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
+import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
 import java.util.List;
 import java.util.ResourceBundle;
 
 @ManagedBean(name = "misictas")
-@RequestScoped
+@ViewScoped
 public class MisCitasBean implements Serializable {
 
     /**
@@ -24,6 +28,17 @@ public class MisCitasBean implements Serializable {
 
     @ManagedProperty("#{msj}")
     private ResourceBundle msj;
+
+    @ManagedProperty("#{citaBusiness}")
+    private CitaBusiness citaBusiness;
+
+    public CitaBusiness getCitaBusiness() {
+        return citaBusiness;
+    }
+
+    public void setCitaBusiness(CitaBusiness citaBusiness) {
+        this.citaBusiness = citaBusiness;
+    }
 
     private final VistasHelper vHelp = new VistasHelper();
 
@@ -50,7 +65,7 @@ public class MisCitasBean implements Serializable {
     }
 
     private String idUser;
-    private boolean renderMisCitas;
+    private boolean renderMisCitas = false;
     private String strLocalMatricula;
     private String strLocalNombre;
 
@@ -58,27 +73,20 @@ public class MisCitasBean implements Serializable {
     private List<MisCitas> listMisCitas;
     private String localArea;
     private String localTramite;
-    private String motivoCancelación;
-    private String anoActual;
+    private String motivoCancelacion;
 
-    public MisCitasBean(){
-        System.out.println("Build Constructor Mis Citas");
-        renderMisCitas = false;
-    }
+    private boolean btnLookForCitas = false;
 
     public void UpdateValores(String nombre, String matricula){
-        renderMisCitas = true;
         strLocalMatricula = matricula;
         strLocalNombre = nombre;
         GetCitas();
     }
 
     public void GetCitas(){
-        listMisCitas = CitasHelper.getDataMisCitas("http://localhost/siiaServices/apis/misCitas.php",strLocalMatricula);
-    }
-
-    public boolean IsRender(){
-        return this.renderMisCitas;
+        ResultadoTO resultado = citaBusiness.miCita(URLs.MiCita.getValor(), strLocalMatricula);
+        listMisCitas = (List<MisCitas>) resultado.getObjeto();
+        renderMisCitas = true;
     }
 
     public boolean isCancelable(String estatus){
@@ -92,6 +100,9 @@ public class MisCitasBean implements Serializable {
     public void SetModalCancelar(String area, String tramite){
         localArea =  area;
         localTramite = tramite;
+        /**
+         * TODO implementacion para borrar la cita
+         */
     }
 
     public void Cancelar(){
@@ -100,6 +111,14 @@ public class MisCitasBean implements Serializable {
 
     public ResourceBundle getMsj() {
         return msj;
+    }
+
+    public boolean isBtnLookForCitas() {
+        return btnLookForCitas;
+    }
+
+    public void setBtnLookForCitas(boolean btnLookForCitas) {
+        this.btnLookForCitas = btnLookForCitas;
     }
 
     public void setMsj(ResourceBundle msj) {
@@ -122,12 +141,12 @@ public class MisCitasBean implements Serializable {
         this.renderMisCitas = renderMisCitas;
     }
 
-    public String getMotivoCancelación() {
-        return motivoCancelación;
+    public String getMotivoCancelacion() {
+        return motivoCancelacion;
     }
 
-    public void setMotivoCancelación(String motivoCancelación) {
-        this.motivoCancelación = motivoCancelación;
+    public void setMotivoCancelacion(String motivoCancelacion) {
+        this.motivoCancelacion = motivoCancelacion;
     }
 
     public String getStrLocalMatricula() {

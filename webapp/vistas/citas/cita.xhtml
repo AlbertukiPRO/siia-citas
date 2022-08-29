@@ -9,7 +9,7 @@
 
     <ui:define name="content">
         <f:metadata>
-            <f:viewAction action="#{cita.pintarMensajeCitaAgendada()}" />
+            <f:viewAction  action="#{cita.pintarMensajeCitaAgendada()}" />
         </f:metadata>
 
         <b:container fluid="true">
@@ -126,8 +126,6 @@
                                                         value="#{cita.obtenerAreas()}" />
                                             </b:selectOneMenu>
                                         </b:column>
-
-                                        <!-- TODO REACTIVAR EL COMBO DE LAS FECHAS -->
                                         <!-- Combo Box of Tramites -->
                                         <b:column mediumScreen="6">
                                             <b:selectOneMenu value="#{cita.listaDatosTramites}" colMd="6" colLg="6" id="selectTramite"
@@ -191,7 +189,7 @@
         <b:modal id="modalCancelar" title="Cancelar Cita" styleClass="modalCancelar">
             <p>Esta a punto de cancelar su cita con el area de <h:outputText value="#{misictas.localArea}"></h:outputText> con el objetivo de  <h:outputText value="#{misictas.localTramite}"></h:outputText> </p>
             <h:form>
-                <b:inputText placeholder="Escribe aquí" value="#{misictas.motivoCancelación}"></b:inputText>
+                <b:inputText placeholder="Escribe aquí" value="#{misictas.motivoCancelacion}"></b:inputText>
 
                 <b:commandButton title="Cancelar" value="Cancelar" action="#{misictas.Cancelar()}" styleClass="btn btn-default">
                 </b:commandButton>
@@ -216,6 +214,5 @@
                 window.open(url+idUser);
             }
         </h:outputScript>
-        <!-- TODO:Agregar el output para los datos del alumno -->
     </ui:define>
 </ui:composition>
