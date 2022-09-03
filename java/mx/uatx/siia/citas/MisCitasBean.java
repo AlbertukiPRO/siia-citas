@@ -2,22 +2,29 @@ package mx.uatx.siia.citas;
 
 import mx.uatx.siia.citas.modelo.MisCitas;
 import mx.uatx.siia.citas.modelo.citasBusiness.CitaBusiness;
+import mx.uatx.siia.citas.modelo.citasBusiness.MethodsGenerics;
 import mx.uatx.siia.citas.modelo.enums.URLs;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 @ManagedBean(name = "misictas")
-@ViewScoped
+@RequestScoped
 public class MisCitasBean implements Serializable {
 
     /**
@@ -68,6 +75,9 @@ public class MisCitasBean implements Serializable {
     private boolean renderMisCitas = false;
     private String strLocalMatricula;
     private String strLocalNombre;
+    private String stridCita;
+    private String strMotivo;
+    private boolean wasCanceled;
 
 
     private List<MisCitas> listMisCitas;
@@ -77,36 +87,55 @@ public class MisCitasBean implements Serializable {
 
     private boolean btnLookForCitas = false;
 
-    public void UpdateValores(String nombre, String matricula){
+    public void UpdateValores(String nombre, String matricula) {
         strLocalMatricula = matricula;
         strLocalNombre = nombre;
         GetCitas();
     }
 
-    public void GetCitas(){
+    public void GetCitas() {
         ResultadoTO resultado = citaBusiness.miCita(URLs.MiCita.getValor(), strLocalMatricula);
         listMisCitas = (List<MisCitas>) resultado.getObjeto();
         renderMisCitas = true;
     }
 
     public boolean isCancelable(String estatus){
-        if (estatus.equals("Agendada")){
-            return true;
-        }else{
-            return false;
-        }
+        return estatus.equals("Agendada");
     }
 
-    public void SetModalCancelar(String area, String tramite){
-        localArea =  area;
-        localTramite = tramite;
-        /**
-         * TODO implementacion para borrar la cita
-         */
+    public void SetModalCancelar(){
+        System.out.println("----- SET DATA FROM CITA----");
+
+        FacesContext fc = FacesContext.getCurrentInstance();
+        Map<String, String> params = fc.getExternalContext().getRequestParameterMap();
+        String data = params.get("idcita");
+
+        logger.info("----> Coming data from idParam -> "+data);
     }
 
     public void Cancelar(){
         System.out.println("--- CANCELAR CITA--");
+        ResultadoTO resultado = null;
+        try {
+            resultado = citaBusiness.cancelarCita(stridCita, URLEncoder.encode(motivoCancelacion, String.valueOf(StandardCharsets.UTF_8)));
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        int nRows = (int) resultado.getObjeto();
+        if (nRows!=0){
+            wasCanceled = !wasCanceled;
+            vHelp.redireccionar("/vistas/test/index.uat");
+        }else{
+            FacesContext.getCurrentInstance().
+                    addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "ERROR:", "No se pudo cancelar su cita intentelo mas tarde."));
+        }
+    }
+
+    public MisCitasBean(){
+        if (wasCanceled){
+            FacesContext.getCurrentInstance().
+                    addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "INF:", "Su cita fue cancelada exitosamente"));
+        }
     }
 
     public ResourceBundle getMsj() {
@@ -137,6 +166,9 @@ public class MisCitasBean implements Serializable {
         return renderMisCitas;
     }
 
+    public void hideMisCitas(){
+        renderMisCitas = false;
+    }
     public void setRenderMisCitas(boolean renderMisCitas) {
         this.renderMisCitas = renderMisCitas;
     }
@@ -173,4 +205,19 @@ public class MisCitasBean implements Serializable {
         this.listMisCitas = listMisCitas;
     }
 
+    public String getStridCita() {
+        return stridCita;
+    }
+
+    public void setStridCita(String stridCita) {
+        this.stridCita = stridCita;
+    }
+
+    public String getStrMotivo() {
+        return strMotivo;
+    }
+
+    public void setStrMotivo(String strMotivo) {
+        this.strMotivo = strMotivo;
+    }
 }

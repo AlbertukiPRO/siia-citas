@@ -61,8 +61,7 @@
                                                 <b:dataTableColumn value="#{item.strFechaHoraReservada}" label="Fecha y Hora"></b:dataTableColumn>
                                                 <b:dataTableColumn  value="#{item.strEstatus}" label="Estatus"></b:dataTableColumn>
                                                 <b:dataTableColumn label="Cancelar" rendered="#{misictas.isCancelable(item.strEstatus)}" >
-                                                    <b:commandButton icon="pencil" iconSize="1x" styleClass="btn btn-default" onclick="$('.modalCancelar').modal()" action="#{misictas.SetModalCancelar(item.area,item.tramite)}"></b:commandButton>
-                                                    <h:inputHidden value="#{misictas.localTramite}" id="tramite"></h:inputHidden>
+
                                                 </b:dataTableColumn>
                                             </b:dataTable>
 

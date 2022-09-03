@@ -22,8 +22,9 @@
                                                  ajax="true"
                                                  disabled="#{citabean.btnLookNewCita}"
                                                  tooltip="Formulario para agendar una cita"
-                                                 update=":formid:contenido:areasselect :formid:contenido:growluno"
+                                                 update=":formid:contenido:areasselect :formid:contenido:growluno :formid:miscitas"
                                                  styleClass="btn btn-default">
+                                    <f:ajax listener="#{misictas.hideMisCitas()}"></f:ajax>
                                 </b:commandButton>
                             </b:column>
                             <b:column mediumScreen="1" smallScreen="12" >
@@ -50,15 +51,19 @@
                                     <b:row>
                                         <b:column largeScreen="10" mediumScreen="10" smallScreen="10">
                                             <b:dataTable value="#{misictas.listMisCitas}" var="item">
-                                                <b:dataTableColumn value="#{item.strIdCita}" label="ID"></b:dataTableColumn>
+                                                <b:dataTableColumn value="CI#{item.strIdCita}" label="ID"></b:dataTableColumn>
                                                 <b:dataTableColumn value="#{item.strDescripcionCita}" label="Datos Cita"></b:dataTableColumn>
                                                 <b:dataTableColumn value="#{item.area}" label="Area"></b:dataTableColumn>
                                                 <b:dataTableColumn value="#{item.tramite}" label="Tramite"></b:dataTableColumn>
                                                 <b:dataTableColumn value="#{item.strRepuesta}" label="Retroalimentación"></b:dataTableColumn>
                                                 <b:dataTableColumn value="#{item.strFechaHoraReservada}" label="Fecha y Hora"></b:dataTableColumn>
                                                 <b:dataTableColumn  value="#{item.strEstatus}" label="Estatus"></b:dataTableColumn>
-                                                <b:dataTableColumn label="Cancelar" rendered="#{misictas.isCancelable(item.strEstatus)}" >
-                                                    <b:navCommandLink icon="pencil" iconSize="1x" styleClass="btn btn-default" onclick="$('#modalCancelar').modal()" action="#{misictas.SetModalCancelar(item.area,item.tramite)}"></b:navCommandLink>
+                                                <b:dataTableColumn label="Cancelar" rendered="#{misictas.isCancelable(item.strEstatus)}">
+                                                    <b:navCommandLink icon="pencil"
+                                                                     onclick="$('#modalCancelar').modal()"
+                                                                     actionListener="#{misictas.SetModalCancelar}">
+                                                        <f:param name="idcita" value="#{item.strIdCita}"></f:param>
+                                                    </b:navCommandLink>
                                                     <h:inputHidden value="#{misictas.localTramite}" id="tramite"></h:inputHidden>
                                                 </b:dataTableColumn>
                                             </b:dataTable>
@@ -303,16 +308,14 @@
             </b:panel>
         </b:container>
         <b:modal id="modalCancelar" title="Cancelar Cita" styleClass="modalCancelar modal">
-            <p>Esta a punto de cancelar su cita con el area de <h:outputText value="#{citabean.strLocalArea}"></h:outputText> con el objetivo de  <h:outputText value="#{misictas.localTramite}"></h:outputText> </p>
+            <p>Esta a punto de cancelar su cita con el area de <h:outputText id="label1" value="#{citabean.strLocalArea}"></h:outputText> con el objetivo de  <h:outputText value="#{misictas.localTramite}"></h:outputText> </p>
             <h:form>
-                <b:inputText placeholder="Escribe aquí" value="#{misictas.motivoCancelacion}"></b:inputText>
-
-                <b:commandButton title="Cancelar" value="Cancelar" action="#{misictas.Cancelar()}" styleClass="btn btn-default">
+                <b:inputText placeholder="Escribe aquí"   label="Ingrese el motivo de la cancelación" value="#{misictas.motivoCancelacion}"></b:inputText>
+                <b:commandButton title="Cancelar cita" value="Cancelar mi cita" action="#{misictas.Cancelar()}" update="formid:contenido:growluno" styleClass="btn btn-default">
                 </b:commandButton>
             </h:form>
             <f:facet name="footer">
-                <b:button value="Cerrar" dismiss="modal" />
-                <b:button value="Estoy de acuerdo" look="btn btn-default" dismiss="modal" />
+                <b:button value="Cancelar" dismiss="modal"></b:button>
             </f:facet>
         </b:modal>
         <b:modal id="modalWellcome" title="Bienvenido al modulo de citas" styleClass="modal">

@@ -8,8 +8,11 @@ import mx.uatx.siia.citas.modelo.citasBusiness.MethodsGenerics;
 import mx.uatx.siia.citas.modelo.enums.Requisitos;
 import mx.uatx.siia.citas.modelo.enums.URLs;
 import mx.uatx.siia.comun.helper.VistasHelper;
+import mx.uatx.siia.reportes.FieldsNuevaCita;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
 import mx.uatx.siia.serviciosUniversitarios.enums.SeveridadMensajeEnum;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.util.JRLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,10 +25,7 @@ import javax.faces.model.SelectItem;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * @author Alberto Noche Rosas
@@ -143,11 +143,45 @@ public class CitaController extends CitaBusiness implements Serializable {
                 this.strLocalNombreUser = name;
                 this.strLocalMatricula = matricula;
                 hasDataAreas = true;
-            }else {
+            } else {
                 isForHidden = true;
                 mostrarNotification(FacesMessage.SEVERITY_FATAL, "ERROR:", " Ups! Parece que ya tienes una cita.");
             }
         }
+    }
+
+    public void generarPDF(){
+        mostrarNotification(FacesMessage.SEVERITY_INFO, "INFO:", "estamos generando el pdf");
+        try {
+
+            ArrayList<FieldsNuevaCita> datos = new ArrayList<>();
+            datos.add(new FieldsNuevaCita("Alberto"));
+
+            String sourFileName = "Comprobante";
+            String rutaFiles = "resources/reportes/citas";
+            HashMap<String, Object> parameters = new HashMap<>();
+
+            parameters.put("p1", "Alberto N.");
+
+            vHelp.llenarYObtenerBytesReporteJasperPDF(rutaFiles, sourFileName, datos, parameters);
+
+        } catch (Exception e) {
+            mostrarNotification(FacesMessage.SEVERITY_WARN, "ERROR:", "no se pudo generar el pdf");
+            throw new RuntimeException("It's not possible to generate the pdf report.", e);
+        }
+
+//        try {
+//            JasperReport jasperReport = (JasperReport) JRLoader.loadObjectFromFile("");
+//
+//            Map parameters = new HashMap();
+//            parameters.put("p1", "Alberto");
+//
+//            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters);
+//
+//            JasperExportManager.exportReportToPdfFile(jasperPrint, "");
+//        }catch (JRException e){
+//            e.printStackTrace();
+//        }
     }
 
     /**

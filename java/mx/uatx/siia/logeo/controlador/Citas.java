@@ -3,7 +3,6 @@ package mx.uatx.siia.logeo.controlador;
 import com.sun.istack.NotNull;
 import mx.uatx.siia.citas.CitasHelper;
 import mx.uatx.siia.citas.ServicesCitas;
-import mx.uatx.siia.citas.modelo.citasBusiness.citaBusiness;
 import mx.uatx.siia.citas.pruebas.Prueba;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.reportes.GenerarReporte;
@@ -24,7 +23,7 @@ import java.util.*;
 
 
 @ManagedBean(name = "cita")
-@RequestScoped
+@ViewScoped
 public class Citas implements Serializable {
     /**
      * serialVersionUID
@@ -32,9 +31,6 @@ public class Citas implements Serializable {
     private static final long serialVersionUID = -2621529818431646329L;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-
-    @ManagedProperty("#{citaBusiness}")
-    private citaBusiness citaBusiness;
 
     @ManagedProperty("#{msj}")
     private ResourceBundle msj;
@@ -52,7 +48,6 @@ public class Citas implements Serializable {
     private String strFechaReserva;
     private String strRetroalimentacion;
     private String strHoraReservada;
-    public String strIdString;
 
     //Datos del alumno
     private String localstrMatricula;
@@ -85,9 +80,7 @@ public class Citas implements Serializable {
         return localprogramaEducativo;
     }
 
-    public void setLocalprogramaEducativo(String localprogramaEducativo) {
-        this.localprogramaEducativo = localprogramaEducativo;
-    }
+    public void setLocalprogramaEducativo(String localprogramaEducativo) { this.localprogramaEducativo = localprogramaEducativo;}
 
     private String localstrNombre;
     private String localfacultdad;
@@ -113,12 +106,13 @@ public class Citas implements Serializable {
     private List<String> listTramites;
     private List<String> listHorarios;
 
+    private boolean isRenderArea;
+
     public boolean isRenderDatosAlumno() {
         return renderDatosAlumno;
     }
 
     private boolean isAgendada;
-
 
     public void setRenderDatosAlumno(boolean renderDatosAlumno) {
         this.renderDatosAlumno = renderDatosAlumno;
@@ -137,6 +131,8 @@ public class Citas implements Serializable {
 
         renderDatosAlumno = true;
 
+        obtenerUsuario();
+
         System.out.println("Cambiando los valores");
     }
 
@@ -147,9 +143,12 @@ public class Citas implements Serializable {
         citasHelper  = new CitasHelper();
         generarReporte = new GenerarReporte();
         listDatosAlumno = Arrays.asList("[20181837] LICENCIATURA EN INGENIERÍA EN COMPUTACIÓN CAMPUS APIZACO (2018)");
-        obtenerAreas();
         renderDatosAlumno = false;
         logger.info("Bean Citas { Constructor() }");
+    }
+
+    public void obtenerUsuario(){
+        isRenderArea = true;
     }
 
     public void ExportarPDF() throws JRException {
@@ -161,7 +160,7 @@ public class Citas implements Serializable {
         parametros.put("strMatricula","2018183");
         parametros.put("strNombre","Alberto Noche Rosas");
 
-        vHelp.llenarYObtenerBytesReporteJasperPDF("src/main/webapp","Reporte.jasper", lista, (HashMap<String, Object>) parametros);
+        //vHelp.llenarYObtenerBytesReporteJasperPDF("src/main/webapp","Reporte.jasper", lista, (HashMap<String, Object>) parametros);
 
 //        Map<String, Object> parametros = new HashMap<String, Object>();
 //        parametros.put("strMatricula","2018183");
@@ -212,14 +211,18 @@ public class Citas implements Serializable {
     }
 
     public List<SelectItem> obtenerTramites()  {
+
         System.out.println("---- GET DATA OF TRAMITES");
+
+        FacesContext context = FacesContext.getCurrentInstance();
+
+        /* LOGICA PARA OBTENER LAS FECHAS INHÁBILES DE LAS AREAS */
         if (listaDatosAreas != null){
-            fechasDisable = getFechasInhabiles();
+            fechasDisable = getFechasInhabiles(); // TODO DESCOMENTAR CUANDO FUNCIONE EL MODULO DE GET AREAS.
             return citasHelper.getSelectTramites(listaDatosAreas);
         }else{
             return citasHelper.getSelectTramites("1");
         }
-
     }
 
     public void ComprobarFecha(){
@@ -433,13 +436,6 @@ public class Citas implements Serializable {
     *   Propiedad set para la inyección
     *   @param CitaBusiness
     */
-    public citaBusiness getCitaBusiness() {
-        return citaBusiness;
-    }
-
-    public void setCitaBusiness(citaBusiness citaBusiness) {
-        this.citaBusiness = citaBusiness;
-    }
 
     public ResourceBundle getMsj() {
         return msj;
@@ -456,4 +452,14 @@ public class Citas implements Serializable {
     public void setListaDatosAreas(String listaDatosAreas) {
         this.listaDatosAreas = listaDatosAreas;
     }
+
+
+    public boolean isRenderArea() {
+        return isRenderArea;
+    }
+
+    public void setRenderArea(boolean renderArea) {
+        isRenderArea = renderArea;
+    }
+
 }
