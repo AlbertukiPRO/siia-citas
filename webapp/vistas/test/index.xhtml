@@ -73,7 +73,7 @@
                             </b:container>
                         </b:row>
                         <!-- IMPLEMENTACION PARA UNA NUEVA CITA -->
-                        <b:row id="contenido">
+                        <b:row id="contenido" rendered="#{!citabean.isCitaAgendada()}">
                             <!-- Seccion Izquuerda Form de la cita -->
                             <b:column mediumScreen="6" largeScreen="6" smallScreen="12">
                                 <!-- Seccion Izquierda FORMULARIO -->
@@ -292,11 +292,21 @@
                                 <br/>
                                 <b:row>
                                     <span class="separador" />
-                                    <b:column mediumScreen="12" largeScreen="12" smallScreen="12">
+                                    <b:column mediumScreen="8" largeScreen="2" smallScreen="12"></b:column>
+                                    <b:column mediumScreen="2" largeScreen="2" smallScreen="12">
                                         <b:container style="margin-top:15px;width:10px">
                                             <b:commandButton styleClass="btn btn-default"
                                                              value="Agendar cita"
-                                                             action="#{citabean.agendarCitabtn()}">
+                                                             update="@form"
+                                                             actionListener="#{citabean.agendarCitabtn()}">
+                                            </b:commandButton>
+                                        </b:container>
+                                    </b:column>
+                                    <b:column mediumScreen="2" largeScreen="2" smallScreen="12" rendered="#{citabean.isCitaAgendada()}">
+                                        <b:container style="margin-top:15px;margin-left:15px;margin-right:12;width:10px">
+                                            <b:commandButton styleClass="btn btn-default"
+                                                             value="Imprimir Reporte"
+                                                             actionListener="#{citabean.generarPDF()}">
                                             </b:commandButton>
                                         </b:container>
                                     </b:column>

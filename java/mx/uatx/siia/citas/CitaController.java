@@ -151,17 +151,53 @@ public class CitaController extends CitaBusiness implements Serializable {
     }
 
     public void generarPDF(){
-        mostrarNotification(FacesMessage.SEVERITY_INFO, "INFO:", "estamos generando el pdf");
+        System.out.println("--- GENERANDO PDF ---");
         try {
+            final String foliocita = "CIA7B";
+
+//            ArrayList<FieldsNuevaCita> datos = new ArrayList<>();
+//            datos.add(new FieldsNuevaCita(
+//                    getStrLocalNombreUser(),
+//                    strLocalFecha,
+//                    fechaFormatCita(),
+//                    "Ingenenieria en computación",
+//                    strLocalMatricula,
+//                    getStrCurrentHora(),
+//                    getStrLocalDescripcion(),
+//                    foliocita,
+//                    getLink(),
+//                    MethodsGenerics.getCurrentDate()
+//            ));
 
             ArrayList<FieldsNuevaCita> datos = new ArrayList<>();
-            datos.add(new FieldsNuevaCita("Alberto"));
+            datos.add(new FieldsNuevaCita(
+                    "Yair Ivan Valencia Perez",
+                    "20/08/2022",
+                    "Baja Temporal",
+                    "Ingenieria en computación",
+                    "20082306",
+                    "10:20",
+                    "Buenas noches",
+                    foliocita,
+                    "https://uatx.mx/secretaria/tecnica/cyre/tramites#collapseFour",
+                    MethodsGenerics.getCurrentDate()
+            ));
 
             String sourFileName = "Comprobante";
             String rutaFiles = "resources/reportes/citas";
             HashMap<String, Object> parameters = new HashMap<>();
 
-            parameters.put("p1", "Alberto N.");
+            parameters.put("nombreuser", "nombreuser");
+            parameters.put("fechacita", "fechacita");
+            parameters.put("tramite", "tramite");
+            parameters.put("programaedu", "programaedu");
+            parameters.put("matricula","matricula");
+            parameters.put("hora", "hora");
+            parameters.put("descripcion", "descripcion");
+            parameters.put("foliocita", "foliocita");
+            parameters.put("link", "link");
+            parameters.put("fechaprint", "fechaprint");
+            parameters.put("qrvalue", "Alberto, 2018137");
 
             vHelp.llenarYObtenerBytesReporteJasperPDF(rutaFiles, sourFileName, datos, parameters);
 
@@ -169,19 +205,6 @@ public class CitaController extends CitaBusiness implements Serializable {
             mostrarNotification(FacesMessage.SEVERITY_WARN, "ERROR:", "no se pudo generar el pdf");
             throw new RuntimeException("It's not possible to generate the pdf report.", e);
         }
-
-//        try {
-//            JasperReport jasperReport = (JasperReport) JRLoader.loadObjectFromFile("");
-//
-//            Map parameters = new HashMap();
-//            parameters.put("p1", "Alberto");
-//
-//            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters);
-//
-//            JasperExportManager.exportReportToPdfFile(jasperPrint, "");
-//        }catch (JRException e){
-//            e.printStackTrace();
-//        }
     }
 
     /**
@@ -229,7 +252,6 @@ public class CitaController extends CitaBusiness implements Serializable {
     }
 
     public String fechaFormatCita(){
-
         if (getStrCurrentCalendar() != null){
             strLocalFecha = getStrCurrentCalendar();
             return MethodsGenerics.formatDate(getStrCurrentCalendar());
@@ -255,16 +277,9 @@ public class CitaController extends CitaBusiness implements Serializable {
 
     public void agendarCitabtn(){
         String[] strindate = strLocalFecha.split(" ");
-        if (strindate[0].equals("Sat") || strindate[0].equals("Sun")){
-            try {
-                final ResultadoTO res = new ResultadoTO();
-                res.agregarMensaje(SeveridadMensajeEnum.ALERTA, "comun.msj.citas.daysnotfound");
-                vHelp.pintarMensajes(msj, res);
-            }catch (Exception e){
-                System.out.println("-- EXCEPTION IN MSJ");
-                System.out.println(e);
-            }
-        }else{
+        if (strindate[0].equals("Sat") || strindate[0].equals("Sun"))
+            mostrarNotification(FacesMessage.SEVERITY_WARN, "WARN:", "Lo sentimos los sabados y domingos no damos servicio intenta otro dia.");
+        else{
             Map<String, String> valores = new HashMap<>();
 
             valores.put("matricula",strLocalMatricula);
@@ -274,37 +289,20 @@ public class CitaController extends CitaBusiness implements Serializable {
             valores.put("fecha",MethodsGenerics.formatDate(strLocalFecha));
             valores.put("hora",strCurrentHora);
 
-
             System.out.println("PUT [ Save Cita ] WITH -> "+valores);
 
             ResultadoTO resultado = citaBusiness.agendarCita(valores, URLs.AgendarCita.getValor());
-            int codeResponse = (int) resultado.getObjeto();
+            Map<String, String> response = (Map<String, String>) resultado.getObjeto();
 
-            HttpServletResponse res = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
-            String url = "http://localhost/siiaServices/reportes/generarPDF.php?id="+strLocalNombreUser+","+strLocalMatricula;
-
-            try {
-                res.getWriter().println("<script>open('" + url + "','_blank', 'location=yes,height=600,width=800,scrollbars=yes,status=yes');</script>");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            FacesContext.getCurrentInstance().responseComplete();
-
-            if (codeResponse == 200){
-                System.out.println("|------------------ CODE RESPONSE : "+codeResponse);
+            if (response.get("responsecode").equals("OK") && response.get("codefromservice").equals("1")){
+                System.out.println("|------------------ CODE RESPONSE : "+response);
                 isCitaAgendada = true;
                 mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Tu cita se agendo correctamente, espera el comprobante");
+
+            }else{
+                mostrarNotification(FacesMessage.SEVERITY_ERROR, "ERROR:", "No se pudo agendar tu cita");
             }
         }
-
-        System.out.println(
-                        strCurrentArea+'\n'+
-                        strCurrentTramite+'\n'+
-                        strLocalMatricula+'\n'+
-                        strCurrentHora+'\n'+
-                        MethodsGenerics.formatDate(strLocalFecha)+'\n'+
-                        strLocalNombreUser
-        );
     }
 
     public void mostrarNotification(FacesMessage.Severity severity, String title, String msg){

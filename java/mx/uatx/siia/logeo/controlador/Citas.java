@@ -5,7 +5,6 @@ import mx.uatx.siia.citas.CitasHelper;
 import mx.uatx.siia.citas.ServicesCitas;
 import mx.uatx.siia.citas.pruebas.Prueba;
 import mx.uatx.siia.comun.helper.VistasHelper;
-import mx.uatx.siia.reportes.GenerarReporte;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
 import mx.uatx.siia.serviciosUniversitarios.enums.SeveridadMensajeEnum;
 import net.sf.jasperreports.engine.JRException;
@@ -137,11 +136,9 @@ public class Citas implements Serializable {
     }
 
     private CitasHelper citasHelper;
-    private GenerarReporte generarReporte;
 
     public Citas()  {
         citasHelper  = new CitasHelper();
-        generarReporte = new GenerarReporte();
         listDatosAlumno = Arrays.asList("[20181837] LICENCIATURA EN INGENIERÍA EN COMPUTACIÓN CAMPUS APIZACO (2018)");
         renderDatosAlumno = false;
         logger.info("Bean Citas { Constructor() }");
@@ -251,23 +248,23 @@ public class Citas implements Serializable {
 
         System.out.println("PUT [ Save Cita ] WITH -> "+valores);
 
-        int codeResponse = ServicesCitas.addValues("http://localhost/siiaServices/apis/Insert.php",valores);
-
-        HttpServletResponse res = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
-        HttpServletRequest req = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        String uri = req.getRequestURI();
-        String url = "http://localhost/siiaServices/reportes/generarPDF.php?id="+localstrNombre+","+localstrMatricula;
-        try {
-            res.getWriter().println("<script>open('" + url + "','_blank', 'location=yes,height=600,width=800,scrollbars=yes,status=yes');</script>");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        FacesContext.getCurrentInstance().responseComplete();
-
-        if (codeResponse == 1){
-            isAgendada = true;
-            pintarMensajeCitaAgendada();
-        }
+//        int codeResponse = ServicesCitas.addValues("http://localhost/siiaServices/apis/Insert.php",valores);
+//
+//        HttpServletResponse res = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
+//        HttpServletRequest req = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+//        String uri = req.getRequestURI();
+//        String url = "http://localhost/siiaServices/reportes/generarPDF.php?id="+localstrNombre+","+localstrMatricula;
+//        try {
+//            res.getWriter().println("<script>open('" + url + "','_blank', 'location=yes,height=600,width=800,scrollbars=yes,status=yes');</script>");
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//        FacesContext.getCurrentInstance().responseComplete();
+//
+//        if (codeResponse == 1){
+//            isAgendada = true;
+//            pintarMensajeCitaAgendada();
+//        }
     }
 
     public void pintarMensajeCitaAgendada(){

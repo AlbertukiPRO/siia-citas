@@ -107,8 +107,9 @@ public class ServicesCitas {
         System.out.println("Finish Horarios Reservados => [value] = "+lista.toString());
         return lista;
     }
-    public static int addValues(String link, Map<String, String> valores){
+    public static Map<String, Object> addValues(String link, Map<String, String> valores){
         int codeResponde = 0;
+        Map<String, Object> response = new HashMap<>();
         System.out.println("---- SEND VALUES TO api save [ Run ]");
        try {
            URL url = new URL(link);
@@ -129,7 +130,7 @@ public class ServicesCitas {
                br = new BufferedReader(new InputStreamReader(http.getInputStream()));
                String strCurrentLine;
                while ((strCurrentLine = br.readLine()) != null) {
-                   System.out.println(strCurrentLine);
+                   codeResponde = Integer.parseInt(strCurrentLine);
                }
            } else {
                br = new BufferedReader(new InputStreamReader(http.getErrorStream()));
@@ -140,19 +141,20 @@ public class ServicesCitas {
                }
            }
 
-           //HEADERS.
-//           Map<String, List<String>> header = http.getHeaderFields();
-//
-//           for (Map.Entry<String,List<String>> entry : header.entrySet())
-//               System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
-           System.out.println("Code response server and sms: "+http.getResponseCode() + " " + http.getResponseMessage() );
+           Map<String, List<String>> header = http.getHeaderFields();
+
+           response.putAll(header);
+
+           response.put("respoSMS",http.getResponseCode());
+           response.put("responsecode",http.getResponseMessage());
+           response.put("codefromservice", codeResponde);
 
            http.disconnect();
 
        }catch (Exception e){
            System.out.println(e.toString());
        }
-        return codeResponde;
+        return response;
     }
 
     public static List<MisCitas> getMisCitas(String url, String strUser){
