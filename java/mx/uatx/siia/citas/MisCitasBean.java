@@ -6,6 +6,7 @@ import mx.uatx.siia.citas.modelo.citasBusiness.MethodsGenerics;
 import mx.uatx.siia.citas.modelo.enums.URLs;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
+import mx.uatx.siia.serviciosUniversitarios.enums.SeveridadMensajeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,6 +98,10 @@ public class MisCitasBean implements Serializable {
         ResultadoTO resultado = citaBusiness.miCita(URLs.MiCita.getValor(), strLocalMatricula);
         listMisCitas = (List<MisCitas>) resultado.getObjeto();
         renderMisCitas = true;
+
+        //! Temporal code para ver si mi teoria es cierta.
+        resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.iniciar.sesion.usuario.logueado");
+        vHelp.pintarMensajes(msj, resultado);
     }
 
     public boolean isCancelable(String estatus){

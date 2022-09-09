@@ -2,6 +2,8 @@ package mx.uatx.siia.citas;
 
 import mx.uatx.siia.citas.modelo.MisCitas;
 import mx.uatx.siia.citas.modelo.Tramites.business.TramitesBusiness;
+import mx.uatx.siia.citas.modelo.areas.business.AreasBusiness;
+import mx.uatx.siia.citas.modelo.areas.business.SiPaAreasConfiguraciones;
 import mx.uatx.siia.citas.modelo.citasBusiness.CitaBusiness;
 import mx.uatx.siia.citas.modelo.citasBusiness.MethodsGenerics;
 import mx.uatx.siia.citas.modelo.enums.ServiciosReportes;
@@ -9,10 +11,12 @@ import mx.uatx.siia.citas.modelo.enums.URLs;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.reportes.GeneriReportFields;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
+import mx.uatx.siia.serviciosUniversitarios.enums.SeveridadMensajeEnum;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
@@ -50,31 +54,35 @@ public class AdminCitasBean implements Serializable {
     private List<String> listDias;
     private List<MisCitas> listCitas;
     private List<SelectItem> listTramites;
+    private List<String> listDaysToCheck;
 
     @ManagedProperty("#{tramitesBusiness}")
     private TramitesBusiness tramitesBusiness;
 
+    @ManagedProperty("#{areasBusiness}")
+    private AreasBusiness areasBusiness;
     private int today;
     private String mesActual;
     private String strDia;
     private String strIdArea;
     private String strkindTramite;
     private String strLocalNameTramite;
-
     private String strCurrentTramite;
+    private String strCalendarValue;
+    private String strDateDisablesCalendar;
+
+    private String strHourServiceStar;
+    private String strHourServiceEnd;
+    private String strCurrentLocalDate;
+    private String strDuracionCita;
+    private String strValueDateField;
+
     private boolean hasDataTramites = false;
-
-    public boolean isHasDataTramites() {
-        return hasDataTramites;
-    }
-
-    public void setHasDataTramites(boolean hasDataTramites) {
-        this.hasDataTramites = hasDataTramites;
-    }
+    private boolean hasFielDate = false;
 
     public AdminCitasBean(){
         listMeses = Arrays.asList("Enero", "Febrero", "Marzo","Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre","Octubre", "Noviembre", "Diciembre");
-        GenerarFechas(4);
+        GenerarFechas(Calendar.getInstance().get(Calendar.MONTH));
         strIdArea = "1";
         LocalDate todaylocal = LocalDate.now();
         today = todaylocal.getDayOfMonth();
@@ -85,13 +93,52 @@ public class AdminCitasBean implements Serializable {
 
         getDayString();
         obtenerCitasGlobales();
+    }
 
+    public void getDaysDisable(){
+        System.out.println("----- Getting days disable");
+        ResultadoTO resultado = areasBusiness.obtenerFechasFromDB(URLs.FechasReservadas.getValor(), strIdArea);
+        strDateDisablesCalendar = MethodsGenerics.formattingStringFechasCalendar( (List<String>) resultado.getObjeto());
+    }
+
+    @PostConstruct
+    public void getSettingsArea(){
+        getDaysDisable();
+        System.out.println("------- Getting Setting from Area [idArea] => "+strIdArea);
+        ResultadoTO resultado = areasBusiness.obtenerConfiguracionArea(strIdArea);
+        List<SiPaAreasConfiguraciones> data = (List<SiPaAreasConfiguraciones>) resultado.getObjeto();
+
+        strDuracionCita = data.get(0).getDuracionCitas();
+        strHourServiceEnd = data.get(0).getHoraServicioFin();
+        strHourServiceStar = data.get(0).getHoraServicioInicio();
+    }
+
+    public void saveDataA(){
+        System.out.println("--- Calling to save data configuración---");
+
+        HashMap<String, String> datacollect = new HashMap<>();
+
+        datacollect.put("idarea", strIdArea);
+        datacollect.put("horainicion", strHourServiceStar);
+        datacollect.put("horafin", strHourServiceEnd);
+        datacollect.put("duracion", strDuracionCita);
+
+        ResultadoTO resultado = citaBusiness.agendarCita(datacollect, URLs.InsertData.getValor()+"?savesetting=true");
+        Map<String, Object> response = (Map<String, Object>) resultado.getObjeto();
+
+        if (response.get("codefromservice").equals("1")){
+            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.admin.savedataconfig.ok");
+            vHelp.pintarMensajes(msj,resultado);
+        }else{
+            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.admin.savedataconfig.error");
+            vHelp.pintarMensajes(msj,resultado);
+        }
     }
 
     public List<SelectItem> getListKindReportes(){
         List<SelectItem> selectItems = new ArrayList<>();
-        selectItems.add(0, new SelectItem("1", "Reporte global de cita"));
-        selectItems.add(1, new SelectItem("2", "Reporte por tipo de tramite"));
+        selectItems.add(0, new SelectItem("1", "Reporte por tipo de tramite"));
+        selectItems.add(1, new SelectItem("2", "Reporte global de cita"));
         selectItems.add(2, new SelectItem("3", "Reporte por fecha"));
 
         return selectItems;
@@ -123,7 +170,7 @@ public class AdminCitasBean implements Serializable {
                 break;
 
             case "2":
-                params = new String[]{"2", strkindTramite};
+                params = new String[]{"1", strkindTramite};
 
                 resultado = citaBusiness.getMisCitasOfService(params, ServiciosReportes.GetAllCitasOnTramite.getValor());
                 misCitas = (List<MisCitas>) resultado.getObjeto();
@@ -136,12 +183,13 @@ public class AdminCitasBean implements Serializable {
                 break;
 
             case "3":
-                params = new String[]{"3"};
+                params = new String[]{"1"};
                 resultado = citaBusiness.getMisCitasOfService(params, ServiciosReportes.GetAllCitasOnFecha.getValor());
                 misCitas = (List<MisCitas>) resultado.getObjeto();
                 colDat = new JRBeanCollectionDataSource(misCitas);
                 parameters.put("JRBeanCollectionData", colDat);
 
+                nameFile = "ReporteCitaOnTramite";
                 lista = new ArrayList<>();
                 lista.add(0, new GeneriReportFields("Departamento de Registro y control escolar", strLocalNameTramite, fechalocal, ""));
                 break;
@@ -156,10 +204,12 @@ public class AdminCitasBean implements Serializable {
     }
 
     public void listerpostReporte(){
-        ResultadoTO res = tramitesBusiness.obtenerTramites(URLs.Tramites.getValor(), "1");
-        setListTramites((List<SelectItem>) res.getObjeto());
-        if (res.isBlnValido()){
-            hasDataTramites = true;
+        if (strkindTramite.equals("1")){
+            ResultadoTO res = tramitesBusiness.obtenerTramites(URLs.Tramites.getValor(), strIdArea);
+            setListTramites((List<SelectItem>) res.getObjeto());
+            if (res.isBlnValido()){
+                hasDataTramites = true;
+            }
         }
     }
 
@@ -168,6 +218,26 @@ public class AdminCitasBean implements Serializable {
             if (list.getValue() == strkindTramite)
                 strLocalNameTramite = list.getLabel();
         }
+    }
+
+    public void RenderDaysToCalendar(){
+        System.out.println("---- Render days");
+        ResultadoTO resultado = citaBusiness.getHoursOfCalendarDisable(strIdArea, MethodsGenerics.formatDate(strCalendarValue));
+        List<String> fromDBhorarios = (List<String>) resultado.getObjeto();
+
+        strCurrentLocalDate = MethodsGenerics.formatDate(strCalendarValue);
+
+        listDaysToCheck = MethodsGenerics.generarHorarios(
+                Integer.parseInt(strHourServiceStar.replace(':', '0'))/1000,
+                Integer.parseInt(strHourServiceEnd.replace(':','0'))/1000,
+                Integer.parseInt(strDuracionCita),
+                fromDBhorarios
+        );
+    }
+
+    public void deletefromlistdays(String strCalendarValue){
+        System.out.println("to delete: "+strCalendarValue);
+        listDaysToCheck.remove(strCalendarValue);
     }
 
     private void getDayString(){
@@ -205,7 +275,7 @@ public class AdminCitasBean implements Serializable {
         int daysInMonth = yearMonth.lengthOfMonth();
 
         for (int i = 1; i <= daysInMonth; i++) {
-            listDias.add(Integer.toString(i).length() <= 9 ? "0"+i : Integer.toString(i));
+            listDias.add(i <= 9 ? "0"+i : Integer.toString(i));
         }
         System.out.println("--- FECHAS GENERADAS : "+listDias);
     }
@@ -299,6 +369,14 @@ public class AdminCitasBean implements Serializable {
         return today;
     }
 
+    public String getStrDateDisablesCalendar() {
+        return strDateDisablesCalendar;
+    }
+
+    public void setStrDateDisablesCalendar(String strDateDisablesCalendar) {
+        this.strDateDisablesCalendar = strDateDisablesCalendar;
+    }
+
     public String getStrkindTramite() {
         return strkindTramite;
     }
@@ -331,6 +409,30 @@ public class AdminCitasBean implements Serializable {
         this.listTramites = listTramites;
     }
 
+    public boolean isHasDataTramites() {
+        return hasDataTramites;
+    }
+
+    public void setHasDataTramites(boolean hasDataTramites) {
+        this.hasDataTramites = hasDataTramites;
+    }
+
+    public String getStrCalendarValue() {
+        return strCalendarValue;
+    }
+
+    public void setStrCalendarValue(String strCalendarValue) {
+        this.strCalendarValue = strCalendarValue;
+    }
+
+    public String getStrDuracionCita() {
+        return strDuracionCita;
+    }
+
+    public void setStrDuracionCita(String strDuracionCita) {
+        this.strDuracionCita = strDuracionCita;
+    }
+
     /**/
     public CitaBusiness getCitaBusiness() {
         return citaBusiness;
@@ -344,10 +446,25 @@ public class AdminCitasBean implements Serializable {
         return strIdArea;
     }
 
+    public List<String> getListDaysToCheck() {
+        return listDaysToCheck;
+    }
+
+    public void setListDaysToCheck(List<String> listDaysToCheck) {
+        this.listDaysToCheck = listDaysToCheck;
+    }
+
     public void setStrIdArea(String strIdArea) {
         this.strIdArea = strIdArea;
     }
 
+    public AreasBusiness getAreasBusiness() {
+        return areasBusiness;
+    }
+
+    public void setAreasBusiness(AreasBusiness areasBusiness) {
+        this.areasBusiness = areasBusiness;
+    }
 
     public void setToday(int today) {
         this.today = today;
@@ -389,6 +506,21 @@ public class AdminCitasBean implements Serializable {
         this.listDias = listDias;
     }
 
+    public String getStrHourServiceStar() {
+        return strHourServiceStar;
+    }
+
+    public void setStrHourServiceStar(String strHourServiceStar) {
+        this.strHourServiceStar = strHourServiceStar;
+    }
+
+    public String getStrHourServiceEnd() {
+        return strHourServiceEnd;
+    }
+
+    public void setStrHourServiceEnd(String strHourServiceEnd) {
+        this.strHourServiceEnd = strHourServiceEnd;
+    }
 
     public void setListMeses(List<String> listMeses) {
         this.listMeses = listMeses;
@@ -396,6 +528,14 @@ public class AdminCitasBean implements Serializable {
 
     public ResourceBundle getMsj() {
         return msj;
+    }
+
+    public String getStrCurrentLocalDate() {
+        return strCurrentLocalDate;
+    }
+
+    public void setStrCurrentLocalDate(String strCurrentLocalDate) {
+        this.strCurrentLocalDate = strCurrentLocalDate;
     }
 
     public void setMsj(ResourceBundle msj) {

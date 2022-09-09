@@ -22,7 +22,7 @@
 					<b:navCommandLink href="#{msj['comun.menu.servicios.solicitarCita.url']}" process="@this" update="@form"
 									  rendered="#{auth.estaLogueado() and auth.hasRole('SolicitarServicio')}"
 									  value="#{msj['comun.menu.servicios.solicitarCita']}"
-									  onclick="location.href = 'http://localhost:8081/SIIA/vistas/test/index.uat'" />
+									  onclick="location.href = 'http://localhost:8081/SIIA/vistas/citas/cita.uat'" />
 
 					<b:navCommandLink process="@this" update="@form"
 						rendered="#{auth.estaLogueado() and auth.hasRole('AdministrarMesaAyuda')}"

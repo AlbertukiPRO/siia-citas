@@ -11,8 +11,6 @@ import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.reportes.FieldsNuevaCita;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
 import mx.uatx.siia.serviciosUniversitarios.enums.SeveridadMensajeEnum;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.engine.util.JRLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,8 +20,6 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
@@ -137,16 +133,10 @@ public class CitaController extends CitaBusiness implements Serializable {
     public void renderDataAlumno(String name, String matricula){
 
         if (matricula != null){
-            ResultadoTO resultado = citaBusiness.numeroCitas(URLs.GetNumCitas.getValor(), matricula);
 
-            if (resultado.getObjeto().equals("0")){
-                this.strLocalNombreUser = name;
-                this.strLocalMatricula = matricula;
-                hasDataAreas = true;
-            } else {
-                isForHidden = true;
-                mostrarNotification(FacesMessage.SEVERITY_FATAL, "ERROR:", " Ups! Parece que ya tienes una cita.");
-            }
+            this.strLocalNombreUser = name;
+            this.strLocalMatricula = matricula;
+            hasDataAreas = true;
         }
     }
 
@@ -154,34 +144,23 @@ public class CitaController extends CitaBusiness implements Serializable {
         System.out.println("--- GENERANDO PDF ---");
         try {
             final String foliocita = "CIA7B";
-
-//            ArrayList<FieldsNuevaCita> datos = new ArrayList<>();
-//            datos.add(new FieldsNuevaCita(
-//                    getStrLocalNombreUser(),
-//                    strLocalFecha,
-//                    fechaFormatCita(),
-//                    "Ingenenieria en computación",
-//                    strLocalMatricula,
-//                    getStrCurrentHora(),
-//                    getStrLocalDescripcion(),
-//                    foliocita,
-//                    getLink(),
-//                    MethodsGenerics.getCurrentDate()
-//            ));
+            final String datePrint = MethodsGenerics.getCurrentDate();
 
             ArrayList<FieldsNuevaCita> datos = new ArrayList<>();
             datos.add(new FieldsNuevaCita(
-                    "Yair Ivan Valencia Perez",
-                    "20/08/2022",
-                    "Baja Temporal",
-                    "Ingenieria en computación",
-                    "20082306",
-                    "10:20",
-                    "Buenas noches",
+                    getStrLocalNombreUser(),
+                    MethodsGenerics.formatDate(strLocalFecha),
+                    strLocalTramite,
+                    "Ingenieria en computación - FCBIyT",
+                    strLocalMatricula,
+                    getStrCurrentHora(),
+                    strMotivoCita,
                     foliocita,
-                    "https://uatx.mx/secretaria/tecnica/cyre/tramites#collapseFour",
-                    MethodsGenerics.getCurrentDate()
+                    getLink(),
+                    datePrint
             ));
+
+            System.out.println(getStrLocalNombreUser()+strLocalFecha+fechaFormatCita()+strLocalMatricula+getStrCurrentHora()+getStrLocalDescripcion()+foliocita+getLink()+datePrint);
 
             String sourFileName = "Comprobante";
             String rutaFiles = "resources/reportes/citas";
@@ -197,7 +176,7 @@ public class CitaController extends CitaBusiness implements Serializable {
             parameters.put("foliocita", "foliocita");
             parameters.put("link", "link");
             parameters.put("fechaprint", "fechaprint");
-            parameters.put("qrvalue", "Alberto, 2018137");
+            parameters.put("qrvalue", getStrLocalNombreUser()+","+strLocalMatricula);
 
             vHelp.llenarYObtenerBytesReporteJasperPDF(rutaFiles, sourFileName, datos, parameters);
 
@@ -276,32 +255,40 @@ public class CitaController extends CitaBusiness implements Serializable {
     }
 
     public void agendarCitabtn(){
-        String[] strindate = strLocalFecha.split(" ");
-        if (strindate[0].equals("Sat") || strindate[0].equals("Sun"))
-            mostrarNotification(FacesMessage.SEVERITY_WARN, "WARN:", "Lo sentimos los sabados y domingos no damos servicio intenta otro dia.");
-        else{
-            Map<String, String> valores = new HashMap<>();
 
-            valores.put("matricula",strLocalMatricula);
-            valores.put("idtramite",strCurrentTramite);
-            valores.put("idarea",strCurrentArea);
-            valores.put("descripcion",strMotivoCita);
-            valores.put("fecha",MethodsGenerics.formatDate(strLocalFecha));
-            valores.put("hora",strCurrentHora);
+        ResultadoTO resultado = citaBusiness.numeroCitas(URLs.Commun.getValor(), strLocalMatricula, strCurrentTramite);
 
-            System.out.println("PUT [ Save Cita ] WITH -> "+valores);
+        if (resultado.getObjeto().equals("0")){
+            String[] strindate = strLocalFecha.split(" ");
+            if (strindate[0].equals("Sat") || strindate[0].equals("Sun"))
+                mostrarNotification(FacesMessage.SEVERITY_WARN, "WARN:", "Lo sentimos los sabados y domingos no damos servicio intenta otro dia.");
+            else{
+                Map<String, String> valores = new HashMap<>();
 
-            ResultadoTO resultado = citaBusiness.agendarCita(valores, URLs.AgendarCita.getValor());
-            Map<String, String> response = (Map<String, String>) resultado.getObjeto();
+                valores.put("matricula",strLocalMatricula);
+                valores.put("idtramite",strCurrentTramite);
+                valores.put("idarea",strCurrentArea);
+                valores.put("descripcion",strMotivoCita);
+                valores.put("fecha",MethodsGenerics.formatDate(strLocalFecha));
+                valores.put("hora",strCurrentHora);
 
-            if (response.get("responsecode").equals("OK") && response.get("codefromservice").equals("1")){
-                System.out.println("|------------------ CODE RESPONSE : "+response);
-                isCitaAgendada = true;
-                mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Tu cita se agendo correctamente, espera el comprobante");
+                System.out.println("PUT [ Save Cita ] WITH -> "+valores);
 
-            }else{
-                mostrarNotification(FacesMessage.SEVERITY_ERROR, "ERROR:", "No se pudo agendar tu cita");
+                ResultadoTO resultadonew = citaBusiness.agendarCita(valores, URLs.InsertData.getValor());
+                Map<String, String> response = (Map<String, String>) resultadonew.getObjeto();
+
+                if (response.get("responsecode").equals("OK") && response.get("codefromservice").equals("1")){
+                    System.out.println("|------------------ CODE RESPONSE : "+response);
+                    isCitaAgendada = true;
+                    mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Tu cita se agendo correctamente, espera el comprobante");
+
+                }else{
+                    mostrarNotification(FacesMessage.SEVERITY_ERROR, "ERROR:", "No se pudo agendar tu cita");
+                }
             }
+        } else {
+            isForHidden = true;
+            mostrarNotification(FacesMessage.SEVERITY_FATAL, "ERROR:", " Ups! Parece que ya tienes una cita.");
         }
     }
 
@@ -339,6 +326,7 @@ public class CitaController extends CitaBusiness implements Serializable {
     public boolean isHasDataAreas() {
         return hasDataAreas;
     }
+
 
     public CitaBusiness getCitaBusiness() {
         return citaBusiness;

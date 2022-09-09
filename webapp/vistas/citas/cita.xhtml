@@ -1,4 +1,3 @@
-<?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html>
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:b="http://bootsfaces.net/ui"
@@ -8,210 +7,378 @@
                 template="/layouts/template.xhtml">
 
     <ui:define name="content">
-        <f:metadata>
-            <f:viewAction  action="#{cita.pintarMensajeCitaAgendada()}" />
-        </f:metadata>
-
         <b:container fluid="true">
-            <b:panel title="Citas" collapsible="false">
-                <b:container>
-                    <br/>
-                    <b:container styleClass="panel-body" fluid="true">
-                        <legend>Citas</legend>
-                        <b:form>
-<!--                            <b:commandButton  onclick="descargarPDF()"  value="Generar PDF" update="@this" styleClass="btn btn-default"></b:commandButton>-->
-                            <b:row>
-                                <b:column mediumScreen="6">
-                                    <b:selectOneMenu value="#{cita.listaDatosAlumn}" colMd="12" colLg="12" id="selectAlumno"
-                                                     label="Seleccione el periodo educativo" labelColLg="12"
-                                                     onchange="console.log('before the change');" ajax="true" process="@this">
-
-                                        <f:selectItem itemLabel="(Please select)" itemValue="none" />
-                                        <f:selectItems value="#{cita.listDatosAlumno}" var="c"  itemValue="#{c}" itemLabel="#{c}"/>
-                                    </b:selectOneMenu>
-                                </b:column>
-                                <b:column mediumScreen="6"></b:column>
-                            </b:row>
-                            <br/>
-                            <b:row>
-                                <b:column mediumScreen="8"></b:column>
-                                <b:column mediumScreen="1">
-                                    <b:commandButton styleClass="btn btn-default"  action="#{cita.updateValues(auth.strNombreUsuarioLogin,auth.strUsuario)}" title="Nueva cita" update="@form" value="Nueva cita">
-                                    </b:commandButton>
-                                </b:column>
-                                <b:column mediumScreen="1">
-                                    <b:commandButton title="Buscar Citas" value="Buscar Cita" action="#{misictas.UpdateValores(auth.strNombreUsuarioLogin,auth.strUsuario)}" styleClass="btn btn-default" update="@form">
-                                    </b:commandButton>
-                                </b:column>
-                            </b:row>
-                            <!-- TODO : RENDER DEL MODO MIS CITAS -->
-                            <b:container id="miscitas" rendered="#{misictas.IsRender()}">
-                                <legend>
-                                    Mis Citas
-                                </legend>
+            <b:panel title="Citas" largeScreen="8" collapsible="false">
+                <b:container styleClass="panel-body" fluid="true">
+                    <legend>Citas <b:iconAwesome name="info" styleClass="btn"></b:iconAwesome> </legend>
+                    <b:form id="formid">
+                        <b:row>
+                            <b:column mediumScreen="9" smallScreen="12"></b:column>
+                            <b:column mediumScreen="1" smallScreen="12">
+                                <b:commandButton value="Nueva cita"
+                                                 action="#{citabean.renderDataAlumno(auth.strNombreUsuarioLogin, auth.strUsuario)}"
+                                                 title="Nueva cita"
+                                                 ajax="true"
+                                                 disabled="#{citabean.btnLookNewCita}"
+                                                 tooltip="Formulario para agendar una cita"
+                                                 update=":formid:contenido:areasselect :formid:contenido:growluno :formid:miscitas"
+                                                 styleClass="btn btn-default"></b:commandButton>
+                            </b:column>
+                            <b:column mediumScreen="1" smallScreen="12" >
+                                <b:commandButton title="Buscar Citas"
+                                                 value="Buscar Cita"
+                                                 ajax="true"
+                                                 icon="fa-search"
+                                                 disabled="#{misictas.btnLookForCitas}"
+                                                 action="#{misictas.UpdateValores(auth.strNombreUsuarioLogin,auth.strUsuario)}"
+                                                 update="@form"
+                                                 styleClass="btn btn-default">
+                                </b:commandButton>
+                            </b:column>
+                        </b:row>
+                        <b:container style="margin-top:25px"></b:container>
+                        <b:container style="margin-top:25px"></b:container>
+                        <!-- IMPLEMENTACION PARA UNA MOSTRAR CITAS -->
+                        <b:row id="miscitas" rendered="#{misictas.renderMisCitas}">
+                            <b:container>
+                                <legend>Mis Citas</legend>
                                 <b:container>
                                     <b:row>
                                         <b:column largeScreen="10" mediumScreen="10" smallScreen="10">
                                             <b:dataTable value="#{misictas.listMisCitas}" var="item">
-                                                <b:dataTableColumn value="#{item.strIdCita}" label="ID"></b:dataTableColumn>
+                                                <b:dataTableColumn value="CI#{item.strIdCita}" label="ID"></b:dataTableColumn>
                                                 <b:dataTableColumn value="#{item.strDescripcionCita}" label="Datos Cita"></b:dataTableColumn>
                                                 <b:dataTableColumn value="#{item.area}" label="Area"></b:dataTableColumn>
                                                 <b:dataTableColumn value="#{item.tramite}" label="Tramite"></b:dataTableColumn>
                                                 <b:dataTableColumn value="#{item.strRepuesta}" label="Retroalimentación"></b:dataTableColumn>
                                                 <b:dataTableColumn value="#{item.strFechaHoraReservada}" label="Fecha y Hora"></b:dataTableColumn>
                                                 <b:dataTableColumn  value="#{item.strEstatus}" label="Estatus"></b:dataTableColumn>
-                                                <b:dataTableColumn label="Cancelar" rendered="#{misictas.isCancelable(item.strEstatus)}" >
-
+                                                <b:dataTableColumn label="Cancelar" rendered="#{misictas.isCancelable(item.strEstatus)}">
+                                                    <b:navCommandLink icon="pencil"
+                                                                      onclick="$('#modalCancelar').modal()"
+                                                                      actionListener="#{misictas.SetModalCancelar}">
+                                                        <f:param name="idcita" value="#{item.strIdCita}"></f:param>
+                                                    </b:navCommandLink>
+                                                    <h:inputHidden value="#{misictas.localTramite}" id="tramite"></h:inputHidden>
                                                 </b:dataTableColumn>
                                             </b:dataTable>
-
                                         </b:column>
                                     </b:row>
                                 </b:container>
                             </b:container>
-                            <!-- TODO: RENDER DEL MODO nueva CITA-->
-                            <b:container rendered="#{cita.renderDatosAlumno}">
-                                <legend>Formulario nueva cita</legend>
-                                <br/>
-                                <b:container fluid="true">
-                                    <b:row>
-                                        <b:column mediumScreen="4">
-                                            <h:outputText>Nombre del alumno:</h:outputText>
-                                            <h:outputText value="#{auth.strNombreUsuarioLogin}" title="Nombre del Alumno:">
-                                            </h:outputText>
-                                        </b:column>
-                                        <b:column mediumScreen="4">
-                                            <h:outputText value="Facultada"></h:outputText>
-                                            <h:outputText value="#{cita.localfacultdad}"></h:outputText>
-                                        </b:column>
-                                        <b:column mediumScreen="4">
-                                            <h:outputText value="Programa Educativo:"></h:outputText>
-                                            <h:outputText value="#{cita.localprogramaEducativo}"></h:outputText>
-                                        </b:column>
-                                        <b:column mediumScreen="4">
-                                            <h:outputText value="Fecha Reservada:"></h:outputText>
-                                            <h:outputText value="#{cita.strcalendarValue}"></h:outputText>
-                                        </b:column>
-                                        <b:column mediumScreen="4">
-                                            <h:outputText value="Hora Reservada:"></h:outputText>
-                                            <h:outputText value="#{cita.strHoraValue}"></h:outputText>
-                                        </b:column>
-                                    </b:row>
-                                </b:container>
-                                <br/>
-                                <br/>
-                                <b:formGroup>
-                                    <b:row>
-                                        <!-- COMBOX OF Areas -->
-                                        <b:column mediumScreen="6">
-                                            <b:selectOneMenu
-                                                    value="#{cita.listaDatosAreas}"
-                                                    colMd="6" colLg="6" id="selectArea"
-                                                    label="Seleccione el area" labelColLg="12"
-                                                    ajax="true"
-                                                    process="@this">
+                        </b:row>
+                        <!-- IMPLEMENTACION PARA UNA NUEVA CITA -->
+                        <b:row id="contenido">
+                            <!-- Seccion Izquuerda Form de la cita -->
+                            <b:column mediumScreen="6" largeScreen="6" smallScreen="12">
+                                <!-- Seccion Izquierda FORMULARIO -->
+                                <b:row>
+                                    <b:formGroup id="areasselect">
+                                        <!--               COMBO DE AREAS             -->
+                                        <b:row>
+                                            <b:selectOneMenu value="#{citabean.strCurrentArea}"
+                                                             colMd="12" colLg="12" colSm="12"
+                                                             label="Seleccione un Area"
+                                                             required="true"
+                                                             requiredMessage="#{msj['comun.msj.citas.selectarearq']}"
+                                                             labelColLg="12"
+                                                             ajax="true"
+                                                             update="@form:**:trami"
+                                                             rendered="#{citabean.hasDataAreas}">
+
+                                                <f:selectItem itemLabel="Seleccione una area" value="none" itemValue="none"/>
+                                                <f:selectItems value="#{citabean.returnAreasList()}"/>
 
                                                 <f:ajax
                                                         event="change"
-                                                        render="selectTramite"
-                                                        execute="@this"
-                                                        listener="#{cita.obtenerTramites}">
+                                                        listener="#{citabean.listenerPostAreas}">
                                                 </f:ajax>
-
-                                                <f:selectItem
-                                                        itemLabel="Seleccione el area"
-                                                        itemValue="none" />
-                                                <f:selectItems
-                                                        value="#{cita.obtenerAreas()}" />
                                             </b:selectOneMenu>
+                                        </b:row>
+                                    </b:formGroup>
+                                    <b:formGroup id="trami" >
+                                        <!--               COMBO DE TRAMITES             -->
+                                        <b:row>
+                                            <b:selectOneMenu value="#{citabean.strCurrentTramite}"
+                                                             colMd="12" colLg="12" colSm="12"
+                                                             id="selectTramite"
+                                                             labelStyle="text-aling:left;"
+                                                             label="Seleccione el tramite"
+                                                             labelColLg="12"
+                                                             ajax="true"
+                                                             rendered="#{citabean.hasDataAreas}"
+                                                             required="true"
+                                                             update="@form"
+                                            >
+
+                                                <f:selectItem itemLabel="Seleccione un tramite" value="none" itemValue="none"/>
+                                                <f:selectItems value="#{citabean.returnTramitesList()}"/>
+
+                                                <f:ajax
+                                                        event="change"
+                                                        listener="#{citabean.listenerPostTramites}">
+                                                </f:ajax>
+                                            </b:selectOneMenu>
+                                        </b:row>
+                                    </b:formGroup>
+                                    <b:row>
+                                        <b:column smallScreen="12" largeScreen="7" mediumScreen="7">
+                                            <b:formGroup id="fechas" styleClass="calend" rendered="#{citabean.hasCalendar}">
+                                                <!--               DATE PICKER FECHAS             -->
+                                                <b:dateTimePicker
+                                                        id="datepicker"
+                                                        weekDaysDisabled="[0,6]"
+                                                        format="MM/DD/YYYY"
+                                                        maxDate="#{citabean.tomaxDate}"
+                                                        minDate="#{citabean.tominDate}"
+                                                        colMd="12" colLg="12" colSm="12"
+                                                        mediumScreen="6" labelMediumScreen="12"
+                                                        value="#{citabean.strCurrentCalendar}"
+                                                        showTime="false"
+                                                        disabledDates="#{citabean.strFechasDisableCalendar}"
+                                                        label="Seleccione la fecha de su cita"
+                                                        labelColMd="12" labelColLg="12">
+                                                </b:dateTimePicker>
+                                            </b:formGroup>
                                         </b:column>
-                                        <!-- Combo Box of Tramites -->
-                                        <b:column mediumScreen="6">
-                                            <b:selectOneMenu value="#{cita.listaDatosTramites}" colMd="6" colLg="6" id="selectTramite"
-                                                             label="Seleccione el tramite" labelColLg="12"
-                                                             ajax="true" process="@this" >
 
-                                                <f:ajax event="change" render="Fechas" execute="@this"></f:ajax>
+                                        <b:column smallScreen="12" largeScreen="4" mediumScreen="4" style="margin-top:18px">
+                                            <b:growl id="growluno"
+                                                     globalOnly="true"
+                                                     showDetail="true"
+                                                     allowDismiss="true"
+                                                     severity="info"/>
 
-                                                <f:selectItem itemLabel="Selecccione su tramite"  />
-                                                <f:selectItems value="#{cita.obtenerTramites()}"/>
-                                            </b:selectOneMenu>
+                                            <b:navCommandLink style="color:white !important; text-transform:none;"
+                                                              action="#{citabean.ComprobarHorario()}" rendered="#{citabean.hasCalendar}"
+                                                              value="Comprobar disponibilidad"
+                                                              update="growluno @form"
+                                                              styleClass="btn" ajax="true"
+                                            ></b:navCommandLink>
                                         </b:column>
                                     </b:row>
                                     <br/>
-                                </b:formGroup>
-                                <br/>
-                                <b:formGroup>
-                                    <b:row>
-                                        <b:column mediumScreen="6">
-                                            <b:dateTimePicker id="Fechas" format="MM/DD/YYYY"  colMd="6" colLg="6" week-days-disabled='6,0' mediumScreen="6" labelMediumScreen="2" ajax="true" value="#{cita.strcalendarValue}" showTime="false" disabledDates="#{cita.fechasDisable}" label="Seleccione la fecha de su cita" labelColMd="12" labelColLg="12">
-
-                                                <f:ajax event="click" execute="@this" listener="#{cita.ComprobarFecha()}"></f:ajax>
-                                            </b:dateTimePicker>
-
-                                            <b:commandButton value="Comprobar disponibilidad" update="selectHora" styleClass="btn btn-default"></b:commandButton>
-                                        </b:column>
-                                        <b:column mediumScreen="6">
-                                            <b:selectOneMenu value="#{cita.strHoraValue}" colMd="6" colLg="6" id="selectHora"
-                                                             label="Seleccione el horario" labelColLg="8"
-                                                             ajax="true" process="@this">
-
-                                                <f:selectItem itemLabel="Seleccione --" itemValue="none" />
-                                                <f:selectItems value="#{cita.listHorarios}"/>
-                                            </b:selectOneMenu>
-                                        </b:column>
-                                    </b:row>
                                     <br/>
                                     <b:row>
-                                        <b:column mediumScreen="3"></b:column>
-                                        <b:column mediumScreen="6">
-                                            <b:inputText value="#{cita.strDescripcion}"  colMd="6" colLg="6" label="Ingrese una descripcion del motivo de su cita" ajax="true" placeholder="Escriba aquí"></b:inputText>
-                                        </b:column>
-                                        <b:column mediumScreen="3"></b:column>
+                                        <b:formGroup id="horas">
+                                            <!--          ComboBox de los horarios                  -->
+                                            <b:selectOneMenu value="#{citabean.strCurrentHora}"
+                                                             colMd="12" colLg="12" colSm="12"
+                                                             rendered="#{citabean.hasHorarios}"
+                                                             id="selectHorarios"
+                                                             label="Seleccione el horario de su cita"
+                                                             labelColLg="12"
+                                                             ajax="true"
+                                                             update="@form">
+
+                                                <f:selectItem itemLabel="Seleccione su horario" value="none" itemValue="none"></f:selectItem>
+                                                <f:selectItems value="#{citabean.returnHorariosList()}"></f:selectItems>
+                                            </b:selectOneMenu>
+                                        </b:formGroup>
                                     </b:row>
-                                    <h:inputHidden id="idAlumno" value="#{auth.strUsuario}"></h:inputHidden>
-                                </b:formGroup>
-                                <b:row>
-                                    <b:column mediumScreen="8"></b:column>
-                                    <b:column mediumScreen="2">
-                                        <b:commandButton value="Agendar cita" styleClass="btn btn-default" action="#{cita.AgendarCita()}" ></b:commandButton>
+                                    <b:row>
+                                        <b:formGroup>
+                                            <b:inputTextarea value="#{citabean.strMotivoCita}"
+                                                             colLg="12" colMd="12" colSm="12"
+                                                             rendered="#{citabean.hasHorarios}"
+                                                             label="Ingrese el motivo de su cita *"
+                                                             ajax="true"
+                                            >
+                                            </b:inputTextarea>
+                                            <h:inputHidden id="idAlumno" value="#{auth.strUsuario}"></h:inputHidden>
+                                        </b:formGroup>
+                                    </b:row>
+                                </b:row>
+                            </b:column>
+                            <!-- Seperador -->
+                            <b:column mediumScreen="1" largeScreen="1" smallScreen="12"></b:column>
+                            <!-- Seccion Dereacha Datos de la cita -->
+                            <b:column mediumScreen="5" largeScreen="5" smallScreen="5" rendered="#{citabean.hasDataTramites}">
+                                <b:row id="panel" rendered="#{citabean.hasDataTramites}">
+                                    <h5><h:outputText style="color:#5E0723;font-weight: bold;" value="Resumen cita"></h:outputText></h5>
+                                    <br/>
+                                    <br/>
+                                    <b:column mediumScreen="7" largeScreen="7" smallScreen="12">
+                                        <b:inputText readonly="true"
+                                                     label="Matricula:"
+                                                     labelStyle="width:100px;"
+                                                     value="#{citabean.strLocalMatricula}"
+                                                     labelColMd="4">
+                                            <f:facet name="prepend">
+                                                <b:iconAwesome name="tag"></b:iconAwesome>
+                                            </f:facet>
+                                        </b:inputText>
+                                    </b:column>
+                                    <b:column  mediumScreen="12" largeScreen="12"  smallScreen="12">
+                                        <b:inputText readonly="true"
+                                                     label="Nombre Usuario"
+                                                     labelStyle="width:100px"
+                                                     labelColMd="4"
+                                                     value="#{citabean.strLocalNombreUser}">
+                                            <f:facet name="prepend">
+                                                <b:iconAwesome name="user"></b:iconAwesome>
+                                            </f:facet>
+                                        </b:inputText>
+                                    </b:column>
+
+                                    <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
+                                        <b:inputText readonly="true"
+                                                     label="Area:"
+                                                     labelStyle="width:100px"
+                                                     labelColMd="4"
+                                                     value="#{citabean.strLocalArea}">
+                                            <f:facet name="prepend">
+                                                <b:iconAwesome name="bank"></b:iconAwesome>
+                                            </f:facet>
+                                        </b:inputText>
+                                    </b:column>
+
+                                    <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
+                                        <b:inputText readonly="true"
+                                                     label="Tramite:"
+                                                     id="Tramite"
+                                                     labelColMd="4"
+                                                     labelStyle="width:100px"
+                                                     value="#{citabean.strLocalTramite}">
+                                            <f:facet name="prepend">
+                                                <b:iconAwesome name="archive"></b:iconAwesome>
+                                            </f:facet>
+                                        </b:inputText>
+                                    </b:column>
+
+                                    <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
+                                        <b:inputText readonly="true"
+                                                     label="Fecha Cita:"
+                                                     labelColMd="4"
+                                                     id="fechacurrent"
+                                                     labelStyle="width:100px"
+                                                     value="#{citabean.fechaFormatCita()}">
+                                            <f:facet name="prepend">
+                                                <b:iconAwesome name="calendar"></b:iconAwesome>
+                                            </f:facet>
+                                        </b:inputText>
+                                    </b:column>
+
+                                    <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
+                                        <b:inputText readonly="true"
+                                                     id="combohoras"
+                                                     label="Hora Cita:"
+                                                     labelColMd="4"
+                                                     labelStyle="width:100px"
+                                                     value="#{citabean.strCurrentHora}">
+                                            <f:facet name="prepend">
+                                                <b:iconAwesome name="clock-o"></b:iconAwesome>
+                                            </f:facet>
+                                        </b:inputText>
                                     </b:column>
                                 </b:row>
-                            </b:container>
-
-                        </b:form>
-                    </b:container>
+                                <span class="separador" />
+                                <b:row>
+                                    <b:column smallScreen="12" mediumScreen="3" largeScreen="3">
+                                        <b:container id="linkgo" rendered="#{citabean.hasHorarios}" style="margin-top:15px;width:300px">
+                                            <h5><h:outputText value="Requisitos de tramite:" style="color:#5E0723;font-weight: bold;"></h:outputText></h5>
+                                            <b:label severity="primary" style="font-size:10px;margin-top:10px" value="#{msj['comun.label.citas.requisitoslabel']}">
+                                            </b:label>
+                                            <a href="#{citabean.getLink()}" target="_blank">Ver requisitos</a>
+                                        </b:container>
+                                    </b:column>
+                                </b:row>
+                                <br/>
+                                <b:row>
+                                    <span class="separador" />
+                                    <b:column mediumScreen="8" largeScreen="2" smallScreen="12"></b:column>
+                                    <b:column mediumScreen="2" largeScreen="2" smallScreen="12">
+                                        <b:container style="margin-top:15px;width:10px">
+                                            <b:commandButton styleClass="btn btn-default"
+                                                             value="Agendar cita"
+                                                             update="@form"
+                                                             disabled="#{citabean.citaAgendada}"
+                                                             actionListener="#{citabean.agendarCitabtn()}">
+                                            </b:commandButton>
+                                        </b:container>
+                                    </b:column>
+                                    <b:column mediumScreen="2" largeScreen="2" smallScreen="12" rendered="#{citabean.isCitaAgendada()}">
+                                        <b:container style="margin-top:15px;margin-left:25px;">
+                                            <b:commandButton styleClass="btn btn-default"
+                                                             value="Imprimir Reporte"
+                                                             actionListener="#{citabean.generarPDF()}">
+                                            </b:commandButton>
+                                        </b:container>
+                                    </b:column>
+                                </b:row>
+                            </b:column>
+                        </b:row>
+                    </b:form>
                 </b:container>
             </b:panel>
         </b:container>
-
-        <b:modal id="modalCancelar" title="Cancelar Cita" styleClass="modalCancelar">
-            <p>Esta a punto de cancelar su cita con el area de <h:outputText value="#{misictas.localArea}"></h:outputText> con el objetivo de  <h:outputText value="#{misictas.localTramite}"></h:outputText> </p>
+        <b:modal id="modalCancelar" title="Cancelar Cita" styleClass="modalCancelar modal">
+            <p>Esta a punto de cancelar su cita con el area de <h:outputText id="label1" value="#{citabean.strLocalArea}"></h:outputText> con el objetivo de  <h:outputText value="#{misictas.localTramite}"></h:outputText> </p>
             <h:form>
-                <b:inputText placeholder="Escribe aquí" value="#{misictas.motivoCancelacion}"></b:inputText>
-
-                <b:commandButton title="Cancelar" value="Cancelar" action="#{misictas.Cancelar()}" styleClass="btn btn-default">
+                <b:inputText placeholder="Escribe aquí"   label="Ingrese el motivo de la cancelación" value="#{misictas.motivoCancelacion}"></b:inputText>
+                <b:commandButton title="Cancelar cita" value="Cancelar mi cita" action="#{misictas.Cancelar()}" update="formid:contenido:growluno" styleClass="btn btn-default">
                 </b:commandButton>
             </h:form>
             <f:facet name="footer">
-                <b:button value="Cerrar" dismiss="modal" />
-                <b:button value="Estoy de acuerdo" look="btn btn-default" dismiss="modal" />
+                <b:button value="Cancelar" dismiss="modal"></b:button>
+            </f:facet>
+        </b:modal>
+        <b:modal id="modalWellcome" title="Bienvenido al modulo de citas" styleClass="modal">
+            <b:well>
+                <h3>Bienvenido al nuevo modulo de citas</h3>
+                <p>
+                    En este nuevo modulo podras agendar tus citas con las diferentes areas de la univerisad. <br/>
+                    <h:outputText value="¿Como se usa?" style="font-weight: bold;"></h:outputText>
+                </p>
+                <b:carousel id="carrucelitems" startAnimation="false" showIndicators="true" wrap="false">
+                    <b:carouselItem>
+                        <h:graphicImage library="imagenes" name="citas/selectArea.png" alt="img areas"></h:graphicImage>
+                        <b:carouselCaption>
+                            <h5>Selecciona el area o departamento el en cual nesitas una cita</h5>
+                        </b:carouselCaption>
+                    </b:carouselItem>
+
+                    <b:carouselItem>
+                        <h:graphicImage library="imagenes" name="citas/selecTramite.png" alt="img areas"></h:graphicImage>
+                        <b:carouselCaption>
+                            <h5>Selecciona el tramite que vas a realizar</h5>
+                        </b:carouselCaption>
+                    </b:carouselItem>
+
+                    <b:carouselItem>
+                        <h:graphicImage library="imagenes" name="citas/calendar.png" alt="img areas"></h:graphicImage>
+                        <b:carouselCaption>
+                            <h5>Elige una fecha y da clik en comprobar disponibilidad</h5>
+                        </b:carouselCaption>
+                    </b:carouselItem>
+
+                    <b:carouselItem>
+                        <h:graphicImage library="imagenes" name="citas/selectHora.png" alt="img areas"></h:graphicImage>
+                        <b:carouselCaption>
+                            <h5>Elige un horario dentro de los disponibles si la lista esta vacias elige otra fecha</h5>
+                        </b:carouselCaption>
+                    </b:carouselItem>
+
+                    <b:carouselItem>
+                        <h:graphicImage library="imagenes" name="citas/resumencita.png" alt="img areas"></h:graphicImage>
+                        <b:carouselCaption>
+                            <h5>Esto es un resumen de tu cita comprueba que los datos son correctos antes de agendar</h5>
+                        </b:carouselCaption>
+                    </b:carouselItem>
+                </b:carousel>
+            </b:well>
+
+            <f:facet name="footer">
+                <b:button value="Lo tengo!" look="btn btn-default" dismiss="modal" />
             </f:facet>
         </b:modal>
         <script>
+            const showModalWellcome = () => $('#modalWellcome').modal();
             $(document).ready(function () {
-                function showModal() {
-                    $('.modalCancelar').modal();
-                }
+                setTimeout(()=>{
+                    showModalWellcome();
+                }, 2000);
             });
         </script>
-
-        <h:outputScript>
-            function descargarPDF() {
-                var idUser = document.getElementById("idAlumno").value;
-                var url = "http://localhost/siiaServices/reportes/generarPDF.php?id=";
-                window.open(url+idUser);
-            }
-        </h:outputScript>
     </ui:define>
 </ui:composition>

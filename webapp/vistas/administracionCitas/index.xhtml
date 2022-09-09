@@ -8,199 +8,306 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 template="/layouts/template.xhtml">
     <ui:define name="content">
-<!--        <b:form id="menuadmincitas">-->
-<!--            <b:navBar brand="Incio" brandHref="#" fluid="true">-->
-<!--                <b:navbarLinks>-->
-<!--                    <b:navLink value="Link" href="#">Linea del tiempo</b:navLink>-->
-<!--                    <b:dropMenu value="Reportes" iconAwesome="fa-briefcase">-->
-<!--                        <b:navLink value="rp1" href="#">Reporte 1</b:navLink>-->
-<!--                        <b:navLink value="rp2" href="#">Reporte 2</b:navLink>-->
-<!--                        <b:navLink value="rp3" href="#">Reporte 3</b:navLink>-->
-<!--                        <b:navLink value="rp3" href="#">Reporte 4</b:navLink>-->
-<!--                        <b:navLink value="rp3" href="#">Reporte 5</b:navLink>-->
-<!--                    </b:dropMenu>-->
-<!--                    <b:navLink value="Calendario" href="#"></b:navLink>-->
-<!--                    <b:navLink value="Horarios" href="#"></b:navLink>-->
-<!--                    <b:navLink value="Tramites" href="#"></b:navLink>-->
-<!--                </b:navbarLinks>-->
-<!--            </b:navBar>-->
-<!--        </b:form>-->
-<!--        <b:container styleClass="separador"></b:container>-->
-<!--        <b:container styleClass="separador"></b:container>-->
-<!--        <b:container>-->
-<!--            <b:row>-->
-<!--                <b:column>-->
-<!--                    <h:outputText value="Mes ant."></h:outputText>-->
-<!--                    <b:iconAwesome value="fa-chevron-left"></b:iconAwesome>-->
-<!--                </b:column>-->
-
-<!--                <b:column>-->
-<!--                    <h:outputText value="Agosto 2022" style="font-size: 25px"></h:outputText>-->
-<!--                </b:column>-->
-
-<!--                <b:column>-->
-<!--                    <h:outputText value="Mes siguiente."></h:outputText>-->
-<!--                    <b:iconAwesome value="fa-chevron-right"></b:iconAwesome>-->
-<!--                </b:column>-->
-<!--            </b:row>-->
-<!--        </b:container>-->
-        <b:tabView activeIndex="2">
-            <b:tab title="Calendar">
-                <main>
-                <h:form>
-                    <b:row>
-                        <b:column largeScreen="12" mediumScreen="12" smallScreen="12">
-                            <b:commandButton styleClass="btn btn-default" mediumScreen="1" value="Recargar" iconAwesome="fa-solid fa-rotate-right"></b:commandButton>
-                        </b:column>
-                    </b:row>
-                    <b:row>
-                        <b:column largeScreen="2" mediumScreen="2" smallScreen="12">
-                            <h:outputText value="#{admin.anoActual}"></h:outputText>
-                        </b:column>
-                        <b:column styleClass="scroll" fluid="true" largeScreen="10" mediumScreen="10" smallScreen="12">
-                            <ui:repeat value="#{admin.listMeses}" var="item">
-                                <p:commandButton styleClass="#{item == admin.mesActual ? 'itemDate':'btn-default'}" value="#{item}" action="#{admin.RefrescarFechas(item)}" update="@form">
-                                </p:commandButton>
-                            </ui:repeat>
-                        </b:column>
-                        <b:column>
-                            <b:container id="fechaslist" largeScreen="12" mediumScreen="12">
-                                <label>Fechas</label>
+        <b:container fluid="true">
+            <b:panel title="Panel de control - Citas" largeScreen="8" collapsible="false">
+                <b:container styleClass="panel-body" fluid="true">
+                    <b:tabView activeIndex="3">
+                        <b:tab title="Calendario">
+                            <h:form>
                                 <b:row>
-                                    <b:column styleClass="scroll" rendered="#{admin.listCitas.size()!=0}">
-                                        <ui:repeat value="#{admin.listDias}" var="fecha">
-                                            <p:commandButton ajax="true" value="#{fecha}" styleClass="#{fecha == admin.today ? 'dateSelected':'itemDate'}" action="#{admin.obtenerCitasFromDia(fecha)}" update="@form"></p:commandButton>
-                                        </ui:repeat>
+                                    <b:column largeScreen="12" mediumScreen="12" smallScreen="12">
+                                        <b:commandButton styleClass="btn btn-default" value="Recargar" iconAwesome="fa-solid fa-rotate-right"></b:commandButton>
                                     </b:column>
                                 </b:row>
-                            </b:container>
-                        </b:column>
-                    </b:row>
-                    <b:row>
-                        <b:column rendered="#{admin.listCitas.size() == null}">
-                            <h:outputText value="Sin citas para hoy" style="font-size: 25px;font-weight: bold;padding: 15px; text-align: center"></h:outputText>
-                        </b:column>
-                        <b:container id="PanelCitas"  styleClass="panelCitas panel-body" rendered="#{admin.listCitas!=null}">
-                            <ui:repeat value="#{admin.listCitas}" var="e">
-                                <b:container styleClass="titlepanel">
-                                    <h3>
-                                        <h:outputText value="#{admin.strDia}"></h:outputText>
-                                    </h3>
-                                    <h5>
-                                        <h:outputText value="#{admin.today}"></h:outputText>
-                                    </h5>
-                                </b:container>
-                                <b:container styleClass="contenpanel">
-                                    <b:row>
-                                        <b:column span="1">
-                                            <b:container styleClass="hora">
-                                                <label><h:outputText value="#{e.strFechaHoraReservada}"></h:outputText></label>
+                                <b:row>
+                                    <b:column styleClass="scroll" fluid="true" largeScreen="12" mediumScreen="12" smallScreen="12">
+                                        <ui:repeat value="#{admin.listMeses}" var="item">
+                                            <p:commandButton styleClass="#{item == admin.mesActual ? 'itemDate':'btn-default'}" value="#{item}" action="#{admin.RefrescarFechas(item)}" update="@form">
+                                            </p:commandButton>
+                                        </ui:repeat>
+                                    </b:column>
+                                    <b:column mediumScreen="12" largeScreen="12" smallScreen="12">
+                                        <b:container id="fechaslist">
+                                            <label style="color:#5E0723;font-weight: bold;font-size: 25px;">Fechas</label>
+                                            <b:row>
+                                                <b:column styleClass="scroll" rendered="#{admin.listCitas.size()!=0}">
+                                                    <ui:repeat value="#{admin.listDias}" var="fecha">
+                                                        <p:commandButton ajax="true" value="#{fecha}" styleClass="#{fecha == admin.today ? 'dateSelected':'itemDate'}" action="#{admin.obtenerCitasFromDia(fecha)}" update="@form"></p:commandButton>
+                                                    </ui:repeat>
+                                                </b:column>
+                                            </b:row>
+                                        </b:container>
+                                    </b:column>
+                                </b:row>
+                                <span class="separator"></span>
+                                <b:row>
+                                    <b:column rendered="#{admin.listCitas.size() == null}">
+                                        <h:outputText styleClass="text-center" value="Sin citas para hoy" style="font-size: 25px;font-weight: bold;padding: 15px; text-align: center"></h:outputText>
+                                    </b:column>
+                                    <b:container id="PanelCitas"  styleClass="panelCitas panel-body" rendered="#{admin.listCitas!=null}">
+                                        <ui:repeat value="#{admin.listCitas}" var="e">
+                                            <b:container styleClass="titlepanel">
+                                                <h3>
+                                                    <h:outputText id="diacita" value="#{admin.strDia}"></h:outputText>
+                                                </h3>
+                                                <h5>
+                                                    <h:outputText value="#{admin.today}"></h:outputText>
+                                                </h5>
                                             </b:container>
-                                        </b:column>
-                                        <b:column span="2">
-                                            <b:container styleClass="circles" style="width: 50px;">
-                                                <b:container styleClass="mayor"></b:container>
-                                                <b:container styleClass="minicircle"></b:container>
-                                                <b:container styleClass="minicircle"></b:container>
-                                                <b:container styleClass="minicircle"></b:container>
-                                                <b:container styleClass="minicircle"></b:container>
+                                            <b:container styleClass="contenpanel">
+                                                <b:row>
+                                                    <b:column span="1">
+                                                        <b:container styleClass="hora">
+                                                            <label>Hora:<h:outputText value="#{e.strFechaHoraReservada.substring(0)}"></h:outputText></label>
+                                                        </b:container>
+                                                    </b:column>
+                                                    <b:column span="2">
+                                                        <b:container styleClass="circles" style="width: 50px;">
+                                                            <b:container styleClass="mayor"></b:container>
+                                                            <b:container styleClass="minicircle"></b:container>
+                                                            <b:container styleClass="minicircle"></b:container>
+                                                            <b:container styleClass="minicircle"></b:container>
+                                                            <b:container styleClass="minicircle"></b:container>
+                                                        </b:container>
+                                                    </b:column>
+                                                    <b:column span="6">
+                                                        <b:container styleClass="contenido">
+                                                            <b:container styleClass="subcontenido" fluid="true">
+                                                                <b:container styleClass="title_subcont" fluid="true">
+                                                                    <h5>  <b>Tramite:</b>  </h5>
+                                                                    <h5><b>Usuario:</b></h5>
+                                                                </b:container>
+                                                                <b:container styleClass="descrip_subcont" style="width: 200px;">
+                                                                    <b:row>
+                                                                        <b:column mediumScreen="12" largeScreen="12" smallScreen="12">
+                                                                            <h4>
+                                                                                <h:outputText value="#{e.tramite}"></h:outputText>
+                                                                            </h4>
+                                                                            <h4>
+                                                                                <h:outputText value="#{e.strNombre}"></h:outputText>
+                                                                            </h4>
+                                                                        </b:column>
+                                                                        <b:column mediumScreen="12" smallScreen="12" largeScreen="12">
+                                                                            <h:outputText value="#{e.strDescripcionCita}"></h:outputText>
+                                                                        </b:column>
+                                                                    </b:row>
+                                                                </b:container>
+                                                                <p><b>Matricula:</b><h:outputText value="#{e.strUser}"></h:outputText></p>
+                                                            </b:container>
+                                                        </b:container>
+                                                    </b:column>
+                                                </b:row>
                                             </b:container>
-                                        </b:column>
-                                        <b:column span="6">
-                                            <b:container styleClass="contenido">
-                                                <b:container styleClass="subcontenido" fluid="true">
-                                                    <b:container styleClass="title_subcont" fluid="true">
-                                                        <h4>Asunto:</h4>
-                                                        <h4>Departamento:</h4>
-                                                    </b:container>
-                                                    <b:container styleClass="descrip_subcont" style="width: 200px;">
-                                                        <h4>
-                                                            <h:outputText value="#{e.area}"></h:outputText>
-                                                        </h4>
-                                                        <h4>
-                                                            <h:outputText value="#{e.tramite}"></h:outputText>
-                                                        </h4>
-                                                    </b:container>
-                                                    <p><h:outputText value="#{e.strUser}"></h:outputText></p>
-                                                    <figure>
-                                                        <img src="https://qph.fs.quoracdn.net/main-thumb-582682478-200-brnqarmxvoghbimyylsupjelucaavxfd.jpeg" alt=""/>
-                                                    </figure>
-                                                </b:container>
-                                            </b:container>
-                                        </b:column>
-                                    </b:row>
-                                </b:container>
-                            </ui:repeat>
-                        </b:container>
-                    </b:row>
-                </h:form>
-            </main>
-            </b:tab>
-            <b:tab title="Reportes">
-               <h:form id="reportesform">
-                   <b:formGroup>
-                        <h5>Generar Reporetes</h5>
-                       <!-- SELECT ONE MENU de los tipos de reportes -->
-                       <b:selectOneMenu value="#{admin.strkindTramite}"
-                                        colMd="12" colLg="12" colSm="12"
-                                        id="selectReporte"
-                                        label="Seleccione el tipo de citrerio para generar su reporte"
-                                        labelColLg="12"
-                                        ajax="true"
-                                        update="reportesform">
+                                        </ui:repeat>
+                                    </b:container>
+                                </b:row>
+                            </h:form>
+                        </b:tab>
+                        <b:tab title="Reportes">
+                            <h:form id="reportesform">
+                               <b:row>
+                                   <b:column mediumScreen="6" smallScreen="12" largeScreen="6">
+                                       <b:formGroup>
+                                           <span class="separator"></span>
+                                           <b:container style="padding:25px">
+                                               <h:outputText value="Generar Reportes de las citas para llevar un control"></h:outputText>
+                                           </b:container>
+                                           <span class="separator"></span>
+                                           <!-- SELECT ONE MENU de los tipos de reportes -->
+                                           <b:selectOneMenu value="#{admin.strkindTramite}"
+                                                            colMd="12" colLg="12" colSm="12"
+                                                            id="selectReporte"
+                                                            label="Seleccione el tipo de citrerio para generar su reporte"
+                                                            labelColLg="12"
+                                                            ajax="true"
+                                                            update="reportesform">
 
-                           <f:selectItem itemLabel="Seleccione su reporte" value="none" itemValue="none"></f:selectItem>
-                           <f:selectItems value="#{admin.getListKindReportes()}"></f:selectItems>
+                                               <f:selectItem itemLabel="Seleccione su reporte" value="none" itemValue="none"></f:selectItem>
+                                               <f:selectItems value="#{admin.getListKindReportes()}"></f:selectItems>
 
-                           <f:ajax
-                                   event="change"
-                                   listener="#{admin.listerpostReporte}">
-                           </f:ajax>
-                       </b:selectOneMenu>
-                   </b:formGroup>
-                   <b:formGroup id="trami" rendered="#{admin.hasDataTramites}">
-                       <!--               COMBO DE TRAMITES             -->
-                       <b:row>
-                           <b:selectOneMenu value="#{admin.strCurrentTramite}"
-                                            colMd="12" colLg="12" colSm="12"
-                                            id="selectTramite"
-                                            labelStyle="text-aling:left;"
-                                            label="Seleccione el tramite"
-                                            labelColLg="12"
-                                            ajax="true"
-                                            rendered="#{admin.hasDataTramites}"
-                                            required="true"
-                                            update="@form"
-                           >
+                                               <f:ajax
+                                                       event="change"
+                                                       listener="#{admin.listerpostReporte}">
+                                               </f:ajax>
+                                           </b:selectOneMenu>
+                                       </b:formGroup>
+                                   </b:column>
+                                   <b:column mediumScreen="6" largeScreen="6" smallScreen="12">
+                                       <span class="separator"></span>
+                                       <b:formGroup id="trami" rendered="#{admin.hasDataTramites}">
+                                           <!--               COMBO DE TRAMITES             -->
+                                           <b:row>
+                                               <b:selectOneMenu value="#{admin.strCurrentTramite}"
+                                                                colMd="12" colLg="12" colSm="12"
+                                                                id="selectTramite"
+                                                                labelStyle="text-aling:left;"
+                                                                label="Seleccione el tramite"
+                                                                labelColLg="12"
+                                                                ajax="true"
+                                                                rendered="#{admin.hasDataTramites}"
+                                                                required="true"
+                                                                update="@form"
+                                               >
+                                                   <f:selectItem itemLabel="Seleccione un tramite" value="none" itemValue="none"/>
+                                                   <f:selectItems value="#{admin.listTramites}"/>
 
-                               <f:selectItem itemLabel="Seleccione un tramite" value="none" itemValue="none"/>
-                               <f:selectItems value="#{admin.listTramites}"/>
+                                                   <f:ajax
+                                                           event="change" listener="#{admin.listenergetnameTramite}">
+                                                   </f:ajax>
+                                               </b:selectOneMenu>
+                                           </b:row>
+                                       </b:formGroup>
+                                       <b:formGroup rendered="#{admin.hasFieldDate}">
+                                           <b:row>
+                                               <b:inputText value="#{admin.strValueDateField}" placeholder="Ingrese la fecha: 01/01/2008"></b:inputText>
+                                           </b:row>
+                                       </b:formGroup>
+                                   </b:column>
+                               </b:row>
+                                <span class="separator"></span>
+                               <b:row>
+                                   <b:column largeScreen="9" smallScreen="12" mediumScreen="9"></b:column>
+                                   <b:column largeScreen="3" mediumScreen="3" smallScreen="12">
+                                       <b:commandButton actionListener="#{admin.generarReporte()}" value="Generar Reporte" icon="file"></b:commandButton>
+                                   </b:column>
+                               </b:row>
+                            </h:form>
+                        </b:tab>
+                        <b:tab title="Configuraciones">
+                            <f:facet name="anchor"><b:iconAwesome name="cog" spin="true" /></f:facet>
 
-                               <f:ajax
-                                       event="change" listener="#{admin.listenergetnameTramite}">
-                               </f:ajax>
-                           </b:selectOneMenu>
-                       </b:row>
-                   </b:formGroup>
-                   <span class="separador" />
-                   <span class="separador" />
-                   <b:commandButton actionListener="#{admin.generarReporte()}" value="Generar Reporte" icon="file"></b:commandButton>
-               </h:form>
-            </b:tab>
-            <b:tab title="Mis cita">
-                <h4>Citas del area</h4>
-            </b:tab>
-            <b:tab title="Configuraciones">
-                <f:facet name="anchor"><b:iconAwesome name="cog" spin="true" /></f:facet>
-            </b:tab>
-
-        </b:tabView>
-        <b:row>
-            <b:column span="5">
-                <b:container styleClass="panel panel-default">
-
+                           <h:form>
+                               <b:row>
+                                   <b:panel>
+                                       <b:column mediumScreen="12" smallScreen="12" largeScreen="12">
+                                           <b:container style="padding:25px;">
+                                               <h:outputText styleClass="title" style="font-size: 20px;" value="Configura el area para ajustar el servico de citas."></h:outputText>
+                                           </b:container>
+                                           <span class="separator"></span>
+                                           <b:row>
+                                               <h:outputText styleClass="title" value="Horarios de atención"></h:outputText>
+                                           </b:row>
+                                           <b:formGroup>
+                                               <b:row>
+                                                   <b:column mediumScreen="4" largeScreen="4" smallScreen="12">
+                                                       <b:inputText value="#{admin.strHourServiceStar}" placeholder="8:00">
+                                                           <f:facet name="prepend">
+                                                               <h:outputText value="Inicio:"></h:outputText>
+                                                               <b:iconAwesome name="fa-clock-o"></b:iconAwesome>
+                                                           </f:facet>
+                                                           <f:facet name="append">
+                                                               <h:outputText value="horas" />
+                                                           </f:facet>
+                                                       </b:inputText>
+                                                   </b:column>
+                                                   <span class="separator"></span>
+                                                   <b:column mediumScreen="4" largeScreen="4" smallScreen="12">
+                                                       <b:inputText value="#{admin.strHourServiceEnd}" placeholder="13:00">
+                                                           <f:facet name="prepend">
+                                                               <h:outputText value="Cierre:"></h:outputText>
+                                                               <b:iconAwesome name="fa-clock-o"></b:iconAwesome>
+                                                           </f:facet>
+                                                           <f:facet name="append">
+                                                               <h:outputText value="horas" />
+                                                           </f:facet>
+                                                       </b:inputText>
+                                                   </b:column>
+                                                   <span class="separator"></span>
+                                                   <b:column mediumScreen="4" largeScreen="4" smallScreen="12">
+                                                       <b:inputText value="#{admin.strDuracionCita}" placeholder="20 min">
+                                                           <f:facet name="prepend">
+                                                               <h:outputText value="Duración Cita:"></h:outputText>
+                                                               <b:iconAwesome name="fa-clock-o"></b:iconAwesome>
+                                                           </f:facet>
+                                                           <f:facet name="append">
+                                                               <h:outputText value="min" />
+                                                           </f:facet>
+                                                       </b:inputText>
+                                                   </b:column>
+                                               </b:row>
+                                           </b:formGroup>
+                                           <span class="separator"></span>
+                                           <span class="separator"></span>
+                                           <span class="separator"></span>
+                                           <b:formGroup>
+                                               <b:row>
+                                                   <b:column mediumScreen="6" largeScreen="6" smallScreen="12"></b:column>
+                                                   <b:column mediumScreen="6" largeScreen="6" smallScreen="12">
+                                                       <b:commandButton action="#{admin.saveDataA()}" value="Guardar configuración"></b:commandButton>
+                                                   </b:column>
+                                               </b:row>
+                                           </b:formGroup>
+                                           <span class="separator"></span>
+                                           <span class="separator"></span>
+                                           <span class="separator"></span>
+                                       </b:column>
+                                   </b:panel>
+                                   <hr/>
+                                   <span class="separator"></span>
+                                   <span class="separator"></span>
+                                   <span class="separator"></span>
+                                   <b:column mediumScreen="12" largeScreen="12" smallScreen="12">
+                                      <b:panel>
+                                          <b:formGroup>
+                                              <b:row>
+                                                  <h:outputText styleClass="title" value="Agrega fechas inhabiles de servicios"></h:outputText>
+                                              </b:row>
+                                              <span class="separator"></span>
+                                              <span class="separator"></span>
+                                              <b:row>
+                                                  <b:column mediumScreen="8" largeScreen="8" smallScreen="8">
+                                                      <b:dateTimePicker
+                                                              id="datepicker"
+                                                              weekDaysDisabled="[0,6]"
+                                                              format="MM/DD/YYYY"
+                                                              colMd="12" colLg="12" colSm="12"
+                                                              mediumScreen="12" labelMediumScreen="12"
+                                                              value="#{admin.strCalendarValue}"
+                                                              showTime="false"
+                                                              disabledDates="#{admin.strDateDisablesCalendar}"
+                                                              tooltip="Selecciona una fecha para editar los horarios"
+                                                              labelColMd="12" labelColLg="12">
+                                                      </b:dateTimePicker>
+                                                  </b:column>
+                                                  <b:column mediumScreen="1" smallScreen="1" largeScreen="1"></b:column>
+                                                  <b:column mediumScreen="3" largeScreen="3" smallScreen="3">
+                                                      <b:commandButton value="Obtener" update="@form" action="#{admin.RenderDaysToCalendar()}"></b:commandButton>
+                                                  </b:column>
+                                              </b:row>
+                                              <span class="separator"></span>
+                                              <b:row>
+                                                  <b:column>
+                                                      <h:outputText value="#{admin.strCurrentLocalDate}"></h:outputText>
+                                                  </b:column>
+                                              </b:row>
+                                              <b:row>
+                                                  <ui:repeat value="#{admin.listDaysToCheck}" var="daycalendar">
+                                                      <b:column smallScreen="12" largeScreen="12" mediumScreen="12">
+                                                          <b:iconAwesome name="fa-clock-o"><h:outputText style="margin-left: 15px;margin-right: 15px" styleClass="secondary-text" value="#{daycalendar}"></h:outputText></b:iconAwesome>
+                                                          <b:commandButton icon="pencil" tooltip="Quite este horario de atencion para el dia seleccionado" action="#{admin.deletefromlistdays(daycalendar)}"></b:commandButton>
+                                                      </b:column>
+                                                  </ui:repeat>
+                                              </b:row>
+                                          </b:formGroup>
+                                          <span class="separator"></span>
+                                          <br/>
+                                          <b:row>
+                                              <b:column mediumScreen="8" largeScreen="8" smallScreen="12">
+                                                  <b:commandButton
+                                                          value="guardar"
+                                                          tooltip="Guarda los horarios para la fecha seleccionada actual"
+                                                  >
+                                                  </b:commandButton>
+                                              </b:column>
+                                          </b:row>
+                                      </b:panel>
+                                   </b:column>
+                               </b:row>
+                           </h:form>
+                        </b:tab>
+                    </b:tabView>
                 </b:container>
-            </b:column>
-        </b:row>
+            </b:panel>
+        </b:container>
     </ui:define>
 </ui:composition>
