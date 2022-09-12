@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.RequestScoped;
 import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 import java.io.Serializable;
@@ -76,14 +75,17 @@ public class AdminCitasBean implements Serializable {
     private String strCurrentLocalDate;
     private String strDuracionCita;
     private String strValueDateField;
+    private final String strUser;
 
     private boolean hasDataTramites = false;
     private boolean hasFielDate = false;
+    private boolean hasUpdateListHorarios = false;
 
     public AdminCitasBean(){
         listMeses = Arrays.asList("Enero", "Febrero", "Marzo","Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre","Octubre", "Noviembre", "Diciembre");
         GenerarFechas(Calendar.getInstance().get(Calendar.MONTH));
         strIdArea = "1";
+        strUser = "20082306";
         LocalDate todaylocal = LocalDate.now();
         today = todaylocal.getDayOfMonth();
         mesActual = GetIndexMes(todaylocal.getMonthValue()-1);
@@ -116,14 +118,14 @@ public class AdminCitasBean implements Serializable {
     public void saveDataA(){
         System.out.println("--- Calling to save data configuración---");
 
-        HashMap<String, String> datacollect = new HashMap<>();
+        HashMap<String, Object> datacollect = new HashMap<>();
 
         datacollect.put("idarea", strIdArea);
         datacollect.put("horainicion", strHourServiceStar);
         datacollect.put("horafin", strHourServiceEnd);
         datacollect.put("duracion", strDuracionCita);
 
-        ResultadoTO resultado = citaBusiness.agendarCita(datacollect, URLs.InsertData.getValor()+"?savesetting=true");
+        ResultadoTO resultado = citaBusiness.saveDataDB(datacollect, URLs.InsertData.getValor()+"?savesetting=true");
         Map<String, Object> response = (Map<String, Object>) resultado.getObjeto();
 
         if (response.get("codefromservice").equals("1")){
@@ -133,6 +135,33 @@ public class AdminCitasBean implements Serializable {
             resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.admin.savedataconfig.error");
             vHelp.pintarMensajes(msj,resultado);
         }
+    }
+
+    public void saveDataB() {
+        System.out.println("------ Calling to save data list days delete");
+
+        HashMap<String, Object> datacollect = new HashMap<>();
+        datacollect.put("lista", listDaysToCheck);
+        datacollect.put("idarea", strIdArea);
+        datacollect.put("fecha", strCurrentLocalDate);
+        datacollect.put("user", strUser);
+
+       if (hasUpdateListHorarios){
+           ResultadoTO resultado = citaBusiness.saveDataDB(datacollect, URLs.InsertData.getValor()+"?savedays=true");
+           Map<String, Object> response = (Map<String, Object>) resultado.getObjeto();
+
+           if (response.get("codefromservice").equals("1")){
+               resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.admin.savedataconfig.ok");
+               vHelp.pintarMensajes(msj, resultado);
+           }else{
+               resultado.agregarMensaje(SeveridadMensajeEnum.ERROR, "comun.msj.citas.admin.savedataconfig.error");
+               vHelp.pintarMensajes(msj, resultado);
+           }
+       }else{
+           ResultadoTO resultado = new ResultadoTO();
+           resultado.agregarMensaje(SeveridadMensajeEnum.ALERTA,"comun.info.citasadmin.listhorariosnoupdate");
+           vHelp.pintarMensajes(msj, resultado);
+       }
     }
 
     public List<SelectItem> getListKindReportes(){
@@ -237,7 +266,16 @@ public class AdminCitasBean implements Serializable {
 
     public void deletefromlistdays(String strCalendarValue){
         System.out.println("to delete: "+strCalendarValue);
-        listDaysToCheck.remove(strCalendarValue);
+        boolean ope = listDaysToCheck.remove(strCalendarValue);
+        ResultadoTO resultado = new ResultadoTO();
+        if (ope) {
+            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.fechas.ok");
+            hasUpdateListHorarios = true;
+        }
+        else
+            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.fechas.loaderror");
+
+        vHelp.pintarMensajes(msj, resultado);
     }
 
     private void getDayString(){
@@ -385,6 +423,14 @@ public class AdminCitasBean implements Serializable {
         return strCurrentTramite;
     }
 
+    public String getStrValueDateField() {
+        return strValueDateField;
+    }
+
+    public void setStrValueDateField(String strValueDateField) {
+        this.strValueDateField = strValueDateField;
+    }
+
     public TramitesBusiness getTramitesBusiness() {
         return tramitesBusiness;
     }
@@ -448,6 +494,14 @@ public class AdminCitasBean implements Serializable {
 
     public List<String> getListDaysToCheck() {
         return listDaysToCheck;
+    }
+
+    public boolean isHasFielDate() {
+        return hasFielDate;
+    }
+
+    public void setHasFielDate(boolean hasFielDate) {
+        this.hasFielDate = hasFielDate;
     }
 
     public void setListDaysToCheck(List<String> listDaysToCheck) {

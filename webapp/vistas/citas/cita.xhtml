@@ -10,7 +10,12 @@
         <b:container fluid="true">
             <b:panel title="Citas" largeScreen="8" collapsible="false">
                 <b:container styleClass="panel-body" fluid="true">
-                    <legend>Citas <b:iconAwesome name="info" styleClass="btn"></b:iconAwesome> </legend>
+                    <b:row>
+                        <b:column mediumScreen="2" largeScreen="2" smallScreen="6">
+                            <legend>Citas</legend>
+                        </b:column>
+                        <b:column mediumScreen="2" largeScreen="2" smallScreen="6"><b:button onclick="showModalWellcome()" iconAwesome="info-circle"></b:button></b:column>
+                    </b:row>
                     <b:form id="formid">
                         <b:row>
                             <b:column mediumScreen="9" smallScreen="12"></b:column>
@@ -69,6 +74,12 @@
                         </b:row>
                         <!-- IMPLEMENTACION PARA UNA NUEVA CITA -->
                         <b:row id="contenido">
+                            <span class="separador" />
+                            <b:column mediumScreen="12" smallScreen="12" largeScreen="12">
+                                <b:commandButton action="#{citabean.reload()}" value="Reininicar formulario" iconAwesome="fa-solid fa-rotate-right"></b:commandButton>
+                            </b:column>
+                            <span class="separador" />
+
                             <!-- Seccion Izquuerda Form de la cita -->
                             <b:column mediumScreen="6" largeScreen="6" smallScreen="12">
                                 <!-- Seccion Izquierda FORMULARIO -->
@@ -173,6 +184,11 @@
 
                                                 <f:selectItem itemLabel="Seleccione su horario" value="none" itemValue="none"></f:selectItem>
                                                 <f:selectItems value="#{citabean.returnHorariosList()}"></f:selectItems>
+
+                                                <f:ajax
+                                                        event="change"
+                                                        listener="#{citabean.listenerPostHorario()}">
+                                                </f:ajax>
                                             </b:selectOneMenu>
                                         </b:formGroup>
                                     </b:row>

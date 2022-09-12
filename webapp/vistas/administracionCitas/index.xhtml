@@ -157,7 +157,7 @@
                                                </b:selectOneMenu>
                                            </b:row>
                                        </b:formGroup>
-                                       <b:formGroup rendered="#{admin.hasFieldDate}">
+                                       <b:formGroup rendered="#{admin.hasFielDate}">
                                            <b:row>
                                                <b:inputText value="#{admin.strValueDateField}" placeholder="Ingrese la fecha: 01/01/2008"></b:inputText>
                                            </b:row>
@@ -277,7 +277,7 @@
                                               <span class="separator"></span>
                                               <b:row>
                                                   <b:column>
-                                                      <h:outputText value="#{admin.strCurrentLocalDate}"></h:outputText>
+                                                      <h:outputText styleClass="title" style="font-size: 20px;" value="#{admin.strCurrentLocalDate}"></h:outputText>
                                                   </b:column>
                                               </b:row>
                                               <b:row>
@@ -295,6 +295,7 @@
                                               <b:column mediumScreen="8" largeScreen="8" smallScreen="12">
                                                   <b:commandButton
                                                           value="guardar"
+                                                          action="#{admin.saveDataB()}"
                                                           tooltip="Guarda los horarios para la fecha seleccionada actual"
                                                   >
                                                   </b:commandButton>

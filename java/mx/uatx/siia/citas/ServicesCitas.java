@@ -107,7 +107,7 @@ public class ServicesCitas {
         System.out.println("Finish Horarios Reservados => [value] = "+lista.toString());
         return lista;
     }
-    public static Map<String, Object> addValues(String link, Map<String, String> valores){
+    public static Map<String, Object> addValues(String link, Map<String, Object> valores){
         int codeResponde = 0;
         Map<String, Object> response = new HashMap<>();
         System.out.println("---- SEND VALUES TO api save [ Run ]");
