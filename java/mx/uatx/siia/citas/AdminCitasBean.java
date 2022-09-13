@@ -54,6 +54,7 @@ public class AdminCitasBean implements Serializable {
     private List<MisCitas> listCitas;
     private List<SelectItem> listTramites;
     private List<String> listDaysToCheck;
+    private List<String> listDayswasRemoved;
 
     @ManagedProperty("#{tramitesBusiness}")
     private TramitesBusiness tramitesBusiness;
@@ -251,6 +252,7 @@ public class AdminCitasBean implements Serializable {
 
     public void RenderDaysToCalendar(){
         System.out.println("---- Render days");
+        listDayswasRemoved = new ArrayList<>();
         ResultadoTO resultado = citaBusiness.getHoursOfCalendarDisable(strIdArea, MethodsGenerics.formatDate(strCalendarValue));
         List<String> fromDBhorarios = (List<String>) resultado.getObjeto();
 
@@ -266,6 +268,7 @@ public class AdminCitasBean implements Serializable {
 
     public void deletefromlistdays(String strCalendarValue){
         System.out.println("to delete: "+strCalendarValue);
+        listDayswasRemoved.add(strCalendarValue);
         boolean ope = listDaysToCheck.remove(strCalendarValue);
         ResultadoTO resultado = new ResultadoTO();
         if (ope) {
@@ -276,6 +279,16 @@ public class AdminCitasBean implements Serializable {
             resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.fechas.loaderror");
 
         vHelp.pintarMensajes(msj, resultado);
+    }
+
+    public void rollbackday(String dayremove)
+    {
+        ResultadoTO resultado = new ResultadoTO();
+        boolean ope = listDaysToCheck.add(dayremove);
+        if (ope) {
+            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.fechas.ok");
+            listDayswasRemoved.remove(dayremove);
+        } else resultado.agregarMensaje(SeveridadMensajeEnum.ALERTA, "comun.msj.citas.fechas.loaderror");
     }
 
     private void getDayString(){
@@ -598,6 +611,14 @@ public class AdminCitasBean implements Serializable {
 
     public String getAnoActual() {
         return anoActual;
+    }
+
+    public List<String> getListDayswasRemoved() {
+        return listDayswasRemoved;
+    }
+
+    public void setListDayswasRemoved(List<String> listDayswasRemoved) {
+        this.listDayswasRemoved = listDayswasRemoved;
     }
 
     public void setAnoActual(String anoActual) {

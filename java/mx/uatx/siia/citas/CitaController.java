@@ -22,9 +22,6 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.beans.beancontext.BeanContext;
 import java.io.Serializable;
 import java.util.*;
 
@@ -36,7 +33,7 @@ import java.util.*;
 
 @ViewScoped
 @ManagedBean(name = "citabean")
-public class CitaController extends CitaBusiness implements Serializable {
+public class CitaController implements Serializable {
 
     /**
      * SerialVersion
@@ -145,7 +142,7 @@ public class CitaController extends CitaBusiness implements Serializable {
             HashMap<String, Object> datacollect = new HashMap<>();
             datacollect.put("idarea", strCurrentArea);
             datacollect.put("user", strLocalMatricula);
-            datacollect.put("fecha", strCurrentCalendar);
+            datacollect.put("fecha", MethodsGenerics.formatDate(strCurrentCalendar));
             datacollect.put("hora", strCurrentHora);
 
             ResultadoTO resultado = citaBusiness.reservarHorario(datacollect);
@@ -153,7 +150,6 @@ public class CitaController extends CitaBusiness implements Serializable {
 
             if (flagHorarioReservado) {
                 mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Hora reservada tienes 10 min");
-                flagHorarioReservado=false;
             } else mostrarNotification(FacesMessage.SEVERITY_FATAL, "ERROR:", "No se pudo reservar tu horarios");
         }else{
             mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Ya tienes un horario reservado, si quieres otra fecha reinicia el formulario");
@@ -270,7 +266,9 @@ public class CitaController extends CitaBusiness implements Serializable {
         System.out.println("|----- New list horarios =>"+listHorarios);
 
         if (resultadoH.isBlnValido() && !horas.isEmpty()) {
+            setListHorariosShow(listHorarios);
             mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Fechas temporal reservada correctamente.");
+
         } else
            mostrarNotification(FacesMessage.SEVERITY_WARN, "WARN:", "No se pudo obtener los horarios para esta fecha intenta con otra");
     }

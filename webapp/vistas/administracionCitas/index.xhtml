@@ -39,7 +39,7 @@
                                         </b:container>
                                     </b:column>
                                 </b:row>
-                                <span class="separator"></span>
+                                <span class="separador"></span>
                                 <b:row>
                                     <b:column rendered="#{admin.listCitas.size() == null}">
                                         <h:outputText styleClass="text-center" value="Sin citas para hoy" style="font-size: 25px;font-weight: bold;padding: 15px; text-align: center"></h:outputText>
@@ -108,11 +108,11 @@
                                <b:row>
                                    <b:column mediumScreen="6" smallScreen="12" largeScreen="6">
                                        <b:formGroup>
-                                           <span class="separator"></span>
+                                           <span class="separador"></span>
                                            <b:container style="padding:25px">
                                                <h:outputText value="Generar Reportes de las citas para llevar un control"></h:outputText>
                                            </b:container>
-                                           <span class="separator"></span>
+                                           <span class="separador"></span>
                                            <!-- SELECT ONE MENU de los tipos de reportes -->
                                            <b:selectOneMenu value="#{admin.strkindTramite}"
                                                             colMd="12" colLg="12" colSm="12"
@@ -133,7 +133,7 @@
                                        </b:formGroup>
                                    </b:column>
                                    <b:column mediumScreen="6" largeScreen="6" smallScreen="12">
-                                       <span class="separator"></span>
+                                       <span class="separador"></span>
                                        <b:formGroup id="trami" rendered="#{admin.hasDataTramites}">
                                            <!--               COMBO DE TRAMITES             -->
                                            <b:row>
@@ -164,7 +164,7 @@
                                        </b:formGroup>
                                    </b:column>
                                </b:row>
-                                <span class="separator"></span>
+                                <span class="separador"></span>
                                <b:row>
                                    <b:column largeScreen="9" smallScreen="12" mediumScreen="9"></b:column>
                                    <b:column largeScreen="3" mediumScreen="3" smallScreen="12">
@@ -183,7 +183,7 @@
                                            <b:container style="padding:25px;">
                                                <h:outputText styleClass="title" style="font-size: 20px;" value="Configura el area para ajustar el servico de citas."></h:outputText>
                                            </b:container>
-                                           <span class="separator"></span>
+                                           <span class="separador"></span>
                                            <b:row>
                                                <h:outputText styleClass="title" value="Horarios de atención"></h:outputText>
                                            </b:row>
@@ -200,7 +200,7 @@
                                                            </f:facet>
                                                        </b:inputText>
                                                    </b:column>
-                                                   <span class="separator"></span>
+                                                   <span class="separador"></span>
                                                    <b:column mediumScreen="4" largeScreen="4" smallScreen="12">
                                                        <b:inputText value="#{admin.strHourServiceEnd}" placeholder="13:00">
                                                            <f:facet name="prepend">
@@ -212,7 +212,7 @@
                                                            </f:facet>
                                                        </b:inputText>
                                                    </b:column>
-                                                   <span class="separator"></span>
+                                                   <span class="separador"></span>
                                                    <b:column mediumScreen="4" largeScreen="4" smallScreen="12">
                                                        <b:inputText value="#{admin.strDuracionCita}" placeholder="20 min">
                                                            <f:facet name="prepend">
@@ -226,9 +226,9 @@
                                                    </b:column>
                                                </b:row>
                                            </b:formGroup>
-                                           <span class="separator"></span>
-                                           <span class="separator"></span>
-                                           <span class="separator"></span>
+                                           <span class="separador"></span>
+                                           <span class="separador"></span>
+                                           <span class="separador"></span>
                                            <b:formGroup>
                                                <b:row>
                                                    <b:column mediumScreen="6" largeScreen="6" smallScreen="12"></b:column>
@@ -237,23 +237,23 @@
                                                    </b:column>
                                                </b:row>
                                            </b:formGroup>
-                                           <span class="separator"></span>
-                                           <span class="separator"></span>
-                                           <span class="separator"></span>
+                                           <span class="separador"></span>
+                                           <span class="separador"></span>
+                                           <span class="separador"></span>
                                        </b:column>
                                    </b:panel>
                                    <hr/>
-                                   <span class="separator"></span>
-                                   <span class="separator"></span>
-                                   <span class="separator"></span>
+                                   <span class="separador"></span>
+                                   <span class="separador"></span>
+                                   <span class="separador"></span>
                                    <b:column mediumScreen="12" largeScreen="12" smallScreen="12">
                                       <b:panel>
                                           <b:formGroup>
                                               <b:row>
                                                   <h:outputText styleClass="title" value="Agrega fechas inhabiles de servicios"></h:outputText>
                                               </b:row>
-                                              <span class="separator"></span>
-                                              <span class="separator"></span>
+                                              <span class="separador"></span>
+                                              <span class="separador"></span>
                                               <b:row>
                                                   <b:column mediumScreen="8" largeScreen="8" smallScreen="8">
                                                       <b:dateTimePicker
@@ -274,30 +274,43 @@
                                                       <b:commandButton value="Obtener" update="@form" action="#{admin.RenderDaysToCalendar()}"></b:commandButton>
                                                   </b:column>
                                               </b:row>
-                                              <span class="separator"></span>
+                                              <span class="separador"></span>
                                               <b:row>
                                                   <b:column>
-                                                      <h:outputText styleClass="title" style="font-size: 20px;" value="#{admin.strCurrentLocalDate}"></h:outputText>
+                                                      <h:outputText styleClass="title text-center" style="font-size: 20px;" value="Fecha seleccionada: #{admin.strCurrentLocalDate}"></h:outputText>
                                                   </b:column>
                                               </b:row>
                                               <b:row>
-                                                  <ui:repeat value="#{admin.listDaysToCheck}" var="daycalendar">
-                                                      <b:column smallScreen="12" largeScreen="12" mediumScreen="12">
-                                                          <b:iconAwesome name="fa-clock-o"><h:outputText style="margin-left: 15px;margin-right: 15px" styleClass="secondary-text" value="#{daycalendar}"></h:outputText></b:iconAwesome>
-                                                          <b:commandButton icon="pencil" tooltip="Quite este horario de atencion para el dia seleccionado" action="#{admin.deletefromlistdays(daycalendar)}"></b:commandButton>
-                                                      </b:column>
-                                                  </ui:repeat>
+                                                  <b:column mediumScreen="5" largeScreen="5" smallScreen="5">
+                                                      <ui:repeat value="#{admin.listDaysToCheck}" var="daycalendar">
+                                                          <b:column smallScreen="12" largeScreen="12" mediumScreen="12">
+                                                              <b:iconAwesome name="fa-clock-o"><h:outputText style="margin-left: 15px;margin-right: 15px" styleClass="secondary-text" value="#{daycalendar}"></h:outputText></b:iconAwesome>
+                                                              <b:commandButton icon="pencil" tooltip="Quite este horario de atencion para el dia seleccionado" update="@form" action="#{admin.deletefromlistdays(daycalendar)}"></b:commandButton>
+                                                          </b:column>
+                                                      </ui:repeat>
+                                                  </b:column>
+                                                  <b:column smallScreen="1" mediumScreen="1" largeScreen="1">
+                                                      <b:row><b:iconAwesome name="fa-angle-double-right"></b:iconAwesome></b:row>
+                                                      <b:row><b:iconAwesome name="fa-angle-double-right"></b:iconAwesome></b:row>
+                                                  </b:column>
+                                                  <b:column mediumScreen="5" largeScreen="5" smallScreen="5">
+                                                      <ui:repeat value="#{admin.listDayswasRemoved}" var="dayremove">
+                                                          <b:column smallScreen="12" largeScreen="12" mediumScreen="12">
+                                                              <b:iconAwesome name="fa-clock-o"><h:outputText style="margin-left: 15px;margin-right: 15px" styleClass="secondary-text" value="#{dayremove}"></h:outputText></b:iconAwesome>
+                                                              <b:commandButton icon="fa-eraser" update="@form" tooltip="Regrese este horario de atencion para el dia seleccionado" action="#{admin.rollbackday(dayremove)}"></b:commandButton>
+                                                          </b:column>
+                                                      </ui:repeat>
+                                                  </b:column>
                                               </b:row>
                                           </b:formGroup>
-                                          <span class="separator"></span>
+                                          <span class="separador"></span>
                                           <br/>
                                           <b:row>
                                               <b:column mediumScreen="8" largeScreen="8" smallScreen="12">
                                                   <b:commandButton
-                                                          value="guardar"
+                                                          value="Guardar cambios"
                                                           action="#{admin.saveDataB()}"
-                                                          tooltip="Guarda los horarios para la fecha seleccionada actual"
-                                                  >
+                                                          tooltip="Guarda los horarios para la fecha seleccionada actual">
                                                   </b:commandButton>
                                               </b:column>
                                           </b:row>
