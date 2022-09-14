@@ -46,21 +46,20 @@ public class AdminCitasBean implements Serializable {
     @ManagedProperty("#{citaBusiness}")
     private CitaBusiness citaBusiness;
 
+    @ManagedProperty("#{tramitesBusiness}")
+    private TramitesBusiness tramitesBusiness;
+
+    @ManagedProperty("#{areasBusiness}")
+    private AreasBusiness areasBusiness;
+
     private final VistasHelper vHelp = new VistasHelper();
 
-    private String anoActual;
     private List<String> listMeses;
     private List<String> listDias;
     private List<MisCitas> listCitas;
     private List<SelectItem> listTramites;
     private List<String> listDaysToCheck;
     private List<String> listDayswasRemoved;
-
-    @ManagedProperty("#{tramitesBusiness}")
-    private TramitesBusiness tramitesBusiness;
-
-    @ManagedProperty("#{areasBusiness}")
-    private AreasBusiness areasBusiness;
     private int today;
     private String mesActual;
     private String strDia;
@@ -86,20 +85,17 @@ public class AdminCitasBean implements Serializable {
         listMeses = Arrays.asList("Enero", "Febrero", "Marzo","Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre","Octubre", "Noviembre", "Diciembre");
         GenerarFechas(Calendar.getInstance().get(Calendar.MONTH));
         strIdArea = "1";
-        strUser = "20082306";
+        strUser = "20082306"; // TODO cambiar por las datos del usuario.
         LocalDate todaylocal = LocalDate.now();
         today = todaylocal.getDayOfMonth();
-        mesActual = GetIndexMes(todaylocal.getMonthValue()-1);
-
-        System.out.println("--- Today => "+today);
-        System.out.println("--- Month => "+mesActual);
+        mesActual = MethodsGenerics.GetIndexMes(todaylocal.getMonthValue()-1);
 
         getDayString();
         obtenerCitasGlobales();
     }
 
     public void getDaysDisable(){
-        System.out.println("----- Getting days disable");
+        logger.info("----- Generando Fechas no abiles");
         ResultadoTO resultado = areasBusiness.obtenerFechasFromDB(URLs.FechasReservadas.getValor(), strIdArea);
         strDateDisablesCalendar = MethodsGenerics.formattingStringFechasCalendar( (List<String>) resultado.getObjeto());
     }
@@ -107,7 +103,7 @@ public class AdminCitasBean implements Serializable {
     @PostConstruct
     public void getSettingsArea(){
         getDaysDisable();
-        System.out.println("------- Getting Setting from Area [idArea] => "+strIdArea);
+        logger.info("Getting Setting from Area [idArea] =>"+strIdArea);
         ResultadoTO resultado = areasBusiness.obtenerConfiguracionArea(strIdArea);
         List<SiPaAreasConfiguraciones> data = (List<SiPaAreasConfiguraciones>) resultado.getObjeto();
 
@@ -117,7 +113,7 @@ public class AdminCitasBean implements Serializable {
     }
 
     public void saveDataA(){
-        System.out.println("--- Calling to save data configuración---");
+        logger.info("---- Guardando datos de la configuracion ---");
 
         HashMap<String, Object> datacollect = new HashMap<>();
 
@@ -139,7 +135,7 @@ public class AdminCitasBean implements Serializable {
     }
 
     public void saveDataB() {
-        System.out.println("------ Calling to save data list days delete");
+        logger.info("---- Guardar datos de la lista de dias desactivados --- ");
 
         HashMap<String, Object> datacollect = new HashMap<>();
         datacollect.put("lista", listDaysToCheck);
@@ -165,6 +161,11 @@ public class AdminCitasBean implements Serializable {
        }
     }
 
+    /**
+     * @apiNote Metodo temporal para tipos de reportes
+     * @return List<SelectItems>
+     */
+
     public List<SelectItem> getListKindReportes(){
         List<SelectItem> selectItems = new ArrayList<>();
         selectItems.add(0, new SelectItem("1", "Reporte por tipo de tramite"));
@@ -175,7 +176,6 @@ public class AdminCitasBean implements Serializable {
     }
 
     public void generarReporte(){
-
         ResultadoTO resultado;
         HashMap<String, Object> parameters = new HashMap<String, Object>();
         List<MisCitas> misCitas = null;
@@ -188,19 +188,7 @@ public class AdminCitasBean implements Serializable {
 
         switch (strkindTramite){
             case "1":
-                 params = new String[]{"1"};
-                resultado = citaBusiness.getMisCitasOfService(params, ServiciosReportes.GetAllCitasOnArea.getValor());
-                misCitas = (List<MisCitas>) resultado.getObjeto();
-                colDat = new JRBeanCollectionDataSource(misCitas);
-                parameters.put("JRBeanCollectionData", colDat);
-
-                nameFile = "ReporteCitasGlobal";
-                lista = new ArrayList<>();
-                lista.add(0, new GeneriReportFields("Departamento de Registro y control escolar", fechalocal));
-                break;
-
-            case "2":
-                params = new String[]{"1", strkindTramite};
+                params = new String[]{strIdArea, strkindTramite};
 
                 resultado = citaBusiness.getMisCitasOfService(params, ServiciosReportes.GetAllCitasOnTramite.getValor());
                 misCitas = (List<MisCitas>) resultado.getObjeto();
@@ -212,16 +200,28 @@ public class AdminCitasBean implements Serializable {
                 lista.add(0, new GeneriReportFields("Departamento de Registro y control escolar", strLocalNameTramite, fechalocal, ""));
                 break;
 
+            case "2":
+                params = new String[]{strIdArea};
+                resultado = citaBusiness.getMisCitasOfService(params, ServiciosReportes.GetAllCitasOnArea.getValor());
+                misCitas = (List<MisCitas>) resultado.getObjeto();
+                colDat = new JRBeanCollectionDataSource(misCitas);
+                parameters.put("JRBeanCollectionData", colDat);
+
+                nameFile = "ReporteCitasGlobal";
+                lista = new ArrayList<>();
+                lista.add(0, new GeneriReportFields("Departamento de Registro y control escolar", fechalocal));
+                break;
+
             case "3":
-                params = new String[]{"1"};
+                params = new String[]{strIdArea, strValueDateField};
                 resultado = citaBusiness.getMisCitasOfService(params, ServiciosReportes.GetAllCitasOnFecha.getValor());
                 misCitas = (List<MisCitas>) resultado.getObjeto();
                 colDat = new JRBeanCollectionDataSource(misCitas);
                 parameters.put("JRBeanCollectionData", colDat);
 
-                nameFile = "ReporteCitaOnTramite";
+                nameFile = "ReporteCitasOnDate";
                 lista = new ArrayList<>();
-                lista.add(0, new GeneriReportFields("Departamento de Registro y control escolar", strLocalNameTramite, fechalocal, ""));
+                lista.add(0, new GeneriReportFields("Departamento de Registro y control escolar", strLocalNameTramite, fechalocal));
                 break;
 
 
@@ -229,7 +229,6 @@ public class AdminCitasBean implements Serializable {
 
         String ruta = "resources/reportes/citas";
 
-        // before pass misCitas var.
         vHelp.llenarYObtenerBytesReporteJasperPDF(ruta, nameFile, lista, parameters);
     }
 
@@ -240,6 +239,11 @@ public class AdminCitasBean implements Serializable {
             if (res.isBlnValido()){
                 hasDataTramites = true;
             }
+        }else if (strkindTramite.equals("3")){
+            hasFielDate = true;
+        }else{
+            hasDataTramites=false;
+            hasFielDate=false;
         }
     }
 
@@ -251,7 +255,7 @@ public class AdminCitasBean implements Serializable {
     }
 
     public void RenderDaysToCalendar(){
-        System.out.println("---- Render days");
+        logger.info("---- Render days");
         listDayswasRemoved = new ArrayList<>();
         ResultadoTO resultado = citaBusiness.getHoursOfCalendarDisable(strIdArea, MethodsGenerics.formatDate(strCalendarValue));
         List<String> fromDBhorarios = (List<String>) resultado.getObjeto();
@@ -267,7 +271,7 @@ public class AdminCitasBean implements Serializable {
     }
 
     public void deletefromlistdays(String strCalendarValue){
-        System.out.println("to delete: "+strCalendarValue);
+        logger.info("to delete:"+strCalendarValue);
         listDayswasRemoved.add(strCalendarValue);
         boolean ope = listDaysToCheck.remove(strCalendarValue);
         ResultadoTO resultado = new ResultadoTO();
@@ -309,7 +313,7 @@ public class AdminCitasBean implements Serializable {
     public void obtenerCitasGlobales(){
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy");
         LocalDateTime now = LocalDateTime.now();
-        listCitas = ServicesCitas.getCitasFromArea("http://localhost/siiaServices/apis/misCitas.php",strIdArea,dtf.format(now));
+        listCitas = ServicesCitas.getCitasFromArea(URLs.MiCita.getValor(), strIdArea,dtf.format(now));
     }
 
     public void obtenerCitasFromDia(String dia){
@@ -317,7 +321,7 @@ public class AdminCitasBean implements Serializable {
         LocalDateTime now = LocalDateTime.now();
         String fecha = dtf.format(now);
         String subStrin[] = fecha.split("/");
-        listCitas = ServicesCitas.getCitasFromArea("http://localhost/siiaServices/apis/misCitas.php",strIdArea,subStrin[0]+"/"+dia+"/"+subStrin[2]);
+        listCitas = ServicesCitas.getCitasFromArea(URLs.MiCita.getValor(), strIdArea,subStrin[0]+"/"+dia+"/"+subStrin[2]);
     }
 
     public void GenerarFechas(int mes){
@@ -328,11 +332,10 @@ public class AdminCitasBean implements Serializable {
         for (int i = 1; i <= daysInMonth; i++) {
             listDias.add(i <= 9 ? "0"+i : Integer.toString(i));
         }
-        System.out.println("--- FECHAS GENERADAS : "+listDias);
+        logger.info("--- FECHAS GENERADAS : "+listDias);
     }
 
     public void RefrescarFechas(String mes){
-        System.out.println("--- SEND "+mes+" To Generate Function");
         switch (mes){
             case "Enero":
                 GenerarFechas(0);
@@ -373,49 +376,6 @@ public class AdminCitasBean implements Serializable {
         }
     }
 
-
-    public String GetIndexMes(int mesString){
-        String mesCurrent = "";
-        switch (mesString){
-            case 0:
-                mesCurrent = "Enero";
-                break;
-            case 1:
-                mesCurrent = "Febrero";
-                break;
-            case 2:
-                mesCurrent = "Marzo";
-                break;
-            case 3:
-                mesCurrent = "Abril";
-                break;
-            case 4:
-                mesCurrent = "Mayo";
-                break;
-            case 5:
-                mesCurrent = "Junio";
-                break;
-            case 6:
-                mesCurrent = "Julio";
-                break;
-            case 7:
-                mesCurrent = "Agosto";
-                break;
-            case 8:
-                mesCurrent = "Septiembre";
-                break;
-            case 9:
-                mesCurrent = "Octubre";
-                break;
-            case 10:
-                mesCurrent = "Noviembre";
-                break;
-            case 11:
-                mesCurrent = "Diciembre";
-                break;
-        }
-        return mesCurrent;
-    }
     public int getToday() {
         return today;
     }
@@ -609,20 +569,12 @@ public class AdminCitasBean implements Serializable {
         this.msj = msj;
     }
 
-    public String getAnoActual() {
-        return anoActual;
-    }
-
     public List<String> getListDayswasRemoved() {
         return listDayswasRemoved;
     }
 
     public void setListDayswasRemoved(List<String> listDayswasRemoved) {
         this.listDayswasRemoved = listDayswasRemoved;
-    }
-
-    public void setAnoActual(String anoActual) {
-        this.anoActual = anoActual;
     }
 
 }

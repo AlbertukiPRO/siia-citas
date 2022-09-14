@@ -15,7 +15,6 @@ import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -82,8 +81,6 @@ public class CitaController implements Serializable {
     /**
      * @BusinessProperties
      */
-
-
     @ManagedProperty("#{areasBusiness}")
     private AreasBusiness areasBusiness;
     @ManagedProperty("#{tramitesBusiness}")
@@ -96,21 +93,24 @@ public class CitaController implements Serializable {
     /**
      * @Listeners para el evento de CHANGE del SelectOneMenu de la IU
      */
+
+    /**
+     * @Listeners que obtiene los trámites segun el área seleccionada además se inicializa las configuraciones del área
+     */
     public void listenerPostAreas(){
-        /**
-         * @return  => List<SelectItem> with Object().values[id,nombre]
-         */
         ResultadoTO res = tramitesBusiness.obtenerTramites(URLs.Tramites.getValor(), getStrCurrentArea());
         setListTramites((List<SelectItem>) res.getObjeto());
 
         hasDataTramites = res.isBlnValido();
-        setStrLocalArea(listAreas.get(Integer.parseInt(getStrCurrentArea())-1).getLabel());
+        strLocalArea = listAreas.get(Integer.parseInt(getStrCurrentArea())-1).getLabel();
 
         inicializarSettings();
     }
 
+    /**
+     * @Listeners que obtienes los horarios del área desde la DB
+     */
     public void listenerPostTramites() {
-        System.out.println("[VALUE] de Tramites => " + getStrCurrentTramite());
 
         for (SelectItem list : listTramites) {
             if (list.getValue() == strCurrentTramite)
@@ -118,15 +118,13 @@ public class CitaController implements Serializable {
         }
 
         ResultadoTO resultadoF = areasBusiness.obtenerFechasFromDB(URLs.FechasReservadas.getValor(), getStrCurrentArea());
-        /**
-         * @apiNote Se crea el string con las fechas desactivadas.
-         */
-        setStrFechasDisableCalendar((
+        /* Se crea el string con las fechas desactivadas.*/
+        strFechasDisableCalendar = (
                 MethodsGenerics.formattingStringFechasCalendar(
                         (List<String>) resultadoF.getObjeto()
                 )
-        ));
-
+        );
+        // Fechas minimas y maximas para renderizar en el calendario.
         tomaxDate = MethodsGenerics.lessOneDay((long) 60, false);
         tominDate = MethodsGenerics.lessOneDay((long) 30, true);
 
@@ -135,6 +133,9 @@ public class CitaController implements Serializable {
     }
 
 
+    /**
+     * @Listeners que reservar el horario temporalmente en la DB.
+     */
     public void listenerPostHorario(){
         System.out.println("--- Reservando hora => ["+strCurrentHora+"]");
 
@@ -158,6 +159,9 @@ public class CitaController implements Serializable {
 
     }
 
+    /**
+     * @apiNote Metodo para obtener las configuraciones del área y mantenerlas en una Lista.
+     */
     public void inicializarSettings(){
         CitaInstance settings = CitaInstance.getInstance();
         ResultadoTO resultado = areasBusiness.obtenerConfiguracionArea(strCurrentArea);
@@ -165,16 +169,23 @@ public class CitaController implements Serializable {
         settings.asignar(lista);
     }
 
+    /**
+     * @param name typeOf => String | descrip => Nombre del usuario
+     * @param matricula typeof => String | descrip => Matricula del usuario
+     * @apiNote Metodo que simula la obtencion de los datos de manera tradicional en el SIIA.
+     */
     public void renderDataAlumno(String name, String matricula){
-
         if (matricula != null){
-
             this.strLocalNombreUser = name;
             this.strLocalMatricula = matricula;
             hasDataAreas = true;
         }
     }
 
+    /**
+     * @apiNote Metodo para generar el comprobante PDF con el uso de JasperReports.
+     * TODO Implementar el metodo para la lista de citas en el IU.
+     */
     public void generarPDF(){
         System.out.println("--- GENERANDO PDF ---");
         try {
@@ -194,8 +205,6 @@ public class CitaController implements Serializable {
                     getLink(),
                     datePrint
             ));
-
-            System.out.println(getStrLocalNombreUser()+strLocalFecha+fechaFormatCita()+strLocalMatricula+getStrCurrentHora()+getStrLocalDescripcion()+foliocita+getLink()+datePrint);
 
             String sourFileName = "Comprobante";
             String rutaFiles = "resources/reportes/citas";
@@ -225,7 +234,6 @@ public class CitaController implements Serializable {
      * @return List => SelectItem para el elemento SelectOneMenu de Bootfaces
      */
     public List<SelectItem> returnAreasList(){
-
         if (listAreas == null){
             ResultadoTO resultado = areasBusiness.obtenerAreas(URLs.Areas.getValor());
             setListAreas((List<SelectItem>) resultado.getObjeto());
@@ -251,24 +259,30 @@ public class CitaController implements Serializable {
      * @apiNote  Function que comparar los horarios reservados con el horario solicitado por usuario;
      */
     public void ComprobarHorario(){
-        System.out.println("Comprobar Horario para la fecha => [ "+ getStrCurrentCalendar() +" ]");
+        logger.info("Comprobar Horario para la fecha => [ "+ getStrCurrentCalendar() +" ]");
         ResultadoTO resultadoH = areasBusiness.obtenerHorariosFromDB(URLs.HorariosReservados.getValor(), MethodsGenerics.formatDate(getStrCurrentCalendar()), getStrCurrentArea());
         List<String> horas = (List<String>) resultadoH.getObjeto();
 
-        CitaInstance instance = CitaInstance.getInstance();
+        CitaInstance instance = CitaInstance.getInstance(); //Obtenemos la instancia previamente creada para las configuraciones de área
 
+        // * Los datos son strings asi que tenemos que parciarlos a int además de darle un formato correcto para el algoritmo de generacion de horarios.
+        // * Ejemplo: "9:00"->.replace() |=> "9000".Integer.parse / 1000 | => 9 ()-> <Integer>
         List<String> listHorarios = MethodsGenerics.generarHorarios(
                 Integer.parseInt(instance.configuraciones.get(0).getHoraServicioInicio().replace(':','0'))/1000,
                 Integer.parseInt(instance.configuraciones.get(0).getHoraServicioFin().replace(':','0'))/1000,
                 Integer.parseInt(instance.configuraciones.get(0).getDuracionCitas()),
                 horas);
+        // El algoritmo generar horarios recibe tres parametros:
+        // 1. Hora Incio => <int>
+        // 2. Hora Fin => <int>
+        // 3. DuracionCita => <int>
+        // @return => List<String>
 
-        System.out.println("|----- New list horarios =>"+listHorarios);
+        logger.info("|----- New list horarios => "+listHorarios);
 
         if (resultadoH.isBlnValido() && !horas.isEmpty()) {
             setListHorariosShow(listHorarios);
             mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Fechas temporal reservada correctamente.");
-
         } else
            mostrarNotification(FacesMessage.SEVERITY_WARN, "WARN:", "No se pudo obtener los horarios para esta fecha intenta con otra");
     }
@@ -281,22 +295,27 @@ public class CitaController implements Serializable {
             return "Vació";
     }
 
+    /**
+     * @return String link con la direccion de los requisitos del trámite
+     */
     public String getLink(){
         String link = "";
         Requisitos[] lista = Requisitos.values();
 
         for (Requisitos requisitos : lista) {
             String[] data = requisitos.getUrl();
-            if (strCurrentTramite != null){
-                if (strCurrentTramite.equals(data[1])){
-                    link=data[0];
+            if (strCurrentTramite != null) {
+                if (strCurrentTramite.equals(data[1])) {
+                    link = data[0];
                 }
             }
         }
-
         return link;
     }
 
+    /**
+     * @apiNote Metodo para agendar la cita.
+     */
     public void agendarCitabtn(){
 
         ResultadoTO resultado = citaBusiness.numeroCitas(URLs.Commun.getValor(), strLocalMatricula, strCurrentTramite);
@@ -335,6 +354,12 @@ public class CitaController implements Serializable {
         }
     }
 
+    /**
+     * @param severity FacesMessage severidad
+     * @param title String title
+     * @param msg String mensaje
+     * TODO Metodo Temporal para las notificaciones.
+     */
     public void mostrarNotification(FacesMessage.Severity severity, String title, String msg){
         FacesContext.getCurrentInstance().
                 addMessage(null, new FacesMessage(severity, title, msg));

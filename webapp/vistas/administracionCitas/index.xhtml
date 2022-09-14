@@ -32,7 +32,9 @@
                                             <b:row>
                                                 <b:column styleClass="scroll" rendered="#{admin.listCitas.size()!=0}">
                                                     <ui:repeat value="#{admin.listDias}" var="fecha">
-                                                        <p:commandButton ajax="true" value="#{fecha}" styleClass="#{fecha == admin.today ? 'dateSelected':'itemDate'}" action="#{admin.obtenerCitasFromDia(fecha)}" update="@form"></p:commandButton>
+                                                        <p:commandButton ajax="true" value="#{fecha}"
+                                                                         styleClass="#{fecha == admin.today ? 'dateSelected':'itemDate'}"
+                                                                         action="#{admin.obtenerCitasFromDia(fecha)}" update="@form"></p:commandButton>
                                                     </ui:repeat>
                                                 </b:column>
                                             </b:row>
@@ -159,7 +161,11 @@
                                        </b:formGroup>
                                        <b:formGroup rendered="#{admin.hasFielDate}">
                                            <b:row>
-                                               <b:inputText value="#{admin.strValueDateField}" placeholder="Ingrese la fecha: 01/01/2008"></b:inputText>
+                                               <b:inputText value="#{admin.strValueDateField}" placeholder="Ingrese la fecha: 01/01/2008">
+                                                   <f:facet name="prepend">
+                                                       <b:iconAwesome name="fa-edit"></b:iconAwesome>
+                                                   </f:facet>
+                                               </b:inputText>
                                            </b:row>
                                        </b:formGroup>
                                    </b:column>
@@ -297,7 +303,7 @@
                                                       <ui:repeat value="#{admin.listDayswasRemoved}" var="dayremove">
                                                           <b:column smallScreen="12" largeScreen="12" mediumScreen="12">
                                                               <b:iconAwesome name="fa-clock-o"><h:outputText style="margin-left: 15px;margin-right: 15px" styleClass="secondary-text" value="#{dayremove}"></h:outputText></b:iconAwesome>
-                                                              <b:commandButton icon="fa-eraser" update="@form" tooltip="Regrese este horario de atencion para el dia seleccionado" action="#{admin.rollbackday(dayremove)}"></b:commandButton>
+                                                              <b:commandButton icon="eraser" update="@form" tooltip="Regrese este horario de atencion para el dia seleccionado" action="#{admin.rollbackday(dayremove)}"></b:commandButton>
                                                           </b:column>
                                                       </ui:repeat>
                                                   </b:column>
