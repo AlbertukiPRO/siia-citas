@@ -138,7 +138,7 @@ public class AdminCitasBean implements Serializable {
         logger.info("---- Guardar datos de la lista de dias desactivados --- ");
 
         HashMap<String, Object> datacollect = new HashMap<>();
-        datacollect.put("lista", listDaysToCheck);
+        datacollect.put("lista", listDayswasRemoved);
         datacollect.put("idarea", strIdArea);
         datacollect.put("fecha", strCurrentLocalDate);
         datacollect.put("user", strUser);
@@ -159,6 +159,10 @@ public class AdminCitasBean implements Serializable {
            resultado.agregarMensaje(SeveridadMensajeEnum.ALERTA,"comun.info.citasadmin.listhorariosnoupdate");
            vHelp.pintarMensajes(msj, resultado);
        }
+    }
+
+    public void disableDay(){
+
     }
 
     /**
@@ -221,7 +225,7 @@ public class AdminCitasBean implements Serializable {
 
                 nameFile = "ReporteCitasOnDate";
                 lista = new ArrayList<>();
-                lista.add(0, new GeneriReportFields("Departamento de Registro y control escolar", strLocalNameTramite, fechalocal));
+                lista.add(0, new GeneriReportFields("Departamento de Registro y control escolar", strLocalNameTramite, strValueDateField));
                 break;
 
 

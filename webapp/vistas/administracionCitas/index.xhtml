@@ -281,9 +281,13 @@
                                                   </b:column>
                                               </b:row>
                                               <span class="separador"></span>
+                                              <span class="separador"></span>
                                               <b:row>
-                                                  <b:column>
+                                                  <b:column mediumScreen="10" smallScreen="12" largeScreen="10">
                                                       <h:outputText styleClass="title text-center" style="font-size: 20px;" value="Fecha seleccionada: #{admin.strCurrentLocalDate}"></h:outputText>
+                                                  </b:column>
+                                                  <b:column mediumScreen="2" smallScreen="12" largeScreen="2">
+                                                      <b:commandButton value="Desactivar dia" action="#{admin.disableDay()}" iconAwesome="lock"></b:commandButton>
                                                   </b:column>
                                               </b:row>
                                               <b:row>
