@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:b="http://bootsfaces.net/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="/layouts/template.xhtml">
+
+    <ui:define name="content">
+        <b:container fluid="true">
+            <b:panel title="Reporte" collapsed="false">
+                <b:container>
+                    <b:container styleClass="separados"></b:container>
+                    <h:form>
+                        <b:growl id="growldos"
+                                 globalOnly="true"
+                                 showDetail="true"
+                                 allowDismiss="true"
+                                 severity="info"/>
+                        <b:commandButton value="Generar PDF" actionListener="#{citabean.generarPDF()}"></b:commandButton>
+                        <b:inputText value="#{misictas.strLocalMatricula}" label="Ingrese el nombre"></b:inputText>
+                        <b:commandButton value="Sacar Mensaje" actionListener="#{misictas.GetCitas}"></b:commandButton>
+                    </h:form>
+                </b:container>
+            </b:panel>
+        </b:container>
+    </ui:define>
+</ui:composition>
