@@ -18,6 +18,6 @@ public class Eventos extends FullCalendarEventBean {
 
     @Override
     public void addExtendedFields(StringBuilder buf) {
-        buf.append("'url:google.com'");
+
     }
 }

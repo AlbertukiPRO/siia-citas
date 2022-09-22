@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:b="http://bootsfaces.net/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="/layouts/template.xhtml">
+    <ui:define name="content">
+        <b:container fluid="true">
+            <b:form>
+                <b:commandButton value="Show Tramites" action="#{test.show()}"></b:commandButton>
+                <span class="separador"></span>
+                <b:panel title="Data from DB ORACLE">
+                    <b:selectOneMenu value="#{test.strCurrentArea}"
+                                     colMd="12" colLg="12" colSm="12"
+                                     label="Seleccione Tramite"
+                                     required="true"
+                                     labelColLg="12"
+                                     ajax="true"
+                                     rendered="#{test.hasDataAreas}">
+
+                        <f:selectItem itemLabel="Seleccione una area" value="none" itemValue="none"/>
+                        <f:selectItems value="#{test.returnTramitesList()}"/>
+
+                        <f:ajax
+                                event="change"
+                                listener="#{test.listenerPostAreas}">
+                        </f:ajax>
+                    </b:selectOneMenu>
+                </b:panel>
+            </b:form>
+            <span class="separador"></span>
+            <b:panel title="Full calendar" largeScreen="8" collapsible="false">
+                <b:fullCalendar lang="#{test.lang}"
+                                events="#{test.toJson()}"
+                                eventClick="
+                                function(calEvent, jsEvent, view){
+                                    $(this).css('background', 'red');
+                                    console.log(calEvent, jsEvent, view);
+                                }"
+                                weekends="false">
+                </b:fullCalendar>
+            </b:panel>
+        </b:container>
+    </ui:define>
+</ui:composition>
