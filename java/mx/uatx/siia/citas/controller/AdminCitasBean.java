@@ -1,4 +1,4 @@
-package mx.uatx.siia.citas;
+package mx.uatx.siia.citas.controller;
 
 import mx.uatx.siia.citas.modelo.MisCitas;
 import mx.uatx.siia.citas.modelo.Tramites.business.TramitesBusiness;
@@ -8,6 +8,7 @@ import mx.uatx.siia.citas.modelo.citasBusiness.CitaBusiness;
 import mx.uatx.siia.citas.modelo.citasBusiness.MethodsGenerics;
 import mx.uatx.siia.citas.modelo.enums.ServiciosReportes;
 import mx.uatx.siia.citas.modelo.enums.URLs;
+import mx.uatx.siia.citas.test.ServicesCitas;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.reportes.GeneriReportFields;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
@@ -238,7 +239,7 @@ public class AdminCitasBean implements Serializable {
 
     public void listerpostReporte(){
         if (strkindTramite.equals("1")){
-            ResultadoTO res = tramitesBusiness.obtenerTramites(URLs.Tramites.getValor(), strIdArea);
+            ResultadoTO res = tramitesBusiness.obtenerTramites(Integer.parseInt(strIdArea));
             setListTramites((List<SelectItem>) res.getObjeto());
             if (res.isBlnValido()){
                 hasDataTramites = true;

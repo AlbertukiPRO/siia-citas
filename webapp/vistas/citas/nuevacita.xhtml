@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:b="http://bootsfaces.net/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="/layouts/template.xhtml">
+   <ui:define name="content">
+      <b:container fluid="true" style="overflow:hidden;">
+         <b:panel title="Nueva Cita" collapsible="false">
+            <b:container styleClass="panel-body" fluid="true">
+               <h:form>
+
+                  <b:container>
+                     <legend>Datos del estudiante:</legend>
+                     <span class="separador"></span>
+                     <b:row>
+                        <b:column>
+                           <b:formGroup>
+                              <b:selectOneMenu value="#{nuevacita.strProgramaEdu}" colMd="6" colLg="6" colSm="12"
+                                               label="Programa educativo: *"
+                                               labelColMd="12" labelColLg="12" labelColSm="12"
+                                               update="@form"
+                                               ajax="true">
+                                 <f:selectItem itemLabel="-Seleccione-" value="none" itemValue="none"></f:selectItem>
+                                 <f:selectItems value="#{nuevacita.returnProgramaEduList()}"></f:selectItems>
+
+                                 <f:ajax
+                                         event="change"
+                                         listener="#{nuevacita.listenerPostProgromaEdu}">
+                                 </f:ajax>
+                              </b:selectOneMenu>
+                           </b:formGroup>
+                        </b:column>
+                     </b:row>
+                     <span class="separador"></span>
+                     <b:container rendered="#{nuevacita.showDataEstudiante}">
+                        <b:row >
+                           <b:column mediumScreen="2"><h:outputText value="Nombre:"></h:outputText></b:column>
+                           <b:column mediumScreen="4"><h:outputLabel value="#{auth.strNombreUsuarioLogin}"></h:outputLabel></b:column>
+                           <b:column mediumScreen="2"><h:outputText value="Matrícula:"></h:outputText></b:column>
+                           <b:column mediumScreen="4"><h:outputLabel value="#{auth.strUsuario}"></h:outputLabel></b:column>
+                        </b:row>
+                        <b:row>
+                           <b:column mediumScreen="2"><h:outputText value="Facultad:"></h:outputText></b:column>
+                           <b:column mediumScreen="4"><h:outputLabel value="#{nuevacita.listDatosAlumno[2]}"></h:outputLabel></b:column>
+                           <b:column mediumScreen="2"><h:outputText value="Programa educativo:"></h:outputText></b:column>
+                           <b:column mediumScreen="4"><h:outputLabel value="#{nuevacita.listDatosAlumno[3]}"></h:outputLabel></b:column>
+                        </b:row>
+                        <b:row>
+                           <b:column mediumScreen="2"><h:outputText value="Semestre:"></h:outputText></b:column>
+                           <b:column mediumScreen="4"><h:outputLabel value="#{nuevacita.listDatosAlumno[4]}"></h:outputLabel></b:column>
+                           <b:column mediumScreen="2"><h:outputText value="Grupo:"></h:outputText></b:column>
+                           <b:column mediumScreen="4"><h:outputLabel value="#{nuevacita.listDatosAlumno[5]}"></h:outputLabel></b:column>
+                        </b:row>
+                     </b:container>
+                  </b:container>
+                  <span class="separador"></span>
+                  <span class="separador"></span>
+                  <b:row>
+                     <b:column mediumScreen="11" smallScreen="12"></b:column>
+                     <b:column mediumScreen="1" smallScreen="12">
+                        <b:commandButton value="Regresar"
+                                         action="#{nuevacita.regresar()}"
+                                         title="Regresar"
+                                         ajax="true"
+                                         tooltip="Formulario para agendar una cita"
+                                         styleClass="btn btn-default">
+                        </b:commandButton>
+                     </b:column>
+                  </b:row>
+                  <span class="separador"></span>
+                  <span class="separador"></span>
+                  <!--        XHTML form nueva cita          -->
+                 <b:container>
+                    <b:row id="contenido" rendered="#{nuevacita.hasDataAreas}">
+                       <span class="separador"></span>
+                       <span class="separador"></span>
+                       <legend>Nueva cita</legend>
+                       <span class="separador" />
+                       <b:column mediumScreen="12" smallScreen="12" largeScreen="12">
+                          <b:commandButton styleClass="btn" action="#{nuevacita.reload()}" value="Reininicar formulario" iconAwesome="fa-solid fa-rotate-right"></b:commandButton>
+                       </b:column>
+                       <span class="separador" />
+                       <span class="separador" />
+                       <span class="separador" />
+
+                       <!-- Seccion Izquuerda Form de la cita -->
+                       <b:column mediumScreen="4" largeScreen="4" smallScreen="12">
+                          <!-- Seccion Izquierda FORMULARIO -->
+                          <b:row>
+                             <b:formGroup id="areasselect">
+                                <!--               COMBO DE AREAS             -->
+                                <b:row>
+                                   <b:selectOneMenu value="#{nuevacita.strCurrentArea}"
+                                                    colMd="12" colLg="12" colSm="12"
+                                                    label="Seleccione un Area"
+                                                    required="true"
+                                                    requiredMessage="#{msj['comun.msj.citas.selectarearq']}"
+                                                    labelColLg="12"
+                                                    ajax="true"
+                                                    update="@form:**:trami"
+                                                    rendered="#{nuevacita.hasDataAreas}">
+
+                                      <f:selectItem itemLabel="Seleccione una area" value="none" itemValue="none"/>
+                                      <f:selectItems value="#{nuevacita.returnAreasList()}"/>
+
+                                      <f:ajax
+                                              event="change"
+                                              listener="#{nuevacita.listenerPostAreas}">
+                                      </f:ajax>
+                                   </b:selectOneMenu>
+                                </b:row>
+                             </b:formGroup>
+                             <b:formGroup id="trami" >
+                                <!--               COMBO DE TRAMITES             -->
+                                <b:row>
+                                   <b:selectOneMenu value="#{nuevacita.strCurrentTramite}"
+                                                    colMd="12" colLg="12" colSm="12"
+                                                    id="selectTramite"
+                                                    labelStyle="text-aling:left;"
+                                                    label="Seleccione el tramite"
+                                                    labelColLg="12"
+                                                    ajax="true"
+                                                    rendered="#{nuevacita.hasDataAreas}"
+                                                    required="true"
+                                                    update="@form"
+                                   >
+
+                                      <f:selectItem itemLabel="Seleccione un tramite" value="none" itemValue="none"/>
+                                      <f:selectItems value="#{nuevacita.returnTramitesList()}"/>
+
+                                      <f:ajax
+                                              event="change"
+                                              listener="#{nuevacita.listenerPostTramites}">
+                                      </f:ajax>
+                                   </b:selectOneMenu>
+                                </b:row>
+                             </b:formGroup>
+                             <b:row>
+                                <b:column smallScreen="12" largeScreen="7" mediumScreen="7">
+                                   <b:formGroup id="fechas" styleClass="calend" rendered="#{nuevacita.hasCalendar}">
+                                      <!--               DATE PICKER FECHAS             -->
+                                      <b:dateTimePicker
+                                              id="datepicker"
+                                              weekDaysDisabled="[0,6]"
+                                              format="MM/DD/YYYY"
+                                              maxDate="#{nuevacita.tomaxDate}"
+                                              minDate="#{nuevacita.tominDate}"
+                                              colMd="12" colLg="12" colSm="12"
+                                              mediumScreen="6" labelMediumScreen="12"
+                                              value="#{nuevacita.strCurrentCalendar}"
+                                              showTime="false"
+                                              disabledDates="#{nuevacita.strFechasDisableCalendar}"
+                                              label="Seleccione la fecha de su cita"
+                                              labelColMd="12" labelColLg="12">
+                                      </b:dateTimePicker>
+                                   </b:formGroup>
+                                </b:column>
+
+                                <b:column smallScreen="12" largeScreen="4" mediumScreen="4" style="margin-top:18px">
+                                   <b:growl id="growluno"
+                                            globalOnly="true"
+                                            showDetail="true"
+                                            allowDismiss="true"
+                                            severity="info"/>
+
+                                   <b:navCommandLink style="color:white !important; text-transform:none;"
+                                                     action="#{nuevacita.ComprobarHorario()}" rendered="#{nuevacita.hasCalendar}"
+                                                     value="Comprobar disponibilidad"
+                                                     update="growluno @form"
+                                                     styleClass="btn" ajax="true"
+                                   ></b:navCommandLink>
+                                </b:column>
+                             </b:row>
+                             <br/>
+                             <br/>
+                             <b:row>
+                                <b:formGroup id="horas">
+                                   <!--          ComboBox de los horarios                  -->
+                                   <b:selectOneMenu value="#{nuevacita.strCurrentHora}"
+                                                    colMd="12" colLg="12" colSm="12"
+                                                    rendered="#{nuevacita.hasHorarios}"
+                                                    id="selectHorarios"
+                                                    label="Seleccione el horario de su cita"
+                                                    labelColLg="12"
+                                                    ajax="true"
+                                                    update="@form">
+
+                                      <f:selectItem itemLabel="Seleccione su horario" value="none" itemValue="none"></f:selectItem>
+                                      <f:selectItems value="#{nuevacita.returnHorariosList()}"></f:selectItems>
+
+                                      <f:ajax
+                                              event="change"
+                                              listener="#{nuevacita.listenerPostHorario()}">
+                                      </f:ajax>
+                                   </b:selectOneMenu>
+                                </b:formGroup>
+                             </b:row>
+                             <b:row>
+                                <b:formGroup>
+                                   <b:inputTextarea value="#{nuevacita.strMotivoCita}"
+                                                    colLg="12" colMd="12" colSm="12"
+                                                    rendered="#{nuevacita.hasHorarios}"
+                                                    label="Ingrese el motivo de su cita *"
+                                                    ajax="true"
+                                   >
+                                   </b:inputTextarea>
+                                   <h:inputHidden id="idAlumno" value="#{auth.strUsuario}"></h:inputHidden>
+                                </b:formGroup>
+                             </b:row>
+                          </b:row>
+                       </b:column>
+                       <!-- Seperador -->
+                       <b:column mediumScreen="1" largeScreen="1" smallScreen="12"></b:column>
+                       <!-- Seccion Dereacha Datos de la cita -->
+                       <b:column mediumScreen="5" largeScreen="5" smallScreen="5" rendered="#{nuevacita.hasDataTramites}">
+                          <b:row id="panel" rendered="#{nuevacita.hasDataTramites}">
+                             <h5><h:outputText style="color:#5E0723;font-weight: bold;" value="Resumen cita"></h:outputText></h5>
+                             <br/>
+                             <br/>
+                             <b:column mediumScreen="7" largeScreen="7" smallScreen="12">
+                                <b:inputText readonly="true"
+                                             label="Matricula:"
+                                             labelStyle="width:100px;"
+                                             value="#{nuevacita.strLocalMatricula}"
+                                             labelColMd="4">
+                                   <f:facet name="prepend">
+                                      <b:iconAwesome name="tag"></b:iconAwesome>
+                                   </f:facet>
+                                </b:inputText>
+                             </b:column>
+                             <b:column  mediumScreen="12" largeScreen="12"  smallScreen="12">
+                                <b:inputText readonly="true"
+                                             label="Nombre Usuario"
+                                             labelStyle="width:100px"
+                                             labelColMd="4"
+                                             value="#{nuevacita.strLocalNombreUser}">
+                                   <f:facet name="prepend">
+                                      <b:iconAwesome name="user"></b:iconAwesome>
+                                   </f:facet>
+                                </b:inputText>
+                             </b:column>
+
+                             <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
+                                <b:inputText readonly="true"
+                                             label="Area:"
+                                             labelStyle="width:100px"
+                                             labelColMd="4"
+                                             value="#{nuevacita.strLocalArea}">
+                                   <f:facet name="prepend">
+                                      <b:iconAwesome name="bank"></b:iconAwesome>
+                                   </f:facet>
+                                </b:inputText>
+                             </b:column>
+
+                             <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
+                                <b:inputText readonly="true"
+                                             label="Tramite:"
+                                             id="Tramite"
+                                             labelColMd="4"
+                                             labelStyle="width:100px"
+                                             value="#{nuevacita.strLocalTramite}">
+                                   <f:facet name="prepend">
+                                      <b:iconAwesome name="archive"></b:iconAwesome>
+                                   </f:facet>
+                                </b:inputText>
+                             </b:column>
+
+                             <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
+                                <b:inputText readonly="true"
+                                             label="Fecha Cita:"
+                                             labelColMd="4"
+                                             id="fechacurrent"
+                                             labelStyle="width:100px"
+                                             value="#{nuevacita.fechaFormatCita()}">
+                                   <f:facet name="prepend">
+                                      <b:iconAwesome name="calendar"></b:iconAwesome>
+                                   </f:facet>
+                                </b:inputText>
+                             </b:column>
+
+                             <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
+                                <b:inputText readonly="true"
+                                             id="combohoras"
+                                             label="Hora Cita:"
+                                             labelColMd="4"
+                                             labelStyle="width:100px"
+                                             value="#{nuevacita.strCurrentHora}">
+                                   <f:facet name="prepend">
+                                      <b:iconAwesome name="clock-o"></b:iconAwesome>
+                                   </f:facet>
+                                </b:inputText>
+                             </b:column>
+                          </b:row>
+                          <span class="separador" />
+                          <b:row>
+                             <b:column smallScreen="12" mediumScreen="3" largeScreen="3">
+                                <b:container id="linkgo" rendered="#{nuevacita.hasHorarios}" style="margin-top:15px;width:300px">
+                                   <h5><h:outputText value="Requisitos de tramite:" style="color:#5E0723;font-weight: bold;"></h:outputText></h5>
+                                   <b:label severity="primary" style="font-size:10px;margin-top:10px" value="#{msj['comun.label.citas.requisitoslabel']}">
+                                   </b:label>
+                                   <a href="#{nuevacita.getLink()}" target="_blank">Ver requisitos</a>
+                                </b:container>
+                             </b:column>
+                          </b:row>
+                          <br/>
+                          <b:row>
+                             <span class="separador" />
+                             <b:column mediumScreen="8" largeScreen="2" smallScreen="12"></b:column>
+                             <b:column mediumScreen="2" largeScreen="2" smallScreen="12">
+                                <b:container style="margin-top:15px;width:10px">
+                                   <b:commandButton styleClass="btn btn-default"
+                                                    value="Agendar cita"
+                                                    update="@form"
+                                                    disabled="#{nuevacita.citaAgendada}"
+                                                    actionListener="#{nuevacita.agendarCitabtn()}">
+                                   </b:commandButton>
+                                </b:container>
+                             </b:column>
+                             <b:column mediumScreen="2" largeScreen="2" smallScreen="12" rendered="#{nuevacita.isCitaAgendada()}">
+                                <b:container style="margin-top:15px;margin-left:25px;">
+                                   <b:commandButton styleClass="btn btn-default"
+                                                    value="Imprimir Reporte"
+                                                    actionListener="#{nuevacita.generarPDF()}">
+                                   </b:commandButton>
+                                </b:container>
+                             </b:column>
+                          </b:row>
+                       </b:column>
+                    </b:row>
+                 </b:container>
+               </h:form>
+            </b:container>
+         </b:panel>
+      </b:container>
+   </ui:define>
+</ui:composition>

@@ -1,4 +1,4 @@
-package mx.uatx.siia.citas;
+package mx.uatx.siia.citas.controller;
 
 import com.sun.istack.NotNull;
 import mx.uatx.siia.citas.modelo.Tramites.business.TramitesBusiness;
@@ -11,7 +11,9 @@ import mx.uatx.siia.citas.modelo.enums.Requisitos;
 import mx.uatx.siia.citas.modelo.enums.URLs;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.reportes.FieldsNuevaCita;
+import mx.uatx.siia.serviciosUniversitarios.constantes.Constantes;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
+import mx.uatx.siia.serviciosUniversitarios.dto.SessionTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,90 +23,100 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.util.*;
 
 /**
  * @author Alberto Noche Rosas
- * @date 02/08/2022
+ * @date 22/09/2022
  * @apiNote Bean para el manejo del frontend del módulo citas.
  */
-
 @ViewScoped
-@ManagedBean(name = "citabean")
-public class CitaController implements Serializable {
-
+@ManagedBean(name = "nuevacita")
+public class NuevaCitaBean implements Serializable {
     /**
      * SerialVersion
      */
-    private static final long serialVersionUID = -8116508067661315434L;
-
+    private static final long serialVersionUID = 2205319003472956990L;
     protected final Logger logger = LoggerFactory.getLogger(getClass());
+
 
     /**
      * @LocalAtributtes
      */
-    private List<SelectItem> listAreas;
-    private List<SelectItem> listTramites;
-    private List<String> ListHorariosShow;
-    private boolean hasDataAreas = false;
-    private boolean hasDataTramites = false;
-    private boolean hasHorarios = false;
-    private boolean isCitaAgendada = false;
-    private boolean hasCalendar = false;
-    private boolean isForHidden = false;
-    private boolean btnLookNewCita = false;
-    public boolean flagHorarioReservado = false;
-    @NotNull
-    private String strFechasDisableCalendar = null;
-    @NotNull
-    private String strCurrentArea = null;
-    @NotNull
-    private String strCurrentTramite = null;
-    @NotNull
-    private String strCurrentCalendar = null;
-    @NotNull
-    private String strCurrentHora = null;
-    @NotNull
-    private String strMotivoCita = null;
+        private List<SelectItem> listAreas;
+        private List<SelectItem> listTramites;
+        private List<String> ListHorariosShow;
+        private List<String> listProgramaEdu;
+        private List<String> listDatosAlumno;
 
-    private String strLocalNombreUser;
-    private String strLocalMatricula;
-    private String strLocalArea;
-    private String strLocalTramite;
-    private String strLocalFecha;
-    private String strLocalHorario;
-    private String strLocalDescripcion;
-    private String tomaxDate;
-    private String tominDate;
+        private boolean hasDataTramites = false;
+        private boolean hasHorarios = false;
+        private boolean isCitaAgendada = false;
+        private boolean hasCalendar = false;
+        private boolean isForHidden = false;
+        private boolean btnLookNewCita = false;
+        public boolean flagHorarioReservado = false;
+        private boolean hasDataAreas = false;
+        private boolean showDataEstudiante = false;
+        @NotNull
+        private String strFechasDisableCalendar = null;
+        @NotNull
+        private String strCurrentArea = null;
+        @NotNull
+        private String strCurrentTramite = null;
+        @NotNull
+        private String strCurrentCalendar = null;
+        @NotNull
+        private String strCurrentHora = null;
+        @NotNull
+        private String strMotivoCita = null;
+
+        private String strLocalNombreUser;
+        private String strLocalMatricula;
+        private String strLocalArea;
+        private String strLocalTramite;
+        private String strLocalFecha;
+        private String strLocalHorario;
+        private String strLocalDescripcion;
+        private String strProgramaEdu;
+        private String tomaxDate;
+        private String tominDate;
 
     /**
      * @BusinessProperties
      */
-    @ManagedProperty("#{areasBusiness}")
-    private AreasBusiness areasBusiness;
-    @ManagedProperty("#{tramitesBusiness}")
-    private TramitesBusiness tramitesBusiness;
-    @ManagedProperty("#{citaBusiness}")
-    private CitaBusiness citaBusiness;
-    @ManagedProperty("#{msj}")
-    private ResourceBundle msj;
-    final private VistasHelper vHelp = new VistasHelper();
-    /**
-     * @Listeners para el evento de CHANGE del SelectOneMenu de la IU
-     */
+        @ManagedProperty("#{areasBusiness}")
+        private AreasBusiness areasBusiness;
+        @ManagedProperty("#{tramitesBusiness}")
+        private TramitesBusiness tramitesBusiness;
+        @ManagedProperty("#{citaBusiness}")
+        private CitaBusiness citaBusiness;
+        @ManagedProperty("#{msj}")
+        private ResourceBundle msj;
+        final private VistasHelper vHelp = new VistasHelper();
+
 
     /**
      * @Listeners que obtiene los trámites segun el área seleccionada además se inicializa las configuraciones del área
      */
     public void listenerPostAreas(){
-        ResultadoTO res = tramitesBusiness.obtenerTramites(URLs.Tramites.getValor(), getStrCurrentArea());
-        setListTramites((List<SelectItem>) res.getObjeto());
+        ResultadoTO res = tramitesBusiness.obtenerTramites(Integer.parseInt(strCurrentArea));
+        listTramites = (List<SelectItem>) res.getObjeto();
 
         hasDataTramites = res.isBlnValido();
-        strLocalArea = listAreas.get(Integer.parseInt(getStrCurrentArea())-1).getLabel();
+        strLocalArea = listAreas.get(Integer.parseInt(strCurrentArea)-1).getLabel();
 
         inicializarSettings();
+    }
+
+    public void listenerPostProgromaEdu(){
+        listDatosAlumno = Arrays.asList("Yair Ivan Valencia Perez","20082306","Facultad de Ciencias Básicas Ingeniería y Tecnología campus Apizaco", "Ingeniería En Computación", "9","B");
+        showDataEstudiante = true;
+        hasDataAreas = true;
+        strLocalMatricula = listDatosAlumno.get(1);
+        strLocalNombreUser = listDatosAlumno.get(0);
     }
 
     /**
@@ -114,10 +126,10 @@ public class CitaController implements Serializable {
 
         for (SelectItem list : listTramites) {
             if (list.getValue() == strCurrentTramite)
-                setStrLocalTramite(list.getLabel());
+                strLocalTramite=list.getLabel();
         }
 
-        ResultadoTO resultadoF = areasBusiness.obtenerFechasFromDB(URLs.FechasReservadas.getValor(), getStrCurrentArea());
+        ResultadoTO resultadoF = areasBusiness.obtenerFechasFromDB(URLs.FechasReservadas.getValor(), strCurrentArea);
         /* Se crea el string con las fechas desactivadas.*/
         strFechasDisableCalendar = (
                 MethodsGenerics.formattingStringFechasCalendar(
@@ -155,8 +167,6 @@ public class CitaController implements Serializable {
         }else{
             mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Ya tienes un horario reservado, si quieres otra fecha reinicia el formulario");
         }
-
-
     }
 
     /**
@@ -169,23 +179,6 @@ public class CitaController implements Serializable {
         settings.asignar(lista);
     }
 
-    /**
-     * @param name typeOf => String | descrip => Nombre del usuario
-     * @param matricula typeof => String | descrip => Matricula del usuario
-     * @apiNote Metodo que simula la obtencion de los datos de manera tradicional en el SIIA.
-     */
-    public void renderDataAlumno(String name, String matricula){
-        if (matricula != null){
-            this.strLocalNombreUser = name;
-            this.strLocalMatricula = matricula;
-            hasDataAreas = true;
-        }
-    }
-
-    /**
-     * @apiNote Metodo para generar el comprobante PDF con el uso de JasperReports.
-     * TODO Implementar el metodo para la lista de citas en el IU.
-     */
     public void generarPDF(){
         System.out.println("--- GENERANDO PDF ---");
         try {
@@ -194,12 +187,12 @@ public class CitaController implements Serializable {
 
             ArrayList<FieldsNuevaCita> datos = new ArrayList<>();
             datos.add(new FieldsNuevaCita(
-                    getStrLocalNombreUser(),
+                    strLocalNombreUser,
                     MethodsGenerics.formatDate(strLocalFecha),
                     strLocalTramite,
                     "Ingenieria en computación - FCBIyT",
                     strLocalMatricula,
-                    getStrCurrentHora(),
+                    strCurrentHora,
                     strMotivoCita,
                     foliocita,
                     getLink(),
@@ -220,8 +213,7 @@ public class CitaController implements Serializable {
             parameters.put("foliocita", "foliocita");
             parameters.put("link", "link");
             parameters.put("fechaprint", "fechaprint");
-            parameters.put("qrvalue", getStrLocalNombreUser()+","+strLocalMatricula);
-
+            parameters.put("qrvalue", strLocalNombreUser+","+strLocalMatricula);
             vHelp.llenarYObtenerBytesReporteJasperPDF(rutaFiles, sourFileName, datos, parameters);
 
         } catch (Exception e) {
@@ -235,32 +227,42 @@ public class CitaController implements Serializable {
      */
     public List<SelectItem> returnAreasList(){
         if (listAreas == null){
-            ResultadoTO resultado = areasBusiness.obtenerAreas(URLs.Areas.getValor());
-            setListAreas((List<SelectItem>) resultado.getObjeto());
+            ResultadoTO resultado = areasBusiness.obtenerAreas();
+            listAreas= (List<SelectItem>) resultado.getObjeto();
         }
-        return getListAreas();
+        return listAreas;
     }
 
     /**
      * @return List => SelectItem para el elemento SelectOneMenu de Bootfaces
      */
     public List<SelectItem> returnTramitesList() {
-        return getListTramites();
+        return listTramites;
     }
 
     /**
      * @return {List} => Strings con los horarios finales y disponibles.
      */
     public List<String> returnHorariosList(){
-        return getListHorariosShow();
+        return ListHorariosShow;
     }
+
+
+    public List<SelectItem> returnProgramaEduList(){
+        List<SelectItem> lista = new ArrayList<>();
+        ///todo cambiar por la de yair valencia
+        lista.add(new SelectItem("20181837", "[20181837] LICENCIATURA EN INGENIERÍA EN COMPUTACIÓN CAMPUS APIZACO (2018)"));
+
+        return lista;
+    }
+
 
     /**
      * @apiNote  Function que comparar los horarios reservados con el horario solicitado por usuario;
      */
     public void ComprobarHorario(){
-        logger.info("Comprobar Horario para la fecha => [ "+ getStrCurrentCalendar() +" ]");
-        ResultadoTO resultadoH = areasBusiness.obtenerHorariosFromDB(URLs.HorariosReservados.getValor(), MethodsGenerics.formatDate(getStrCurrentCalendar()), getStrCurrentArea());
+        logger.info("Comprobar Horario para la fecha => [ "+ strCurrentCalendar +" ]");
+        ResultadoTO resultadoH = areasBusiness.obtenerHorariosFromDB(URLs.HorariosReservados.getValor(), MethodsGenerics.formatDate(strCurrentCalendar), strCurrentArea);
         List<String> horas = (List<String>) resultadoH.getObjeto();
 
         CitaInstance instance = CitaInstance.getInstance(); //Obtenemos la instancia previamente creada para las configuraciones de área
@@ -281,16 +283,16 @@ public class CitaController implements Serializable {
         logger.info("|----- New list horarios => "+listHorarios);
 
         if (resultadoH.isBlnValido() && !horas.isEmpty()) {
-            setListHorariosShow(listHorarios);
+            ListHorariosShow = listHorarios;
             mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Fechas temporal reservada correctamente.");
         } else
-           mostrarNotification(FacesMessage.SEVERITY_WARN, "WARN:", "No se pudo obtener los horarios para esta fecha intenta con otra");
+            mostrarNotification(FacesMessage.SEVERITY_WARN, "WARN:", "No se pudo obtener los horarios para esta fecha intenta con otra");
     }
 
     public String fechaFormatCita(){
-        if (getStrCurrentCalendar() != null){
-            strLocalFecha = getStrCurrentCalendar();
-            return MethodsGenerics.formatDate(getStrCurrentCalendar());
+        if (strCurrentCalendar != null){
+            strLocalFecha = strCurrentCalendar;
+            return MethodsGenerics.formatDate(strCurrentCalendar);
         } else
             return "Vació";
     }
@@ -366,82 +368,22 @@ public class CitaController implements Serializable {
     }
 
     public void reload(){
-        vHelp.redireccionar("/vistas/citas/cita.uat");
+        vHelp.redireccionar("/vistas/citas/nuevacita.uat");
     }
 
-    /**
+    public void regresar(){vHelp.redireccionar("/vistas/citas/cita.uat");}
+
+
+    /*----------------------
      * @GettersAndSetters
      */
+
     public List<SelectItem> getListAreas() {
         return listAreas;
     }
+
     public void setListAreas(List<SelectItem> listAreas) {
         this.listAreas = listAreas;
-    }
-
-    public AreasBusiness getAreasBusiness() {
-        return areasBusiness;
-    }
-
-    public void setAreasBusiness(AreasBusiness areasBusiness) {
-        this.areasBusiness = areasBusiness;
-    }
-
-    public ResourceBundle getMsj() {
-        return msj;
-    }
-
-    public void setMsj(ResourceBundle msj) {
-        this.msj = msj;
-    }
-
-    public boolean isHasDataAreas() {
-        return hasDataAreas;
-    }
-
-
-    public CitaBusiness getCitaBusiness() {
-        return citaBusiness;
-    }
-
-    public void setCitaBusiness(CitaBusiness citaBusiness) {
-        this.citaBusiness = citaBusiness;
-    }
-
-    public void setHasDataAreas(boolean hasDataAreas) {
-        this.hasDataAreas = hasDataAreas;
-    }
-
-    public String getStrCurrentArea() {
-        return strCurrentArea;
-    }
-
-    public boolean isHasCalendar() {
-        return hasCalendar;
-    }
-
-    public void setHasCalendar(boolean hasCalendar) {
-        this.hasCalendar = hasCalendar;
-    }
-
-    public void setStrCurrentArea(String strCurrentArea) {
-        this.strCurrentArea = strCurrentArea;
-    }
-
-    public boolean isHasDataTramites() {
-        return hasDataTramites;
-    }
-
-    public void setHasDataTramites(boolean hasDataTramites) {
-        this.hasDataTramites = hasDataTramites;
-    }
-
-    public String getStrCurrentTramite() {
-        return strCurrentTramite;
-    }
-
-    public void setStrCurrentTramite(String strCurrentTramite) {
-        this.strCurrentTramite = strCurrentTramite;
     }
 
     public List<SelectItem> getListTramites() {
@@ -452,16 +394,68 @@ public class CitaController implements Serializable {
         this.listTramites = listTramites;
     }
 
-    public TramitesBusiness getTramitesBusiness() {
-        return tramitesBusiness;
-    }
-
-    public void setTramitesBusiness(TramitesBusiness tramitesBusiness) {
-        this.tramitesBusiness = tramitesBusiness;
-    }
-
     public List<String> getListHorariosShow() {
         return ListHorariosShow;
+    }
+
+    public void setListHorariosShow(List<String> listHorariosShow) {
+        ListHorariosShow = listHorariosShow;
+    }
+
+    public boolean isHasDataTramites() {
+        return hasDataTramites;
+    }
+
+    public void setHasDataTramites(boolean hasDataTramites) {
+        this.hasDataTramites = hasDataTramites;
+    }
+
+    public boolean isHasHorarios() {
+        return hasHorarios;
+    }
+
+    public void setHasHorarios(boolean hasHorarios) {
+        this.hasHorarios = hasHorarios;
+    }
+
+    public boolean isCitaAgendada() {
+        return isCitaAgendada;
+    }
+
+    public void setCitaAgendada(boolean citaAgendada) {
+        isCitaAgendada = citaAgendada;
+    }
+
+    public boolean isHasCalendar() {
+        return hasCalendar;
+    }
+
+    public void setHasCalendar(boolean hasCalendar) {
+        this.hasCalendar = hasCalendar;
+    }
+
+    public boolean isForHidden() {
+        return isForHidden;
+    }
+
+    public void setForHidden(boolean forHidden) {
+        isForHidden = forHidden;
+    }
+
+    public boolean isBtnLookNewCita() {
+        return btnLookNewCita;
+    }
+
+    public void setBtnLookNewCita(boolean btnLookNewCita) {
+        this.btnLookNewCita = btnLookNewCita;
+    }
+
+    public boolean isFlagHorarioReservado() {
+        return flagHorarioReservado;
+    }
+
+    public void setFlagHorarioReservado(boolean flagHorarioReservado) {
+        this.flagHorarioReservado = flagHorarioReservado;
     }
 
     public String getStrFechasDisableCalendar() {
@@ -472,8 +466,20 @@ public class CitaController implements Serializable {
         this.strFechasDisableCalendar = strFechasDisableCalendar;
     }
 
-    public void setListHorariosShow(List<String> listHorariosShow) {
-        this.ListHorariosShow = listHorariosShow;
+    public String getStrCurrentArea() {
+        return strCurrentArea;
+    }
+
+    public void setStrCurrentArea(String strCurrentArea) {
+        this.strCurrentArea = strCurrentArea;
+    }
+
+    public String getStrCurrentTramite() {
+        return strCurrentTramite;
+    }
+
+    public void setStrCurrentTramite(String strCurrentTramite) {
+        this.strCurrentTramite = strCurrentTramite;
     }
 
     public String getStrCurrentCalendar() {
@@ -484,7 +490,13 @@ public class CitaController implements Serializable {
         this.strCurrentCalendar = strCurrentCalendar;
     }
 
-    public String getStrCurrentHora() {return strCurrentHora;}
+    public String getStrCurrentHora() {
+        return strCurrentHora;
+    }
+
+    public void setStrCurrentHora(String strCurrentHora) {
+        this.strCurrentHora = strCurrentHora;
+    }
 
     public String getStrMotivoCita() {
         return strMotivoCita;
@@ -493,8 +505,6 @@ public class CitaController implements Serializable {
     public void setStrMotivoCita(String strMotivoCita) {
         this.strMotivoCita = strMotivoCita;
     }
-
-    public void setStrCurrentHora(String strCurrentHora) {this.strCurrentHora = strCurrentHora;}
 
     public String getStrLocalNombreUser() {
         return strLocalNombreUser;
@@ -548,30 +558,6 @@ public class CitaController implements Serializable {
         return strLocalDescripcion;
     }
 
-    public boolean isHasHorarios() {
-        return hasHorarios;
-    }
-
-    public void setHasHorarios(boolean hasHorarios) {
-        this.hasHorarios = hasHorarios;
-    }
-
-    public boolean isCitaAgendada() {
-        return isCitaAgendada;
-    }
-
-    public void setCitaAgendada(boolean citaAgendada) {
-        isCitaAgendada = citaAgendada;
-    }
-
-    public boolean isForHidden() {
-        return isForHidden;
-    }
-
-    public void setForHidden(boolean forHidden) {
-        isForHidden = forHidden;
-    }
-
     public void setStrLocalDescripcion(String strLocalDescripcion) {
         this.strLocalDescripcion = strLocalDescripcion;
     }
@@ -579,6 +565,7 @@ public class CitaController implements Serializable {
     public String getTomaxDate() {
         return tomaxDate;
     }
+
     public void setTomaxDate(String tomaxDate) {
         this.tomaxDate = tomaxDate;
     }
@@ -591,11 +578,75 @@ public class CitaController implements Serializable {
         this.tominDate = tominDate;
     }
 
-    public boolean isBtnLookNewCita() {
-        return btnLookNewCita;
+    public AreasBusiness getAreasBusiness() {
+        return areasBusiness;
     }
 
-    public void setBtnLookNewCita(boolean btnLookNewCita) {
-        this.btnLookNewCita = btnLookNewCita;
+    public void setAreasBusiness(AreasBusiness areasBusiness) {
+        this.areasBusiness = areasBusiness;
+    }
+
+    public TramitesBusiness getTramitesBusiness() {
+        return tramitesBusiness;
+    }
+
+    public void setTramitesBusiness(TramitesBusiness tramitesBusiness) {
+        this.tramitesBusiness = tramitesBusiness;
+    }
+
+    public CitaBusiness getCitaBusiness() {
+        return citaBusiness;
+    }
+
+    public void setCitaBusiness(CitaBusiness citaBusiness) {
+        this.citaBusiness = citaBusiness;
+    }
+
+    public ResourceBundle getMsj() {
+        return msj;
+    }
+
+    public void setMsj(ResourceBundle msj) {
+        this.msj = msj;
+    }
+
+    public List<String> getListProgramaEdu() {
+        return listProgramaEdu;
+    }
+
+    public void setListProgramaEdu(List<String> listProgramaEdu) {
+        this.listProgramaEdu = listProgramaEdu;
+    }
+
+    public boolean isHasDataAreas() {
+        return hasDataAreas;
+    }
+
+    public String getStrProgramaEdu() {
+        return strProgramaEdu;
+    }
+
+    public void setStrProgramaEdu(String strProgramaEdu) {
+        this.strProgramaEdu = strProgramaEdu;
+    }
+
+    public void setHasDataAreas(boolean hasDataAreas) {
+        this.hasDataAreas = hasDataAreas;
+    }
+
+    public List<String> getListDatosAlumno() {
+        return listDatosAlumno;
+    }
+
+    public void setListDatosAlumno(List<String> listDatosAlumno) {
+        this.listDatosAlumno = listDatosAlumno;
+    }
+
+    public boolean isShowDataEstudiante() {
+        return showDataEstudiante;
+    }
+
+    public void setShowDataEstudiante(boolean showDataEstudiante) {
+        this.showDataEstudiante = showDataEstudiante;
     }
 }

@@ -1,4 +1,4 @@
-package mx.uatx.siia.citas;
+package mx.uatx.siia.citas.controller;
 
 import mx.uatx.siia.citas.modelo.MisCitas;
 import mx.uatx.siia.citas.modelo.citasBusiness.CitaBusiness;
@@ -98,10 +98,6 @@ public class MisCitasBean implements Serializable {
         ResultadoTO resultado = citaBusiness.miCita(URLs.MiCita.getValor(), strLocalMatricula);
         listMisCitas = (List<MisCitas>) resultado.getObjeto();
         renderMisCitas = true;
-
-        //! Temporal code para ver si mi teoria es cierta.
-        resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.iniciar.sesion.usuario.logueado");
-        vHelp.pintarMensajes(msj, resultado);
     }
 
     public boolean isCancelable(String estatus){
