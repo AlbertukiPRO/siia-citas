@@ -125,8 +125,9 @@ public class NuevaCitaBean implements Serializable {
     public void listenerPostTramites() {
 
         for (SelectItem list : listTramites) {
-            if (list.getValue() == strCurrentTramite)
+            if (list.getValue().equals(Integer.parseInt(strCurrentTramite))) {
                 strLocalTramite=list.getLabel();
+            }
         }
 
         ResultadoTO resultadoF = areasBusiness.obtenerFechasFromDB(URLs.FechasReservadas.getValor(), strCurrentArea);

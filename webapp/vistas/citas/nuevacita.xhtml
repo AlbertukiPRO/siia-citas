@@ -143,12 +143,14 @@
                                       <!--               DATE PICKER FECHAS             -->
                                       <b:dateTimePicker
                                               id="datepicker"
-                                              weekDaysDisabled="[0,6]"
+                                              mode="inline"
+                                              week-days-disabled='6,0'
+                                              weekDaysDisabled="'6,0'"
                                               format="MM/DD/YYYY"
                                               maxDate="#{nuevacita.tomaxDate}"
                                               minDate="#{nuevacita.tominDate}"
                                               colMd="12" colLg="12" colSm="12"
-                                              mediumScreen="6" labelMediumScreen="12"
+                                              mediumScreen="8" labelMediumScreen="12" largeScreen="10" smallScreen="12"
                                               value="#{nuevacita.strCurrentCalendar}"
                                               showTime="false"
                                               disabledDates="#{nuevacita.strFechasDisableCalendar}"
@@ -167,8 +169,9 @@
 
                                    <b:navCommandLink style="color:white !important; text-transform:none;"
                                                      action="#{nuevacita.ComprobarHorario()}" rendered="#{nuevacita.hasCalendar}"
-                                                     value="Comprobar disponibilidad"
-                                                     update="growluno @form"
+                                                     iconAwesome="check"
+                                                     value="Confirmar "
+                                                     update="growluno @form:**:horas @form:**:fechacurrent"
                                                      styleClass="btn" ajax="true"
                                    ></b:navCommandLink>
                                 </b:column>
@@ -185,7 +188,7 @@
                                                     label="Seleccione el horario de su cita"
                                                     labelColLg="12"
                                                     ajax="true"
-                                                    update="@form">
+                                                    update="@form:**:combohoras">
 
                                       <f:selectItem itemLabel="Seleccione su horario" value="none" itemValue="none"></f:selectItem>
                                       <f:selectItems value="#{nuevacita.returnHorariosList()}"></f:selectItems>
@@ -203,7 +206,6 @@
                                                     colLg="12" colMd="12" colSm="12"
                                                     rendered="#{nuevacita.hasHorarios}"
                                                     label="Ingrese el motivo de su cita *"
-                                                    ajax="true"
                                    >
                                    </b:inputTextarea>
                                    <h:inputHidden id="idAlumno" value="#{auth.strUsuario}"></h:inputHidden>
@@ -257,7 +259,7 @@
                              <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
                                 <b:inputText readonly="true"
                                              label="Tramite:"
-                                             id="Tramite"
+                                             id="tramitefield"
                                              labelColMd="4"
                                              labelStyle="width:100px"
                                              value="#{nuevacita.strLocalTramite}">
@@ -312,15 +314,15 @@
                                 <b:container style="margin-top:15px;width:10px">
                                    <b:commandButton styleClass="btn btn-default"
                                                     value="Agendar cita"
-                                                    update="@form"
+                                                    update="@form:**:growluno @form:**:btnreporte"
                                                     disabled="#{nuevacita.citaAgendada}"
-                                                    actionListener="#{nuevacita.agendarCitabtn()}">
+                                                    actionListener="#{nuevacita.agendarCitabtn() }">
                                    </b:commandButton>
                                 </b:container>
                              </b:column>
-                             <b:column mediumScreen="2" largeScreen="2" smallScreen="12" rendered="#{nuevacita.isCitaAgendada()}">
+                             <b:column mediumScreen="2" largeScreen="2" smallScreen="12">
                                 <b:container style="margin-top:15px;margin-left:25px;">
-                                   <b:commandButton styleClass="btn btn-default"
+                                   <b:commandButton styleClass="btn btn-default" disabled="#{!nuevacita.isCitaAgendada()}" id="btnreporte"
                                                     value="Imprimir Reporte"
                                                     actionListener="#{nuevacita.generarPDF()}">
                                    </b:commandButton>

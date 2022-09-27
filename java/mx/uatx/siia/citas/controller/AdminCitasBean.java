@@ -1,5 +1,6 @@
 package mx.uatx.siia.citas.controller;
 
+import com.google.gson.Gson;
 import mx.uatx.siia.citas.modelo.MisCitas;
 import mx.uatx.siia.citas.modelo.Tramites.business.TramitesBusiness;
 import mx.uatx.siia.citas.modelo.areas.business.AreasBusiness;
@@ -8,6 +9,7 @@ import mx.uatx.siia.citas.modelo.citasBusiness.CitaBusiness;
 import mx.uatx.siia.citas.modelo.citasBusiness.MethodsGenerics;
 import mx.uatx.siia.citas.modelo.enums.ServiciosReportes;
 import mx.uatx.siia.citas.modelo.enums.URLs;
+import mx.uatx.siia.citas.test.Eventos;
 import mx.uatx.siia.citas.test.ServicesCitas;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.reportes.GeneriReportFields;
@@ -61,6 +63,7 @@ public class AdminCitasBean implements Serializable {
     private List<SelectItem> listTramites;
     private List<String> listDaysToCheck;
     private List<String> listDayswasRemoved;
+    private List<Eventos> listEventos;
     private int today;
     private String mesActual;
     private String strDia;
@@ -77,6 +80,8 @@ public class AdminCitasBean implements Serializable {
     private String strDuracionCita;
     private String strValueDateField;
     private final String strUser;
+    private String jsonEvents;
+    private String strlang;
 
     private boolean hasDataTramites = false;
     private boolean hasFielDate = false;
@@ -111,6 +116,14 @@ public class AdminCitasBean implements Serializable {
         strDuracionCita = data.get(0).getDuracionCitas();
         strHourServiceEnd = data.get(0).getHoraServicioFin();
         strHourServiceStar = data.get(0).getHoraServicioInicio();
+
+        listEventos = new ArrayList<>();
+
+        Eventos eventos1 = new Eventos("Cita de Alberto Noche Rosas", MethodsGenerics.getDateToFullCalendar("21/09/2022 18:00:00"));
+        Eventos eventos2 = new Eventos("Cita de Yair Valencia", MethodsGenerics.getDateToFullCalendar("21/09/2022 14:00:00"));
+        listEventos.add(0, eventos1);
+        listEventos.add(1, eventos2);
+        strlang = "es";
     }
 
     public void saveDataA(){
@@ -161,6 +174,7 @@ public class AdminCitasBean implements Serializable {
            vHelp.pintarMensajes(msj, resultado);
        }
     }
+
 
     public void disableDay(){
 
@@ -314,7 +328,9 @@ public class AdminCitasBean implements Serializable {
             System.out.println(e);
         }
     }
-
+    public String toJson(){
+        return jsonEvents = new Gson().toJson(listEventos);
+    }
     public void obtenerCitasGlobales(){
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy");
         LocalDateTime now = LocalDateTime.now();
@@ -582,4 +598,19 @@ public class AdminCitasBean implements Serializable {
         this.listDayswasRemoved = listDayswasRemoved;
     }
 
+    public List<Eventos> getListEventos() {
+        return listEventos;
+    }
+
+    public void setListEventos(List<Eventos> listEventos) {
+        this.listEventos = listEventos;
+    }
+
+    public String getStrlang() {
+        return strlang;
+    }
+
+    public void setStrlang(String strlang) {
+        this.strlang = strlang;
+    }
 }

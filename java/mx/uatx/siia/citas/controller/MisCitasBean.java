@@ -104,8 +104,8 @@ public class MisCitasBean implements Serializable {
         return estatus.equals("Agendada");
     }
 
-    public void SetModalCancelar(){
-        System.out.println("----- SET DATA FROM CITA----");
+    public void SetModalCancelar(String tramite){
+        System.out.println("----- SET DATA FROM CITA ----->"+tramite);
 
         FacesContext fc = FacesContext.getCurrentInstance();
         Map<String, String> params = fc.getExternalContext().getRequestParameterMap();

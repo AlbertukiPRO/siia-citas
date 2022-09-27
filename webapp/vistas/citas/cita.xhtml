@@ -50,13 +50,15 @@
                                                 <b:dataTableColumn value="#{item.strRepuesta}" label="Retroalimentación"></b:dataTableColumn>
                                                 <b:dataTableColumn value="#{item.strFechaHoraReservada}" label="Fecha y Hora"></b:dataTableColumn>
                                                 <b:dataTableColumn  value="#{item.strEstatus}" label="Estatus"></b:dataTableColumn>
+                                                <b:dataTableColumn label="Comprobante">
+                                                    <b:commandButton value=" " iconAwesome="file-pdf-o" styleClass="btn btn-default"></b:commandButton>
+                                                </b:dataTableColumn>
                                                 <b:dataTableColumn label="Cancelar" rendered="#{misictas.isCancelable(item.strEstatus)}">
-                                                    <b:navCommandLink icon="pencil"
-                                                                      onclick="$('#modalCancelar').modal()"
-                                                                      actionListener="#{misictas.SetModalCancelar}">
-                                                    </b:navCommandLink>
-                                                    <b:commandButton icon="file" styleClass="btn btn-default"></b:commandButton>
-                                                    <h:inputHidden value="#{misictas.localTramite}" id="tramite"></h:inputHidden>
+                                                    <b:commandButton iconAwesome="trash-o"
+                                                                      styleClass="btn btn-default"
+                                                                      onclick="$('#modalCancelar').modal(); javascript:return false; "
+                                                                      actionListener="#{misictas.SetModalCancelar(item.tramite)}">
+                                                    </b:commandButton>
                                                 </b:dataTableColumn>
                                             </b:dataTable>
                                         </b:column>
@@ -73,7 +75,8 @@
             </b:panel>
         </b:container>
         <b:modal id="modalCancelar" title="Cancelar Cita" styleClass="modalCancelar modal">
-            <p>Esta a punto de cancelar su cita con el area de con el objetivo de  <h:outputText value="#{misictas.localTramite}"></h:outputText> </p>
+            <p>Esta a punto de cancelar su cita con el area de con el objetivo de  <h:outputText value="#{misictas.localTramite}"><span id="setlabeltramite"
+            ></span></h:outputText> </p>
             <h:form>
                 <b:inputText placeholder="Escribe aquí"   label="Ingrese el motivo de la cancelación" value="#{misictas.motivoCancelacion}"></b:inputText>
                 <b:commandButton title="Cancelar cita" value="Cancelar mi cita" action="#{misictas.Cancelar()}" styleClass="btn btn-default">
@@ -134,6 +137,10 @@
         </b:modal>
         <script>
             const showModalWellcome = () => $('#modalWellcome').modal();
+
+            function loger(data) {
+                console.log(data);
+            }
         </script>
     </ui:define>
 </ui:composition>
