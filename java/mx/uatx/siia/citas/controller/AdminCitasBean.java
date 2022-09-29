@@ -107,7 +107,7 @@ public class AdminCitasBean implements Serializable {
     }
 
     @PostConstruct
-    public void getSettingsArea(){
+    public void innit(){
         getDaysDisable();
         logger.info("Getting Setting from Area [idArea] =>"+strIdArea);
         ResultadoTO resultado = areasBusiness.obtenerConfiguracionArea(strIdArea);
@@ -117,17 +117,23 @@ public class AdminCitasBean implements Serializable {
         strHourServiceEnd = data.get(0).getHoraServicioFin();
         strHourServiceStar = data.get(0).getHoraServicioInicio();
 
-        listEventos = new ArrayList<>();
-
-        Eventos eventos1 = new Eventos("Cita de Alberto Noche Rosas", MethodsGenerics.getDateToFullCalendar("21/09/2022 18:00:00"));
-        Eventos eventos2 = new Eventos("Cita de Yair Valencia", MethodsGenerics.getDateToFullCalendar("21/09/2022 14:00:00"));
-        listEventos.add(0, eventos1);
-        listEventos.add(1, eventos2);
+        ResultadoTO resultadoTO = areasBusiness.obtenerEventos(strIdArea);
+        List<MisCitas> localList = (List<MisCitas>) resultadoTO.getObjeto();
+        if (!localList.isEmpty()){
+            listEventos = new ArrayList<>();
+            localList.forEach(misCitas -> {
+                String[] date = misCitas.getStrFechaHoraReservada().split("/");
+                        listEventos.add(new Eventos(
+                                "Cita de " + misCitas.getStrNombre(),
+                                MethodsGenerics.getDateToFullCalendar(date[1] +"/" +date[0] +"/"+date[2] + " " + misCitas.getStrHora())));
+                    }
+            );
+        }else listEventos = new ArrayList<>();
         strlang = "es";
     }
 
     public void saveDataA(){
-        logger.info("---- Guardando datos de la configuracion ---");
+        logger.info("--- Guardando datos de la configuracion ---");
 
         HashMap<String, Object> datacollect = new HashMap<>();
 

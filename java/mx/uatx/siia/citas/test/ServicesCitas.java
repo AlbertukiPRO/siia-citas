@@ -1,4 +1,4 @@
-package mx.uatx.siia.citas;
+package mx.uatx.siia.citas.test;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.*;
 import mx.uatx.siia.citas.modelo.MisCitas;
