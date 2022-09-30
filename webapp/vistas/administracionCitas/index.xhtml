@@ -16,10 +16,10 @@
                             <b:fullCalendar lang="#{admin.strlang}"
                                             events="#{admin.toJson()}"
                                             eventClick="
-                                function(calEvent, jsEvent, view){
-                                    $(this).css('background', 'red');
-                                    console.log(calEvent, jsEvent, view);
-                                }"
+                                            function(calEvent, jsEvent, view){
+                                                $(this).css('background', 'red');
+                                                console.log(calEvent, jsEvent, view);
+                                            }"
                                             weekends="false">
                             </b:fullCalendar>
                         </b:tab>

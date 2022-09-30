@@ -9,7 +9,7 @@ import mx.uatx.siia.citas.modelo.citasBusiness.CitaBusiness;
 import mx.uatx.siia.citas.modelo.citasBusiness.MethodsGenerics;
 import mx.uatx.siia.citas.modelo.enums.ServiciosReportes;
 import mx.uatx.siia.citas.modelo.enums.URLs;
-import mx.uatx.siia.citas.test.Eventos;
+import mx.uatx.siia.citas.models.Eventos;
 import mx.uatx.siia.citas.test.ServicesCitas;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.reportes.GeneriReportFields;
@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.RequestScoped;
 import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 import java.io.Serializable;
@@ -122,14 +123,20 @@ public class AdminCitasBean implements Serializable {
         if (!localList.isEmpty()){
             listEventos = new ArrayList<>();
             localList.forEach(misCitas -> {
+                String[] params = new String[]{misCitas.getStrIdCita(),misCitas.getStrUser(), strIdArea};
                 String[] date = misCitas.getStrFechaHoraReservada().split("/");
                         listEventos.add(new Eventos(
                                 "Cita de " + misCitas.getStrNombre(),
-                                MethodsGenerics.getDateToFullCalendar(date[1] +"/" +date[0] +"/"+date[2] + " " + misCitas.getStrHora())));
+                                MethodsGenerics.getDateToFullCalendar(date[1] +"/" +date[0] +"/"+date[2] + " " + misCitas.getStrHora()),
+                                params));
                     }
             );
         }else listEventos = new ArrayList<>();
         strlang = "es";
+    }
+
+    public void saludar(Object e){
+        logger.info(e.toString());
     }
 
     public void saveDataA(){

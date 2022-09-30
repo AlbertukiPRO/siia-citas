@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:b="http://bootsfaces.net/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="/layouts/template.xhtml">
+   <ui:define name="content">
+      <f:metadata>
+         <f:viewParam name="idarea"  value="#{viewcita.idarea}"></f:viewParam>
+         <f:viewParam name="matricula"  value="#{viewcita.id}"></f:viewParam>
+         <f:viewParam name="idcita"  value="#{viewcita.matricula}"></f:viewParam>
+      </f:metadata>
+
+      <b:container fluid="true">
+         <b:panel title="Cita de #{viewcita.modelCita.strNombre}" largeScreen="8" collapsible="true">
+            <h:outputText value="It's works"></h:outputText>
+         </b:panel>
+      </b:container>
+   </ui:define>
+</ui:composition>
