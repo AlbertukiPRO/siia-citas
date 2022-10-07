@@ -11,9 +11,7 @@ import mx.uatx.siia.citas.modelo.enums.Requisitos;
 import mx.uatx.siia.citas.modelo.enums.URLs;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.reportes.FieldsNuevaCita;
-import mx.uatx.siia.serviciosUniversitarios.constantes.Constantes;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
-import mx.uatx.siia.serviciosUniversitarios.dto.SessionTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +21,6 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
-import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.util.*;
 
@@ -105,8 +102,13 @@ public class NuevaCitaBean implements Serializable {
         ResultadoTO res = tramitesBusiness.obtenerTramites(Integer.parseInt(strCurrentArea));
         listTramites = (List<SelectItem>) res.getObjeto();
 
+        listAreas.forEach(selectItem -> {
+            if ( selectItem.getValue().equals(strCurrentArea))
+                setStrLocalArea(selectItem.getLabel());
+            else mostrarNotification(FacesMessage.SEVERITY_FATAL, "ERROR:", "No se pudo cargar el area correctamente");
+        });
+
         hasDataTramites = res.isBlnValido();
-        strLocalArea = listAreas.get(Integer.parseInt(strCurrentArea)-1).getLabel();
 
         inicializarSettings();
     }
@@ -130,13 +132,14 @@ public class NuevaCitaBean implements Serializable {
             }
         }
 
-        ResultadoTO resultadoF = areasBusiness.obtenerFechasFromDB(URLs.FechasReservadas.getValor(), strCurrentArea);
+        ResultadoTO resultadoF = areasBusiness.obtenerDiasInhabiles(strCurrentArea);
         /* Se crea el string con las fechas desactivadas.*/
         strFechasDisableCalendar = (
                 MethodsGenerics.formattingStringFechasCalendar(
                         (List<String>) resultadoF.getObjeto()
                 )
         );
+
         // Fechas minimas y maximas para renderizar en el calendario.
         tomaxDate = MethodsGenerics.lessOneDay((long) 60, false);
         tominDate = MethodsGenerics.lessOneDay((long) 30, true);
@@ -229,7 +232,7 @@ public class NuevaCitaBean implements Serializable {
     public List<SelectItem> returnAreasList(){
         if (listAreas == null){
             ResultadoTO resultado = areasBusiness.obtenerAreas();
-            listAreas= (List<SelectItem>) resultado.getObjeto();
+            listAreas = (List<SelectItem>) resultado.getObjeto();
         }
         return listAreas;
     }
@@ -250,20 +253,17 @@ public class NuevaCitaBean implements Serializable {
 
 
     public List<SelectItem> returnProgramaEduList(){
-        List<SelectItem> lista = new ArrayList<>();
-        ///todo cambiar por la de yair valencia
-        lista.add(new SelectItem("20181837", "[20181837] LICENCIATURA EN INGENIERÍA EN COMPUTACIÓN CAMPUS APIZACO (2018)"));
-
-        return lista;
+        return Collections.singletonList(new SelectItem("20181837", "[20181837] LICENCIATURA EN INGENIERÍA EN COMPUTACIÓN CAMPUS APIZACO (2018)"));
     }
-
 
     /**
      * @apiNote  Function que comparar los horarios reservados con el horario solicitado por usuario;
      */
     public void ComprobarHorario(){
         logger.info("Comprobar Horario para la fecha => [ "+ strCurrentCalendar +" ]");
-        ResultadoTO resultadoH = areasBusiness.obtenerHorariosFromDB(URLs.HorariosReservados.getValor(), MethodsGenerics.formatDate(strCurrentCalendar), strCurrentArea);
+        String[] params = new String[]{strCurrentArea, MethodsGenerics.formatDate(strCurrentCalendar)};
+        ResultadoTO resultadoH = areasBusiness.obtenerHorarios(params);
+        logger.info("--RESULTADO-- \t"+resultadoH.getObjeto());
         List<String> horas = (List<String>) resultadoH.getObjeto();
 
         CitaInstance instance = CitaInstance.getInstance(); //Obtenemos la instancia previamente creada para las configuraciones de área
@@ -283,7 +283,7 @@ public class NuevaCitaBean implements Serializable {
 
         logger.info("|----- New list horarios => "+listHorarios);
 
-        if (resultadoH.isBlnValido() && !horas.isEmpty()) {
+        if (resultadoH.isBlnValido()) {
             ListHorariosShow = listHorarios;
             mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Fechas temporal reservada correctamente.");
         } else

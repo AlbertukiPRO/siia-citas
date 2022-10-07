@@ -87,11 +87,13 @@ public class AdminCitasBean implements Serializable {
     private boolean hasDataTramites = false;
     private boolean hasFielDate = false;
     private boolean hasUpdateListHorarios = false;
+    private boolean wasDayDisable = true;
+    private boolean hasDiastoDisable = false;
 
     public AdminCitasBean(){
         listMeses = Arrays.asList("Enero", "Febrero", "Marzo","Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre","Octubre", "Noviembre", "Diciembre");
         GenerarFechas(Calendar.getInstance().get(Calendar.MONTH));
-        strIdArea = "1";
+        strIdArea = "65";
         strUser = "20082306"; // TODO cambiar por las datos del usuario.
         LocalDate todaylocal = LocalDate.now();
         today = todaylocal.getDayOfMonth();
@@ -133,10 +135,6 @@ public class AdminCitasBean implements Serializable {
             );
         }else listEventos = new ArrayList<>();
         strlang = "es";
-    }
-
-    public void saludar(Object e){
-        logger.info(e.toString());
     }
 
     public void saveDataA(){
@@ -190,7 +188,16 @@ public class AdminCitasBean implements Serializable {
 
 
     public void disableDay(){
-
+        String[] params = new String[]{strIdArea, "20082306"};
+        ResultadoTO resultado = areasBusiness.desactivarDia(strCurrentLocalDate, params);
+        if ((boolean) resultado.getObjeto()) {
+            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msg.citas.daysave.ok");
+            vHelp.pintarMensajes(msj, resultado);
+            wasDayDisable = false;
+        } else {
+            resultado.agregarMensaje(SeveridadMensajeEnum.ERROR, "comun.msg.citas.daysave.error");
+            vHelp.pintarMensajes(msj, resultado);
+        }
     }
 
     /**
@@ -245,7 +252,7 @@ public class AdminCitasBean implements Serializable {
                 break;
 
             case "3":
-                params = new String[]{strIdArea, strValueDateField};
+                params = new String[]{strIdArea, MethodsGenerics.formatDate(strValueDateField)};
                 resultado = citaBusiness.getMisCitasOfService(params, ServiciosReportes.GetAllCitasOnFecha.getValor());
                 misCitas = (List<MisCitas>) resultado.getObjeto();
                 colDat = new JRBeanCollectionDataSource(misCitas);
@@ -253,7 +260,7 @@ public class AdminCitasBean implements Serializable {
 
                 nameFile = "ReporteCitasOnDate";
                 lista = new ArrayList<>();
-                lista.add(0, new GeneriReportFields("Departamento de Registro y control escolar", strLocalNameTramite, strValueDateField));
+                lista.add(0, new GeneriReportFields("Departamento de Registro y control escolar", strLocalNameTramite, MethodsGenerics.formatDate(strValueDateField)));
                 break;
 
 
@@ -300,6 +307,8 @@ public class AdminCitasBean implements Serializable {
                 Integer.parseInt(strDuracionCita),
                 fromDBhorarios
         );
+        wasDayDisable=true;
+        hasDiastoDisable=true;
     }
 
     public void deletefromlistdays(String strCalendarValue){
@@ -625,5 +634,21 @@ public class AdminCitasBean implements Serializable {
 
     public void setStrlang(String strlang) {
         this.strlang = strlang;
+    }
+
+    public boolean isWasDayDisable() {
+        return wasDayDisable;
+    }
+
+    public void setWasDayDisable(boolean wasDayDisable) {
+        this.wasDayDisable = wasDayDisable;
+    }
+
+    public boolean isHasDiastoDisable() {
+        return hasDiastoDisable;
+    }
+
+    public void setHasDiastoDisable(boolean hasDiastoDisable) {
+        this.hasDiastoDisable = hasDiastoDisable;
     }
 }

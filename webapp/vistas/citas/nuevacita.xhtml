@@ -99,7 +99,7 @@
                                                     requiredMessage="#{msj['comun.msj.citas.selectarearq']}"
                                                     labelColLg="12"
                                                     ajax="true"
-                                                    update="@form:**:trami"
+                                                    update="@form:**:trami @form:**:showarealabel"
                                                     rendered="#{nuevacita.hasDataAreas}">
 
                                       <f:selectItem itemLabel="Seleccione una area" value="none" itemValue="none"/>
@@ -107,6 +107,7 @@
 
                                       <f:ajax
                                               event="change"
+                                              execute="@this"
                                               listener="#{nuevacita.listenerPostAreas}">
                                       </f:ajax>
                                    </b:selectOneMenu>
@@ -246,6 +247,7 @@
 
                              <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
                                 <b:inputText readonly="true"
+                                             id="showarealabel"
                                              label="Area:"
                                              labelStyle="width:100px"
                                              labelColMd="4"

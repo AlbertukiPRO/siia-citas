@@ -77,13 +77,18 @@
                                                </b:selectOneMenu>
                                            </b:row>
                                        </b:formGroup>
-                                       <b:formGroup rendered="#{admin.hasFielDate}">
+                                       <b:formGroup>
+                                           <b:container>
+                                               <h:outputLabel value="Ingrese un rago de fechas: "></h:outputLabel>
+                                           </b:container>
                                            <b:row>
-                                               <b:inputText value="#{admin.strValueDateField}" placeholder="Ingrese la fecha: 01/01/2008">
-                                                   <f:facet name="prepend">
-                                                       <b:iconAwesome name="fa-edit"></b:iconAwesome>
-                                                   </f:facet>
-                                               </b:inputText>
+                                               <b:datepicker value="#{admin.strValueDateField}"
+                                                             showTime="false"
+                                                             disabledDates="#{admin.strDateDisablesCalendar}"
+                                                             labelColMd="12" labelColLg="12"
+                                                             label="Fecha A: "
+                                                             mediumScreen="8" labelMediumScreen="12" largeScreen="10" smallScreen="12">
+                                               </b:datepicker>
                                            </b:row>
                                        </b:formGroup>
                                    </b:column>
@@ -102,7 +107,7 @@
 
                            <h:form>
                                <b:row>
-                                   <b:panel>
+                                   <b:panel title="Configura el area">
                                        <b:column mediumScreen="12" smallScreen="12" largeScreen="12">
                                            <b:container style="padding:25px;">
                                                <h:outputText styleClass="title" style="font-size: 20px;" value="Configura el area para ajustar el servico de citas."></h:outputText>
@@ -171,7 +176,7 @@
                                    <span class="separador"></span>
                                    <span class="separador"></span>
                                    <b:column mediumScreen="12" largeScreen="12" smallScreen="12">
-                                      <b:panel>
+                                      <b:panel title="Fechas de servicio">
                                           <b:formGroup>
                                               <b:row>
                                                   <h:outputText styleClass="title" value="Agrega fechas inhabiles de servicios"></h:outputText>
@@ -200,16 +205,16 @@
                                               </b:row>
                                               <span class="separador"></span>
                                               <span class="separador"></span>
-                                              <b:row>
+                                              <b:row rendered="#{admin.hasDiastoDisable}">
                                                   <b:column mediumScreen="10" smallScreen="12" largeScreen="10">
                                                       <h:outputText styleClass="title text-center" style="font-size: 20px;" value="Fecha seleccionada: #{admin.strCurrentLocalDate}"></h:outputText>
                                                   </b:column>
                                                   <b:column mediumScreen="2" smallScreen="12" largeScreen="2">
-                                                      <b:commandButton value="Desactivar dia" action="#{admin.disableDay()}" iconAwesome="lock"></b:commandButton>
+                                                      <b:commandButton value="Desactivar dia" update="@form" action="#{admin.disableDay()}" iconAwesome="lock"></b:commandButton>
                                                   </b:column>
                                               </b:row>
                                               <b:row>
-                                                  <b:column mediumScreen="5" largeScreen="5" smallScreen="5">
+                                                  <b:column mediumScreen="5" largeScreen="5" smallScreen="5" rendered="#{admin.wasDayDisable}">
                                                       <ui:repeat value="#{admin.listDaysToCheck}" var="daycalendar">
                                                           <b:column smallScreen="12" largeScreen="12" mediumScreen="12">
                                                               <b:iconAwesome name="fa-clock-o"><h:outputText style="margin-left: 15px;margin-right: 15px" styleClass="secondary-text" value="#{daycalendar}"></h:outputText></b:iconAwesome>
@@ -230,18 +235,18 @@
                                                       </ui:repeat>
                                                   </b:column>
                                               </b:row>
+                                              <span class="separador"></span>
+                                              <br/>
+                                              <b:row>
+                                                  <b:column mediumScreen="8" largeScreen="8" smallScreen="12">
+                                                      <b:commandButton
+                                                              value="Guardar cambios"
+                                                              action="#{admin.saveDataB()}"
+                                                              tooltip="Guarda los horarios para la fecha seleccionada actual">
+                                                      </b:commandButton>
+                                                  </b:column>
+                                              </b:row>
                                           </b:formGroup>
-                                          <span class="separador"></span>
-                                          <br/>
-                                          <b:row>
-                                              <b:column mediumScreen="8" largeScreen="8" smallScreen="12">
-                                                  <b:commandButton
-                                                          value="Guardar cambios"
-                                                          action="#{admin.saveDataB()}"
-                                                          tooltip="Guarda los horarios para la fecha seleccionada actual">
-                                                  </b:commandButton>
-                                              </b:column>
-                                          </b:row>
                                       </b:panel>
                                    </b:column>
                                </b:row>

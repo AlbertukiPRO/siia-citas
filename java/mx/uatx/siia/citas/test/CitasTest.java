@@ -1,10 +1,9 @@
-package mx.uatx.siia.citas;
+package mx.uatx.siia.citas.test;
 
 import com.google.gson.Gson;
 import mx.uatx.siia.citas.modelo.Tramites.business.TramitesBusiness;
 import mx.uatx.siia.citas.modelo.citasBusiness.MethodsGenerics;
-import mx.uatx.siia.citas.modelo.enums.URLs;
-import mx.uatx.siia.citas.pruebas.Eventos;
+import mx.uatx.siia.citas.models.Eventos;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
 
 import javax.faces.bean.ManagedBean;
@@ -37,7 +36,7 @@ public class CitasTest implements Serializable {
     public List<SelectItem> returnTramitesList(){
         if (listTramites == null){
 //            ResultadoTO res = tramitesBusiness.obtenerTramites(URLs.Tramites.getValor(), getStrCurrentArea());
-            ResultadoTO res = tramitesBusiness.obtenerListTramites(1);
+            ResultadoTO res = tramitesBusiness.obtenerTramites(1);
             System.out.println(res.getObjeto().toString());
             setListTramites((List<SelectItem>) res.getObjeto());
         }
@@ -51,10 +50,6 @@ public class CitasTest implements Serializable {
     public CitasTest() {
         eventos = new ArrayList<>();
 
-        Eventos eventos1 = new Eventos("Cita de Alberto Noche Rosas", MethodsGenerics.getDateToFullCalendar("21/09/2022 18:00:00"), "google.com");
-        Eventos eventos2 = new Eventos("Cita de Yair Valencia", MethodsGenerics.getDateToFullCalendar("21/09/2022 14:00:00"), "youtube.com");
-        eventos.add(0, eventos1);
-        eventos.add(1, eventos2);
         lang = "es";
     }
 
