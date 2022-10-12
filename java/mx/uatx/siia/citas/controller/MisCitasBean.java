@@ -1,6 +1,7 @@
 package mx.uatx.siia.citas.controller;
 
 import mx.uatx.siia.citas.modelo.MisCitas;
+import mx.uatx.siia.citas.modelo.SIMSCITAS;
 import mx.uatx.siia.citas.modelo.citasBusiness.CitaBusiness;
 import mx.uatx.siia.citas.modelo.citasBusiness.MethodsGenerics;
 import mx.uatx.siia.citas.modelo.enums.URLs;
@@ -79,23 +80,23 @@ public class MisCitasBean implements Serializable {
     private String stridCita;
     private String strMotivo;
     private boolean wasCanceled;
-
-
     private List<MisCitas> listMisCitas;
     private String localArea;
     private String localTramite;
     private String motivoCancelacion;
-
     private boolean btnLookForCitas = false;
+    private Long idHistorico;
 
     public void UpdateValores(String nombre, String matricula) {
         strLocalMatricula = matricula;
         strLocalNombre = nombre;
+        idHistorico = 30643L;
         GetCitas();
     }
 
     public void GetCitas() {
-        ResultadoTO resultado = citaBusiness.miCita(URLs.MiCita.getValor(), strLocalMatricula);
+//        ResultadoTO resultado = citaBusiness.miCita(URLs.MiCita.getValor(), strLocalMatricula);
+        ResultadoTO resultado = citaBusiness.obtenerMisCitas(idHistorico);
         listMisCitas = (List<MisCitas>) resultado.getObjeto();
         renderMisCitas = true;
     }

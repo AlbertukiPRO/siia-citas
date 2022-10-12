@@ -96,7 +96,7 @@
                                                     colMd="12" colLg="12" colSm="12"
                                                     label="Seleccione un Area"
                                                     required="true"
-                                                    requiredMessage="#{msj['comun.msj.citas.selectarearq']}"
+                                                    requiredMessage="#{admin.msj['comun.msj.citas.selectarearq']}"
                                                     labelColLg="12"
                                                     ajax="true"
                                                     update="@form:**:trami @form:**:showarealabel"
@@ -302,7 +302,7 @@
                              <b:column smallScreen="12" mediumScreen="3" largeScreen="3">
                                 <b:container id="linkgo" rendered="#{nuevacita.hasHorarios}" style="margin-top:15px;width:300px">
                                    <h5><h:outputText value="Requisitos de tramite:" style="color:#5E0723;font-weight: bold;"></h:outputText></h5>
-                                   <b:label severity="primary" style="font-size:10px;margin-top:10px" value="#{msj['comun.label.citas.requisitoslabel']}">
+                                   <b:label severity="primary" style="font-size:10px;margin-top:10px" value="#{admin.msj['comun.label.citas.requisitoslabel']}">
                                    </b:label>
                                    <a href="#{nuevacita.getLink()}" target="_blank">Ver requisitos</a>
                                 </b:container>
@@ -316,17 +316,15 @@
                                 <b:container style="margin-top:15px;width:10px">
                                    <b:commandButton styleClass="btn btn-default"
                                                     value="Agendar cita"
-                                                    update="@form:**:growluno @form:**:btnreporte"
-                                                    disabled="#{nuevacita.citaAgendada}"
-                                                    actionListener="#{nuevacita.agendarCitabtn() }">
+                                                    update="@form:**:growluno"
+                                                    disabled="#{nuevacita.strCurrentArea != null and nuevacita.strCurrentTramite!=null}"
+                                                    actionListener="#{nuevacita.agendarCita(auth.sesion.idHistorialAcademico) }"
+                                                    oncomplete="$('.btndownload').click();">
                                    </b:commandButton>
-                                </b:container>
-                             </b:column>
-                             <b:column mediumScreen="2" largeScreen="2" smallScreen="12">
-                                <b:container style="margin-top:15px;margin-left:25px;">
-                                   <b:commandButton styleClass="btn btn-default" disabled="#{!nuevacita.isCitaAgendada()}" id="btnreporte"
+                                   <b:commandButton styleClass="btn btn-default btndownload"
+                                                    style="visibility:hidden;"
                                                     value="Imprimir Reporte"
-                                                    actionListener="#{nuevacita.generarPDF()}">
+                                                    action="#{nuevacita.generarPDF()}">
                                    </b:commandButton>
                                 </b:container>
                              </b:column>

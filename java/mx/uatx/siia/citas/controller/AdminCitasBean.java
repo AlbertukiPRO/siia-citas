@@ -2,6 +2,7 @@ package mx.uatx.siia.citas.controller;
 
 import com.google.gson.Gson;
 import mx.uatx.siia.citas.modelo.MisCitas;
+import mx.uatx.siia.citas.modelo.SIMSCITAS;
 import mx.uatx.siia.citas.modelo.Tramites.business.TramitesBusiness;
 import mx.uatx.siia.citas.modelo.areas.business.AreasBusiness;
 import mx.uatx.siia.citas.modelo.areas.business.SiPaAreasConfiguraciones;
@@ -10,7 +11,6 @@ import mx.uatx.siia.citas.modelo.citasBusiness.MethodsGenerics;
 import mx.uatx.siia.citas.modelo.enums.ServiciosReportes;
 import mx.uatx.siia.citas.modelo.enums.URLs;
 import mx.uatx.siia.citas.models.Eventos;
-import mx.uatx.siia.citas.test.ServicesCitas;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.reportes.GeneriReportFields;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
@@ -22,16 +22,9 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.RequestScoped;
 import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 import java.io.Serializable;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @ViewScoped
@@ -65,7 +58,6 @@ public class AdminCitasBean implements Serializable {
     private List<String> listDaysToCheck;
     private List<String> listDayswasRemoved;
     private List<Eventos> listEventos;
-    private int today;
     private String mesActual;
     private String strDia;
     private String strIdArea;
@@ -81,7 +73,6 @@ public class AdminCitasBean implements Serializable {
     private String strDuracionCita;
     private String strValueDateField;
     private final String strUser;
-    private String jsonEvents;
     private String strlang;
 
     private boolean hasDataTramites = false;
@@ -89,23 +80,18 @@ public class AdminCitasBean implements Serializable {
     private boolean hasUpdateListHorarios = false;
     private boolean wasDayDisable = true;
     private boolean hasDiastoDisable = false;
+    private boolean switchMode = false;
+    private String strIDH;
 
     public AdminCitasBean(){
-        listMeses = Arrays.asList("Enero", "Febrero", "Marzo","Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre","Octubre", "Noviembre", "Diciembre");
-        GenerarFechas(Calendar.getInstance().get(Calendar.MONTH));
+        strIDH = "30643";
         strIdArea = "65";
         strUser = "20082306"; // TODO cambiar por las datos del usuario.
-        LocalDate todaylocal = LocalDate.now();
-        today = todaylocal.getDayOfMonth();
-        mesActual = MethodsGenerics.GetIndexMes(todaylocal.getMonthValue()-1);
-
-        getDayString();
-        obtenerCitasGlobales();
     }
 
     public void getDaysDisable(){
         logger.info("----- Generando Fechas no abiles");
-        ResultadoTO resultado = areasBusiness.obtenerFechasFromDB(URLs.FechasReservadas.getValor(), strIdArea);
+        ResultadoTO resultado = areasBusiness.obtenerDiasInhabiles(strIdArea);
         strDateDisablesCalendar = MethodsGenerics.formattingStringFechasCalendar( (List<String>) resultado.getObjeto());
     }
 
@@ -121,19 +107,18 @@ public class AdminCitasBean implements Serializable {
         strHourServiceStar = data.get(0).getHoraServicioInicio();
 
         ResultadoTO resultadoTO = areasBusiness.obtenerEventos(strIdArea);
-        List<MisCitas> localList = (List<MisCitas>) resultadoTO.getObjeto();
+
+        List<SIMSCITAS> localList = (List<SIMSCITAS>) resultadoTO.getObjeto();
         if (!localList.isEmpty()){
             listEventos = new ArrayList<>();
             localList.forEach(misCitas -> {
-                String[] params = new String[]{misCitas.getStrIdCita(),misCitas.getStrUser(), strIdArea};
-                String[] date = misCitas.getStrFechaHoraReservada().split("/");
-                        listEventos.add(new Eventos(
-                                "Cita de " + misCitas.getStrNombre(),
-                                MethodsGenerics.getDateToFullCalendar(date[1] +"/" +date[0] +"/"+date[2] + " " + misCitas.getStrHora()),
-                                params));
+                String[] params = new String[]{misCitas.getIntIdCita().toString(),misCitas.getIntIdAlumno().toString(), strIdArea};
+                listEventos.add(new Eventos(
+                        "Cita de " + misCitas.getIntIdAlumno(),
+                        MethodsGenerics.getDateToFullCalendar(misCitas.getStrFechaReservada() + " " + misCitas.getStrHoraReservada()), params));
                     }
             );
-        }else listEventos = new ArrayList<>();
+        }
         strlang = "es";
     }
 
@@ -188,8 +173,8 @@ public class AdminCitasBean implements Serializable {
 
 
     public void disableDay(){
-        String[] params = new String[]{strIdArea, "20082306"};
-        ResultadoTO resultado = areasBusiness.desactivarDia(strCurrentLocalDate, params);
+        String[] params = new String[]{strIdArea, strCurrentLocalDate, "20082306"};
+        ResultadoTO resultado = areasBusiness.desactivarDia(params);
         if ((boolean) resultado.getObjeto()) {
             resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msg.citas.daysave.ok");
             vHelp.pintarMensajes(msj, resultado);
@@ -216,8 +201,8 @@ public class AdminCitasBean implements Serializable {
 
     public void generarReporte(){
         ResultadoTO resultado;
-        HashMap<String, Object> parameters = new HashMap<String, Object>();
-        List<MisCitas> misCitas = null;
+        HashMap<String, Object> parameters = new HashMap<>();
+        List<MisCitas> misCitas;
         List<GeneriReportFields> lista = null;
         JRBeanCollectionDataSource colDat;
         String[] params;
@@ -262,14 +247,15 @@ public class AdminCitasBean implements Serializable {
                 lista = new ArrayList<>();
                 lista.add(0, new GeneriReportFields("Departamento de Registro y control escolar", strLocalNameTramite, MethodsGenerics.formatDate(strValueDateField)));
                 break;
-
-
         }
+        downloadPDF(nameFile, lista, parameters);
+    }
 
+    public void downloadPDF(String nameFile, List<?> lista, HashMap<String, Object> parameters ){
         String ruta = "resources/reportes/citas";
-
         vHelp.llenarYObtenerBytesReporteJasperPDF(ruta, nameFile, lista, parameters);
     }
+
 
     public void listerpostReporte(){
         if (strkindTramite.equals("1")){
@@ -329,215 +315,97 @@ public class AdminCitasBean implements Serializable {
     public void rollbackday(String dayremove)
     {
         ResultadoTO resultado = new ResultadoTO();
-        boolean ope = listDaysToCheck.add(dayremove);
-        if (ope) {
-            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.fechas.ok");
-            listDayswasRemoved.remove(dayremove);
-        } else resultado.agregarMensaje(SeveridadMensajeEnum.ALERTA, "comun.msj.citas.fechas.loaderror");
+        listDaysToCheck.add(dayremove);
+        resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.fechas.ok");
+        listDayswasRemoved.remove(dayremove);
     }
 
-    private void getDayString(){
-
-        try {
-            SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
-            Date dt1=format.parse("05/26/2022");
-            DateFormat format2=new SimpleDateFormat("EEEE");
-            String finalDay=format2.format(dt1);
-            System.out.println(finalDay);
-
-            this.strDia = finalDay;
-        }catch (Exception e){
-            System.out.println(e);
-        }
-    }
     public String toJson(){
-        return jsonEvents = new Gson().toJson(listEventos);
-    }
-    public void obtenerCitasGlobales(){
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-        LocalDateTime now = LocalDateTime.now();
-        listCitas = ServicesCitas.getCitasFromArea(URLs.MiCita.getValor(), strIdArea,dtf.format(now));
+        return new Gson().toJson(listEventos);
     }
 
-    public void obtenerCitasFromDia(String dia){
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-        LocalDateTime now = LocalDateTime.now();
-        String fecha = dtf.format(now);
-        String subStrin[] = fecha.split("/");
-        listCitas = ServicesCitas.getCitasFromArea(URLs.MiCita.getValor(), strIdArea,subStrin[0]+"/"+dia+"/"+subStrin[2]);
-    }
 
-    public void GenerarFechas(int mes){
-        listDias = new ArrayList<>();
-        YearMonth yearMonth = YearMonth.of(2022,mes+1);
-        int daysInMonth = yearMonth.lengthOfMonth();
 
-        for (int i = 1; i <= daysInMonth; i++) {
-            listDias.add(i <= 9 ? "0"+i : Integer.toString(i));
-        }
-        logger.info("--- FECHAS GENERADAS : "+listDias);
-    }
-
-    public void RefrescarFechas(String mes){
-        switch (mes){
-            case "Enero":
-                GenerarFechas(0);
-                break;
-            case "Febrero":
-                GenerarFechas(1);
-                break;
-            case "Marzo":
-                GenerarFechas(2);
-                break;
-            case "Abril":
-                GenerarFechas(3);
-                break;
-            case "Mayo":
-                GenerarFechas(4);
-                break;
-            case "Junio":
-                GenerarFechas(5);
-                break;
-            case "Julio":
-                GenerarFechas(6);
-                break;
-            case "Agosto":
-                GenerarFechas(7);
-                break;
-            case "Septiembre":
-                GenerarFechas(8);
-                break;
-            case "Octubre":
-                GenerarFechas(9);
-                break;
-            case "Noviembre":
-                GenerarFechas(10);
-                break;
-            case "Diciembre":
-                GenerarFechas(11);
-                break;
-        }
-    }
-
-    public int getToday() {
-        return today;
-    }
-
+    /**
+     * @apiNote Metoddos Setter and Getters.
+     */
     public String getStrDateDisablesCalendar() {
         return strDateDisablesCalendar;
     }
-
     public void setStrDateDisablesCalendar(String strDateDisablesCalendar) {
         this.strDateDisablesCalendar = strDateDisablesCalendar;
     }
-
     public String getStrkindTramite() {
         return strkindTramite;
     }
-
     public String getStrCurrentTramite() {
         return strCurrentTramite;
     }
-
     public String getStrValueDateField() {
         return strValueDateField;
     }
-
     public void setStrValueDateField(String strValueDateField) {
         this.strValueDateField = strValueDateField;
     }
-
     public TramitesBusiness getTramitesBusiness() {
         return tramitesBusiness;
     }
-
-    public void setTramitesBusiness(TramitesBusiness tramitesBusiness) {
-        this.tramitesBusiness = tramitesBusiness;
-    }
-
+    public void setTramitesBusiness(TramitesBusiness tramitesBusiness) {this.tramitesBusiness = tramitesBusiness;}
     public void setStrCurrentTramite(String strCurrentTramite) {
         this.strCurrentTramite = strCurrentTramite;
     }
-
     public void setStrkindTramite(String strkindTramite) {
         this.strkindTramite = strkindTramite;
     }
-
     public List<SelectItem> getListTramites() {
         return listTramites;
     }
-
     public void setListTramites(List<SelectItem> listTramites) {
         this.listTramites = listTramites;
     }
-
     public boolean isHasDataTramites() {
         return hasDataTramites;
     }
-
     public void setHasDataTramites(boolean hasDataTramites) {
         this.hasDataTramites = hasDataTramites;
     }
-
     public String getStrCalendarValue() {
         return strCalendarValue;
     }
-
     public void setStrCalendarValue(String strCalendarValue) {
         this.strCalendarValue = strCalendarValue;
     }
-
     public String getStrDuracionCita() {
         return strDuracionCita;
     }
-
     public void setStrDuracionCita(String strDuracionCita) {
         this.strDuracionCita = strDuracionCita;
     }
-
-    /**/
     public CitaBusiness getCitaBusiness() {
         return citaBusiness;
     }
-
-    public void setCitaBusiness(CitaBusiness citaBusiness) {
-        this.citaBusiness = citaBusiness;
-    }
-
+    public void setCitaBusiness(CitaBusiness citaBusiness) {this.citaBusiness = citaBusiness;}
     public String getStrIdArea() {
         return strIdArea;
     }
-
     public List<String> getListDaysToCheck() {
         return listDaysToCheck;
     }
-
-    public boolean isHasFielDate() {
-        return hasFielDate;
-    }
-
+    public boolean isHasFielDate() {return hasFielDate;}
     public void setHasFielDate(boolean hasFielDate) {
         this.hasFielDate = hasFielDate;
     }
-
     public void setListDaysToCheck(List<String> listDaysToCheck) {
         this.listDaysToCheck = listDaysToCheck;
     }
-
     public void setStrIdArea(String strIdArea) {
         this.strIdArea = strIdArea;
     }
-
     public AreasBusiness getAreasBusiness() {
         return areasBusiness;
     }
-
     public void setAreasBusiness(AreasBusiness areasBusiness) {
         this.areasBusiness = areasBusiness;
-    }
-
-    public void setToday(int today) {
-        this.today = today;
     }
     public Logger getLogger() {
         return logger;
@@ -548,107 +416,94 @@ public class AdminCitasBean implements Serializable {
     public String getMesActual() {
         return mesActual;
     }
-
     public void setMesActual(String mesActual) {
         this.mesActual = mesActual;
     }
-    public String getStrDia() {
-        return strDia;
-    }
-
-    public void setStrDia(String strDia) {
-        this.strDia = strDia;
-    }
-
+    public String getStrDia() {return strDia;}
+    public void setStrDia(String strDia) {this.strDia = strDia;}
     public List<MisCitas> getListCitas() {
         return listCitas;
     }
-
     public void setListCitas(List<MisCitas> listCitas) {
         this.listCitas = listCitas;
     }
-
     public List<String> getListDias() {
         return listDias;
     }
-
     public void setListDias(List<String> listDias) {
         this.listDias = listDias;
     }
-
     public String getStrHourServiceStar() {
         return strHourServiceStar;
     }
-
     public void setStrHourServiceStar(String strHourServiceStar) {
         this.strHourServiceStar = strHourServiceStar;
     }
-
     public String getStrHourServiceEnd() {
         return strHourServiceEnd;
     }
-
     public void setStrHourServiceEnd(String strHourServiceEnd) {
         this.strHourServiceEnd = strHourServiceEnd;
     }
-
     public void setListMeses(List<String> listMeses) {
         this.listMeses = listMeses;
     }
-
     public ResourceBundle getMsj() {
         return msj;
     }
-
     public String getStrCurrentLocalDate() {
         return strCurrentLocalDate;
     }
-
     public void setStrCurrentLocalDate(String strCurrentLocalDate) {
         this.strCurrentLocalDate = strCurrentLocalDate;
     }
-
     public void setMsj(ResourceBundle msj) {
         this.msj = msj;
     }
-
     public List<String> getListDayswasRemoved() {
         return listDayswasRemoved;
     }
-
     public void setListDayswasRemoved(List<String> listDayswasRemoved) {
         this.listDayswasRemoved = listDayswasRemoved;
     }
-
     public List<Eventos> getListEventos() {
         return listEventos;
     }
-
     public void setListEventos(List<Eventos> listEventos) {
         this.listEventos = listEventos;
     }
-
     public String getStrlang() {
         return strlang;
     }
-
     public void setStrlang(String strlang) {
         this.strlang = strlang;
     }
-
     public boolean isWasDayDisable() {
         return wasDayDisable;
     }
-
     public void setWasDayDisable(boolean wasDayDisable) {
         this.wasDayDisable = wasDayDisable;
     }
-
     public boolean isHasDiastoDisable() {
         return hasDiastoDisable;
     }
-
     public void setHasDiastoDisable(boolean hasDiastoDisable) {
         this.hasDiastoDisable = hasDiastoDisable;
+    }
+
+    public boolean isSwitchMode() {
+        return switchMode;
+    }
+
+    public void setSwitchMode(boolean switchMode) {
+        this.switchMode = switchMode;
+    }
+
+    public String getStrIDH() {
+        return strIDH;
+    }
+
+    public void setStrIDH(String strIDH) {
+        this.strIDH = strIDH;
     }
 }

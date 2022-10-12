@@ -12,8 +12,10 @@ import mx.uatx.siia.citas.modelo.enums.URLs;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.reportes.FieldsNuevaCita;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
+import net.bootsfaces.render.R;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -155,22 +157,8 @@ public class NuevaCitaBean implements Serializable {
     public void listenerPostHorario(){
         System.out.println("--- Reservando hora => ["+strCurrentHora+"]");
 
-        if (!flagHorarioReservado){
-            HashMap<String, Object> datacollect = new HashMap<>();
-            datacollect.put("idarea", strCurrentArea);
-            datacollect.put("user", strLocalMatricula);
-            datacollect.put("fecha", MethodsGenerics.formatDate(strCurrentCalendar));
-            datacollect.put("hora", strCurrentHora);
 
-            ResultadoTO resultado = citaBusiness.reservarHorario(datacollect);
-            flagHorarioReservado = (boolean) resultado.getObjeto();
-
-            if (flagHorarioReservado) {
-                mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Hora reservada tienes 10 min");
-            } else mostrarNotification(FacesMessage.SEVERITY_FATAL, "ERROR:", "No se pudo reservar tu horarios");
-        }else{
-            mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Ya tienes un horario reservado, si quieres otra fecha reinicia el formulario");
-        }
+        // TODO Remenber check before instert Cita in DB to Validate the Schudele is available.
     }
 
     /**
@@ -319,17 +307,21 @@ public class NuevaCitaBean implements Serializable {
     /**
      * @apiNote Metodo para agendar la cita.
      */
-    public void agendarCitabtn(){
+    @Transactional
+    public void agendarCita(Long idhistorical){
 
-        ResultadoTO resultado = citaBusiness.numeroCitas(URLs.Commun.getValor(), strLocalMatricula, strCurrentTramite);
+//        ResultadoTO resultado = citaBusiness.numeroCitas(URLs.Commun.getValor(), strLocalMatricula, strCurrentTramite);
 
-        if (resultado.getObjeto().equals("0")){
+        ResultadoTO flag1 = citaBusiness.validarTramite(idhistorical, Integer.parseInt(strCurrentTramite));
+        ResultadoTO flag2 = citaBusiness.validarHorario(MethodsGenerics.formatDate(strLocalFecha), strCurrentHora);
+        if ((boolean) flag1.getObjeto() &&  (boolean) flag2.getObjeto()){
             String[] strindate = strLocalFecha.split(" ");
             if (strindate[0].equals("Sat") || strindate[0].equals("Sun"))
                 mostrarNotification(FacesMessage.SEVERITY_WARN, "WARN:", "Lo sentimos los sabados y domingos no damos servicio intenta otro dia.");
             else{
                 Map<String, Object> valores = new HashMap<>();
 
+                valores.put("idhistorical", idhistorical);
                 valores.put("matricula",strLocalMatricula);
                 valores.put("idtramite",strCurrentTramite);
                 valores.put("idarea",strCurrentArea);
@@ -337,19 +329,13 @@ public class NuevaCitaBean implements Serializable {
                 valores.put("fecha",MethodsGenerics.formatDate(strLocalFecha));
                 valores.put("hora",strCurrentHora);
 
-                System.out.println("PUT [ Save Cita ] WITH -> "+valores);
+                ResultadoTO resultadoTO = citaBusiness.guardarCita(valores);
 
-                ResultadoTO resultadonew = citaBusiness.saveDataDB(valores, URLs.InsertData.getValor());
-                Map<String, String> response = (Map<String, String>) resultadonew.getObjeto();
-
-                if (response.get("responsecode").equals("OK") && response.get("codefromservice").equals("1")){
-                    System.out.println("|------------------ CODE RESPONSE : "+response);
+                if (resultadoTO.getObjeto().equals(true)){
+                    System.out.println("|------------------ WAS SUCCESFUL SAVE CITA => "+resultadoTO.getObjeto());
                     isCitaAgendada = true;
                     mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Tu cita se agendo correctamente, espera el comprobante");
-
-                }else{
-                    mostrarNotification(FacesMessage.SEVERITY_ERROR, "ERROR:", "No se pudo agendar tu cita");
-                }
+                }else   mostrarNotification(FacesMessage.SEVERITY_ERROR, "ERROR:", "No se pudo agendar tu cita");
             }
         } else {
             isForHidden = true;

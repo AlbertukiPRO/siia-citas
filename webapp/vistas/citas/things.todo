@@ -1,0 +1,10 @@
+TODO: Cambiar los iconos de la tabla de buscar cita ademas de las columnas 👌
+TODO: Cambiar la logica de la aplicacion cuando buscamos horarios en una fecha especificada 👌
+TODO: Tratar de mantener la fecha en el campo de fecha de datetimepicker 👌
+TODO: Implementar el FullCalendar en la parte de admins => 👌
+TODO: Crear los servicios obtener la lista de eventos para el fullcalendar 👌
+TODO: Crear una vista para cada cita de forma induvidual. => 👌
+TODO: Agregar el botton para desactivar el dia en el adminCitas. => 👌
+TODO: Modificar los campos de criterios de generacion de PDFs segun lo acordado en la reunion => 1/2 😨
+TODO: Migrar la mayoria de los servicios posibles de MYSQL local a Oracle DB SIIA 1/n 👌
+TODO: Cambiar el formato de fecha y hora de la tabla de MisCitas 
