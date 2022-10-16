@@ -1,20 +1,17 @@
 package mx.uatx.siia.citas.test;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.*;
-import mx.uatx.siia.citas.modelo.MisCitas;
+import mx.uatx.siia.citas.MisCitas;
 import mx.uatx.siia.serviciosUniversitarios.dto.AreasTO;
 import mx.uatx.siia.serviciosUniversitarios.dto.CitasTO;
 import mx.uatx.siia.serviciosUniversitarios.dto.TramitesTO;
 import mx.uatx.siia.serviciosUniversitarios.dto.UserTest;
-import sun.net.www.protocol.http.HttpURLConnection;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class ServicesCitas {
@@ -106,55 +103,6 @@ public class ServicesCitas {
 
         System.out.println("Finish Horarios Reservados => [value] = "+lista.toString());
         return lista;
-    }
-    public static Map<String, Object> addValues(String link, Map<String, Object> valores){
-        int codeResponde = 0;
-        Map<String, Object> response = new HashMap<>();
-        System.out.println("---- SEND VALUES TO api save [ Run ]");
-       try {
-           URL url = new URL(link);
-           HttpURLConnection http = (HttpURLConnection)url.openConnection();
-           http.setRequestMethod("PUT");
-           http.setDoOutput(true);
-           http.setRequestProperty("Content-Type", "application/json");
-
-           String strJson = new Gson().toJson(valores);
-
-           byte[] out = strJson.getBytes(StandardCharsets.UTF_8);
-
-           OutputStream stream = http.getOutputStream();
-           stream.write(out);
-
-           BufferedReader br = null;
-           if (http.getResponseCode() == 200) {
-               br = new BufferedReader(new InputStreamReader(http.getInputStream()));
-               String strCurrentLine;
-               while ((strCurrentLine = br.readLine()) != null) {
-                   codeResponde = Integer.parseInt(strCurrentLine);
-               }
-           } else {
-               br = new BufferedReader(new InputStreamReader(http.getErrorStream()));
-               String strCurrentLine;
-               while ((strCurrentLine = br.readLine()) != null) {
-                   System.out.println("Buffer: "+strCurrentLine);
-                   codeResponde = Integer.parseInt(strCurrentLine);
-               }
-           }
-
-           Map<String, List<String>> header = http.getHeaderFields();
-
-           response.putAll(header);
-
-           response.put("respoSMS",http.getResponseCode());
-           response.put("responsecode",http.getResponseMessage());
-           response.put("codefromservice", codeResponde);
-
-           http.disconnect();
-
-       }catch (Exception e){
-           System.out.println(e.toString());
-       }
-        return response;
     }
 
     public static List<MisCitas> getMisCitas(String url, String strUser){

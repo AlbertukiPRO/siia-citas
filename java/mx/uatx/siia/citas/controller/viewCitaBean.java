@@ -1,10 +1,8 @@
 package mx.uatx.siia.citas.controller;
 
-import mx.uatx.siia.citas.modelo.MisCitas;
-import mx.uatx.siia.citas.modelo.Tramites.business.TramitesBusiness;
-import mx.uatx.siia.citas.modelo.areas.business.AreasBusiness;
-import mx.uatx.siia.citas.modelo.citasBusiness.CitaBusiness;
-import mx.uatx.siia.citas.modelo.enums.URLs;
+import mx.uatx.siia.citas.MisCitas;
+import mx.uatx.siia.citas.areas.business.AreasBusiness;
+import mx.uatx.siia.citas.enums.URLs;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
 import org.slf4j.Logger;

@@ -1,18 +1,21 @@
 package mx.uatx.siia.citas.controller;
 
 import com.google.gson.Gson;
-import mx.uatx.siia.citas.modelo.MisCitas;
-import mx.uatx.siia.citas.modelo.SIMSCITAS;
-import mx.uatx.siia.citas.modelo.Tramites.business.TramitesBusiness;
-import mx.uatx.siia.citas.modelo.areas.business.AreasBusiness;
-import mx.uatx.siia.citas.modelo.areas.business.SiPaAreasConfiguraciones;
-import mx.uatx.siia.citas.modelo.citasBusiness.CitaBusiness;
-import mx.uatx.siia.citas.modelo.citasBusiness.MethodsGenerics;
-import mx.uatx.siia.citas.modelo.enums.ServiciosReportes;
-import mx.uatx.siia.citas.modelo.enums.URLs;
+import mx.uatx.siia.citas.MisCitas;
+import mx.uatx.siia.citas.SIMSCITAS;
+import mx.uatx.siia.citas.Tramites.business.TramitesBusiness;
+import mx.uatx.siia.citas.areas.business.AreasBusiness;
+import mx.uatx.siia.citas.areas.business.SiPaAreasConfiguraciones;
+import mx.uatx.siia.citas.citasBusiness.CitaBusiness;
+import mx.uatx.siia.citas.citasBusiness.MethodsGenerics;
+import mx.uatx.siia.citas.citasBusiness.ObjectMapperUtils;
+import mx.uatx.siia.citas.dto.ConfiguacionesDTO;
+import mx.uatx.siia.citas.enums.ServiciosReportes;
+import mx.uatx.siia.citas.enums.URLs;
 import mx.uatx.siia.citas.models.Eventos;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.reportes.GeneriReportFields;
+import mx.uatx.siia.serviciosUniversitarios.dto.CitasTO;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
 import mx.uatx.siia.serviciosUniversitarios.enums.SeveridadMensajeEnum;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
@@ -100,24 +103,27 @@ public class AdminCitasBean implements Serializable {
         getDaysDisable();
         logger.info("Getting Setting from Area [idArea] =>"+strIdArea);
         ResultadoTO resultado = areasBusiness.obtenerConfiguracionArea(strIdArea);
-        List<SiPaAreasConfiguraciones> data = (List<SiPaAreasConfiguraciones>) resultado.getObjeto();
+        SiPaAreasConfiguraciones dataConfig = (SiPaAreasConfiguraciones) resultado.getObjeto();
 
-        strDuracionCita = data.get(0).getDuracionCitas();
-        strHourServiceEnd = data.get(0).getHoraServicioFin();
-        strHourServiceStar = data.get(0).getHoraServicioInicio();
+        ConfiguacionesDTO configuacionesDTOS = ObjectMapperUtils.map(dataConfig, ConfiguacionesDTO.class);
+
+        strDuracionCita = configuacionesDTOS.getDuracionCitas();
+        strHourServiceEnd = configuacionesDTOS.getHoraServicioFin();
+        strHourServiceStar = configuacionesDTOS.getHoraServicioInicio();
 
         ResultadoTO resultadoTO = areasBusiness.obtenerEventos(strIdArea);
-
         List<SIMSCITAS> localList = (List<SIMSCITAS>) resultadoTO.getObjeto();
+
         if (!localList.isEmpty()){
             listEventos = new ArrayList<>();
-            localList.forEach(misCitas -> {
-                String[] params = new String[]{misCitas.getIntIdCita().toString(),misCitas.getIntIdAlumno().toString(), strIdArea};
+            List<CitasTO> citas = ObjectMapperUtils.mapAll(localList, CitasTO.class);
+
+            for (CitasTO misCitas : citas){
+                String[] params = new String[]{misCitas.getIntIdCita().toString(), misCitas.getIntIdAlumno().toString(), strIdArea};
                 listEventos.add(new Eventos(
                         "Cita de " + misCitas.getIntIdAlumno(),
-                        MethodsGenerics.getDateToFullCalendar(misCitas.getStrFechaReservada() + " " + misCitas.getStrHoraReservada()), params));
-                    }
-            );
+                        MethodsGenerics.getDateToFullCalendar(misCitas.getStrFechaReserva() + " " + misCitas.getStrHoraReservada()), params));
+            }
         }
         strlang = "es";
     }

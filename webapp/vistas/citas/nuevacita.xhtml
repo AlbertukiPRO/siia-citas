@@ -89,14 +89,14 @@
                        <b:column mediumScreen="4" largeScreen="4" smallScreen="12">
                           <!-- Seccion Izquierda FORMULARIO -->
                           <b:row>
-                             <b:formGroup id="areasselect">
+                             <b:formGroup>
                                 <!--               COMBO DE AREAS             -->
                                 <b:row>
                                    <b:selectOneMenu value="#{nuevacita.strCurrentArea}"
                                                     colMd="12" colLg="12" colSm="12"
                                                     label="Seleccione un Area"
                                                     required="true"
-                                                    requiredMessage="#{admin.msj['comun.msj.citas.selectarearq']}"
+                                                    requiredMessage="#{nuevacita.msj['comun.msj.citas.selectarearq']}"
                                                     labelColLg="12"
                                                     ajax="true"
                                                     update="@form:**:trami @form:**:showarealabel"
@@ -302,7 +302,7 @@
                              <b:column smallScreen="12" mediumScreen="3" largeScreen="3">
                                 <b:container id="linkgo" rendered="#{nuevacita.hasHorarios}" style="margin-top:15px;width:300px">
                                    <h5><h:outputText value="Requisitos de tramite:" style="color:#5E0723;font-weight: bold;"></h:outputText></h5>
-                                   <b:label severity="primary" style="font-size:10px;margin-top:10px" value="#{admin.msj['comun.label.citas.requisitoslabel']}">
+                                   <b:label severity="primary" style="font-size:10px;margin-top:10px" value="#{nuevacita.msj['comun.label.citas.requisitoslabel']}">
                                    </b:label>
                                    <a href="#{nuevacita.getLink()}" target="_blank">Ver requisitos</a>
                                 </b:container>
@@ -317,7 +317,6 @@
                                    <b:commandButton styleClass="btn btn-default"
                                                     value="Agendar cita"
                                                     update="@form:**:growluno"
-                                                    disabled="#{nuevacita.strCurrentArea != null and nuevacita.strCurrentTramite!=null}"
                                                     actionListener="#{nuevacita.agendarCita(auth.sesion.idHistorialAcademico) }"
                                                     oncomplete="$('.btndownload').click();">
                                    </b:commandButton>

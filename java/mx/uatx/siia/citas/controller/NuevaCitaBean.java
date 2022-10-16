@@ -1,22 +1,21 @@
 package mx.uatx.siia.citas.controller;
 
 import com.sun.istack.NotNull;
-import mx.uatx.siia.citas.modelo.Tramites.business.TramitesBusiness;
-import mx.uatx.siia.citas.modelo.areas.business.AreasBusiness;
-import mx.uatx.siia.citas.modelo.areas.business.SiPaAreasConfiguraciones;
-import mx.uatx.siia.citas.modelo.citasBusiness.CitaBusiness;
-import mx.uatx.siia.citas.modelo.citasBusiness.CitaInstance;
-import mx.uatx.siia.citas.modelo.citasBusiness.MethodsGenerics;
-import mx.uatx.siia.citas.modelo.enums.Requisitos;
-import mx.uatx.siia.citas.modelo.enums.URLs;
+import mx.uatx.siia.citas.Tramites.business.TramitesBusiness;
+import mx.uatx.siia.citas.areas.business.AreasBusiness;
+import mx.uatx.siia.citas.areas.business.SiPaAreasConfiguraciones;
+import mx.uatx.siia.citas.citasBusiness.CitaBusiness;
+import mx.uatx.siia.citas.citasBusiness.MethodsGenerics;
+import mx.uatx.siia.citas.citasBusiness.ObjectMapperUtils;
+import mx.uatx.siia.citas.dto.ConfiguacionesDTO;
+import mx.uatx.siia.citas.enums.Requisitos;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.reportes.FieldsNuevaCita;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
-import net.bootsfaces.render.R;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -49,6 +48,7 @@ public class NuevaCitaBean implements Serializable {
         private List<String> ListHorariosShow;
         private List<String> listProgramaEdu;
         private List<String> listDatosAlumno;
+        public ConfiguacionesDTO listaConfig;
 
         private boolean hasDataTramites = false;
         private boolean hasHorarios = false;
@@ -165,10 +165,10 @@ public class NuevaCitaBean implements Serializable {
      * @apiNote Metodo para obtener las configuraciones del área y mantenerlas en una Lista.
      */
     public void inicializarSettings(){
-        CitaInstance settings = CitaInstance.getInstance();
         ResultadoTO resultado = areasBusiness.obtenerConfiguracionArea(strCurrentArea);
-        List<SiPaAreasConfiguraciones> lista = (List<SiPaAreasConfiguraciones>) resultado.getObjeto();
-        settings.asignar(lista);
+        SiPaAreasConfiguraciones listfromdb = (SiPaAreasConfiguraciones) resultado.getObjeto();
+
+        listaConfig = ObjectMapperUtils.map(listfromdb, ConfiguacionesDTO.class);
     }
 
     public void generarPDF(){
@@ -248,21 +248,20 @@ public class NuevaCitaBean implements Serializable {
      * @apiNote  Function que comparar los horarios reservados con el horario solicitado por usuario;
      */
     public void ComprobarHorario(){
-        logger.info("Comprobar Horario para la fecha => [ "+ strCurrentCalendar +" ]");
+        logger.info("Comprobar Horario para la fecha => [ "+ MethodsGenerics.formatDate(strCurrentCalendar) +" ]");
         String[] params = new String[]{strCurrentArea, MethodsGenerics.formatDate(strCurrentCalendar)};
         ResultadoTO resultadoH = areasBusiness.obtenerHorarios(params);
         logger.info("--RESULTADO-- \t"+resultadoH.getObjeto());
+        logger.info("-- CONFIG: \t"+listaConfig.toString());
         List<String> horas = (List<String>) resultadoH.getObjeto();
-
-        CitaInstance instance = CitaInstance.getInstance(); //Obtenemos la instancia previamente creada para las configuraciones de área
 
         // * Los datos son strings asi que tenemos que parciarlos a int además de darle un formato correcto para el algoritmo de generacion de horarios.
         // * Ejemplo: "9:00"->.replace() |=> "9000".Integer.parse / 1000 | => 9 ()-> <Integer>
-        List<String> listHorarios = MethodsGenerics.generarHorarios(
-                Integer.parseInt(instance.configuraciones.get(0).getHoraServicioInicio().replace(':','0'))/1000,
-                Integer.parseInt(instance.configuraciones.get(0).getHoraServicioFin().replace(':','0'))/1000,
-                Integer.parseInt(instance.configuraciones.get(0).getDuracionCitas()),
-                horas);
+        List<String> listHorarios =
+                MethodsGenerics.generarHorarios(
+                Integer.parseInt(listaConfig.getHoraServicioInicio().replace(':','0'))/1000,
+                Integer.parseInt(listaConfig.getHoraServicioFin().replace(':','0'))/1000,
+                Integer.parseInt(listaConfig.getDuracionCitas()), horas);
         // El algoritmo generar horarios recibe tres parametros:
         // 1. Hora Incio => <int>
         // 2. Hora Fin => <int>
@@ -307,13 +306,11 @@ public class NuevaCitaBean implements Serializable {
     /**
      * @apiNote Metodo para agendar la cita.
      */
-    @Transactional
     public void agendarCita(Long idhistorical){
-
-//        ResultadoTO resultado = citaBusiness.numeroCitas(URLs.Commun.getValor(), strLocalMatricula, strCurrentTramite);
 
         ResultadoTO flag1 = citaBusiness.validarTramite(idhistorical, Integer.parseInt(strCurrentTramite));
         ResultadoTO flag2 = citaBusiness.validarHorario(MethodsGenerics.formatDate(strLocalFecha), strCurrentHora);
+
         if ((boolean) flag1.getObjeto() &&  (boolean) flag2.getObjeto()){
             String[] strindate = strLocalFecha.split(" ");
             if (strindate[0].equals("Sat") || strindate[0].equals("Sun"))
@@ -627,6 +624,14 @@ public class NuevaCitaBean implements Serializable {
 
     public void setListDatosAlumno(List<String> listDatosAlumno) {
         this.listDatosAlumno = listDatosAlumno;
+    }
+
+    public ConfiguacionesDTO getLista() {
+        return listaConfig;
+    }
+
+    public void setLista(ConfiguacionesDTO lista) {
+        this.listaConfig = lista;
     }
 
     public boolean isShowDataEstudiante() {

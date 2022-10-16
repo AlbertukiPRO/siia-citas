@@ -1,13 +1,9 @@
 package mx.uatx.siia.citas.controller;
 
-import mx.uatx.siia.citas.modelo.MisCitas;
-import mx.uatx.siia.citas.modelo.SIMSCITAS;
-import mx.uatx.siia.citas.modelo.citasBusiness.CitaBusiness;
-import mx.uatx.siia.citas.modelo.citasBusiness.MethodsGenerics;
-import mx.uatx.siia.citas.modelo.enums.URLs;
+import mx.uatx.siia.citas.MisCitas;
+import mx.uatx.siia.citas.citasBusiness.CitaBusiness;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
-import mx.uatx.siia.serviciosUniversitarios.enums.SeveridadMensajeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +11,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
-import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
