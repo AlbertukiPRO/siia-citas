@@ -327,8 +327,13 @@ public class NuevaCitaBean implements Serializable {
                 valores.put("hora",strCurrentHora);
 
                 ResultadoTO resultadoTO = citaBusiness.guardarCita(valores);
+                String[] params1 = new String[]{ valores.get("fecha").toString(),valores.get("hora").toString(), "20181837"  };
+                String[] params2 = new String[]{ valores.get("idarea").toString(), "20181837" };
+                logger.info("--- CITAS RUN SAVE HORARIO ---");
+                ResultadoTO resultadoh1 = citaBusiness.reservarHorarios(params1, params2);
+                boolean flaghorarios = (boolean) resultadoh1.getObjeto();
 
-                if (resultadoTO.getObjeto().equals(true)){
+                if (resultadoTO.getObjeto().equals(true) && flaghorarios){
                     System.out.println("|------------------ WAS SUCCESFUL SAVE CITA => "+resultadoTO.getObjeto());
                     isCitaAgendada = true;
                     mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Tu cita se agendo correctamente, espera el comprobante");
