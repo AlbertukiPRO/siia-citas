@@ -122,7 +122,9 @@ public class AdminCitasBean implements Serializable {
                 String[] params = new String[]{misCitas.getIntIdCita().toString(), misCitas.getIntIdAlumno().toString(), strIdArea};
                 listEventos.add(new Eventos(
                         "Cita de " + misCitas.getIntIdAlumno(),
-                        MethodsGenerics.getDateToFullCalendar(misCitas.getStrFechaReserva() + " " + misCitas.getStrHoraReservada()), params));
+                        MethodsGenerics.getDateToFullCalendar(misCitas.getStrFechaReservada() + " " + misCitas.getStrHoraReservada()),
+                        params
+                ));
             }
         }
         strlang = "es";

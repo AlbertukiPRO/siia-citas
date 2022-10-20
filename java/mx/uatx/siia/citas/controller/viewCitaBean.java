@@ -1,9 +1,12 @@
 package mx.uatx.siia.citas.controller;
 
 import mx.uatx.siia.citas.MisCitas;
+import mx.uatx.siia.citas.SIMSCITAS;
 import mx.uatx.siia.citas.areas.business.AreasBusiness;
+import mx.uatx.siia.citas.citasBusiness.ObjectMapperUtils;
 import mx.uatx.siia.citas.enums.URLs;
 import mx.uatx.siia.comun.helper.VistasHelper;
+import mx.uatx.siia.serviciosUniversitarios.dto.CitasTO;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,17 +45,15 @@ public class viewCitaBean implements Serializable {
     private String id;
     @ManagedProperty(value = "#{param.matricula}")
     private String matricula;
-
-    private MisCitas modelCita;
+    private CitasTO modelCita;
 
     @PostConstruct
     public void init(){
         String[] params = new String[]{idarea,matricula,id};
-        ResultadoTO resultado = areasBusiness.obtenerCita(2, URLs.MiCita.getValor(), params);
-        modelCita = (MisCitas) resultado.getObjeto();
+//        ResultadoTO resultado = areasBusiness.obtenerCita(2, URLs.MiCita.getValor(), params);
+        ResultadoTO resultado = areasBusiness.obtenerCita(Long.parseLong(matricula), Long.parseLong(id));
+        modelCita = ObjectMapperUtils.map((SIMSCITAS) resultado.getObjeto(), CitasTO.class);
     }
-
-
 
     public AreasBusiness getAreasBusiness() {
         return areasBusiness;
@@ -86,11 +87,11 @@ public class viewCitaBean implements Serializable {
         this.matricula = matricula;
     }
 
-    public MisCitas getModelCita() {
+    public CitasTO getModelCita() {
         return modelCita;
     }
 
-    public void setModelCita(MisCitas modelCita) {
+    public void setModelCita(CitasTO modelCita) {
         this.modelCita = modelCita;
     }
 
