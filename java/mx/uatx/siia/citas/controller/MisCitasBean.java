@@ -90,7 +90,6 @@ public class MisCitasBean implements Serializable {
     }
 
     public void GetCitas() {
-//        ResultadoTO resultado = citaBusiness.miCita(URLs.MiCita.getValor(), strLocalMatricula);
         ResultadoTO resultado = citaBusiness.obtenerMisCitas(idHistorico);
         listMisCitas = (List<MisCitas>) resultado.getObjeto();
         renderMisCitas = true;

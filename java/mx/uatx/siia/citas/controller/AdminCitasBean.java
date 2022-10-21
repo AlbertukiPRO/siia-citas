@@ -210,7 +210,7 @@ public class AdminCitasBean implements Serializable {
     public void generarReporte(){
         ResultadoTO resultado;
         HashMap<String, Object> parameters = new HashMap<>();
-        List<MisCitas> misCitas;
+        List<CitasTO> misCitas;
         List<GeneriReportFields> lista = null;
         JRBeanCollectionDataSource colDat;
         String[] params;
@@ -222,39 +222,42 @@ public class AdminCitasBean implements Serializable {
             case "1":
                 params = new String[]{strIdArea, strkindTramite};
 
-                resultado = citaBusiness.getMisCitasOfService(params, ServiciosReportes.GetAllCitasOnTramite.getValor());
-                misCitas = (List<MisCitas>) resultado.getObjeto();
+//                resultado = citaBusiness.getMisCitasOfService(params, ServiciosReportes.GetAllCitasOnTramite.getValor());
+                resultado = citaBusiness.GenerarReportePorTipoTramite(Long.parseLong(strkindTramite), Long.parseLong(strIdArea));
+                misCitas = ObjectMapperUtils.mapAll((List<SIMSCITAS>) resultado.getObjeto(), CitasTO.class);
                 colDat = new JRBeanCollectionDataSource(misCitas);
                 parameters.put("JRBeanCollectionData", colDat);
+
+                // TODO -> CHECK IF THE FILE TO PDF NEEDS TO PASS THE SAME VARIABLES NAMES IN THE FIELDS.
 
                 nameFile = "ReporteCitaOnTramite";
                 lista = new ArrayList<>();
                 lista.add(0, new GeneriReportFields("Departamento de Registro y control escolar", strLocalNameTramite, fechalocal, ""));
                 break;
 
-            case "2":
-                params = new String[]{strIdArea};
-                resultado = citaBusiness.getMisCitasOfService(params, ServiciosReportes.GetAllCitasOnArea.getValor());
-                misCitas = (List<MisCitas>) resultado.getObjeto();
-                colDat = new JRBeanCollectionDataSource(misCitas);
-                parameters.put("JRBeanCollectionData", colDat);
-
-                nameFile = "ReporteCitasGlobal";
-                lista = new ArrayList<>();
-                lista.add(0, new GeneriReportFields("Departamento de Registro y control escolar", fechalocal));
-                break;
-
-            case "3":
-                params = new String[]{strIdArea, MethodsGenerics.formatDate(strValueDateField)};
-                resultado = citaBusiness.getMisCitasOfService(params, ServiciosReportes.GetAllCitasOnFecha.getValor());
-                misCitas = (List<MisCitas>) resultado.getObjeto();
-                colDat = new JRBeanCollectionDataSource(misCitas);
-                parameters.put("JRBeanCollectionData", colDat);
-
-                nameFile = "ReporteCitasOnDate";
-                lista = new ArrayList<>();
-                lista.add(0, new GeneriReportFields("Departamento de Registro y control escolar", strLocalNameTramite, MethodsGenerics.formatDate(strValueDateField)));
-                break;
+//            case "2":
+//                params = new String[]{strIdArea};
+//                resultado = citaBusiness.getMisCitasOfService(params, ServiciosReportes.GetAllCitasOnArea.getValor());
+//                misCitas = (List<MisCitas>) resultado.getObjeto();
+//                colDat = new JRBeanCollectionDataSource(misCitas);
+//                parameters.put("JRBeanCollectionData", colDat);
+//
+//                nameFile = "ReporteCitasGlobal";
+//                lista = new ArrayList<>();
+//                lista.add(0, new GeneriReportFields("Departamento de Registro y control escolar", fechalocal));
+//                break;
+//
+//            case "3":
+//                params = new String[]{strIdArea, MethodsGenerics.formatDate(strValueDateField)};
+//                resultado = citaBusiness.getMisCitasOfService(params, ServiciosReportes.GetAllCitasOnFecha.getValor());
+//                misCitas = (List<MisCitas>) resultado.getObjeto();
+//                colDat = new JRBeanCollectionDataSource(misCitas);
+//                parameters.put("JRBeanCollectionData", colDat);
+//
+//                nameFile = "ReporteCitasOnDate";
+//                lista = new ArrayList<>();
+//                lista.add(0, new GeneriReportFields("Departamento de Registro y control escolar", strLocalNameTramite, MethodsGenerics.formatDate(strValueDateField)));
+//                break;
         }
         downloadPDF(nameFile, lista, parameters);
     }

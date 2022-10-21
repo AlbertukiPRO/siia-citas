@@ -53,6 +53,11 @@ public class viewCitaBean implements Serializable {
 //        ResultadoTO resultado = areasBusiness.obtenerCita(2, URLs.MiCita.getValor(), params);
         ResultadoTO resultado = areasBusiness.obtenerCita(Long.parseLong(matricula), Long.parseLong(id));
         modelCita = ObjectMapperUtils.map((SIMSCITAS) resultado.getObjeto(), CitasTO.class);
+        logger.info(modelCita.toString());
+    }
+
+    public void regresar(){
+        vHelp.redireccionar("/vistas/administracionCitas/index.uat");
     }
 
     public AreasBusiness getAreasBusiness() {

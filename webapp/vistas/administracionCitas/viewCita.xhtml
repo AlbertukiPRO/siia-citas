@@ -8,18 +8,84 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 template="/layouts/template.xhtml">
    <ui:define name="content">
-
       <b:container fluid="true">
-         <b:panel title="Cita de #{viewcita.modelCita.strNombreUser}" largeScreen="8" collapsible="true">
-            <b:container>
-                <b:row>
-                    <b:column smallScreen="12" mediumScreen="6" largeScreen="4">
-                        <b:label value="Nombre del alumno"></b:label>
-                    </b:column>
-                </b:row>
+         <b:form>
+             <b:panel title="Cita de #{viewcita.modelCita.strNombreUser}" largeScreen="8" collapsible="true">
+                 <b:container style="width: 60%; height:611px;background-image: url('/SIIA/resources/imagenes/citas/toviewcita.png');background-size: contain;background-repeat: no-repeat;">
+                     <b:row>
+                         <b:column mediumScreen="12" largeScreen="12" smallScreen="12"><span class="separador"></span></b:column>
+                     </b:row>
+                     <b:row style="margin-top:100px;margin-left: 10px; font-size:12px">
+                         <b:column smallScreen="12" mediumScreen="4" largeScreen="4" >
+                             <b:label value="Nombre del alumno: "></b:label>
+                         </b:column>
+                         <b:column smallScreen="12" mediumScreen="6" largeScreen="6">
+                             <h:outputText styleClass="title" value="#{viewcita.modelCita.strNombreUser}"></h:outputText>
+                         </b:column>
 
-            </b:container>
-         </b:panel>
+                         <span class="separador"></span>
+                         <b:row style="margin-top:15px;">
+                             <b:column smallScreen="4" mediumScreen="4" largeScreen="4">
+                                 <b:label value="Grado : "></b:label>
+                             </b:column>
+                             <b:column smallScreen="2" mediumScreen="2" largeScreen="2">
+                                 <h:outputText styleClass="title" value="#{viewcita.modelCita.strGrado}"></h:outputText>
+                             </b:column>
+                             <b:column smallScreen="4" mediumScreen="4" largeScreen="4">
+                                 <b:label value="Grupo : "></b:label>
+                             </b:column>
+                             <b:column smallScreen="2" mediumScreen="2" largeScreen="2">
+                                 <h:outputText styleClass="title" value="#{viewcita.modelCita.strGrupo}"></h:outputText>
+                             </b:column>
+
+                         </b:row>
+
+                         <b:row style="margin-top:15px;">
+                             <b:column smallScreen="6" mediumScreen="6" largeScreen="6">
+                                 <b:label value="Area : "></b:label>
+                             </b:column>
+                             <b:column smallScreen="6" mediumScreen="6" largeScreen="6">
+                                 <h:outputText styleClass="title" value="#{viewcita.modelCita.strNameArea}"></h:outputText>
+                             </b:column>
+                         </b:row>
+
+
+                         <b:row style="margin-top:15px;">
+                             <b:column smallScreen="6" mediumScreen="6" largeScreen="6">
+                                 <b:label value="Tramite : "></b:label>
+                             </b:column>
+                             <b:column smallScreen="6" mediumScreen="6" largeScreen="6">
+                                 <h:outputText styleClass="title" value="#{viewcita.modelCita.strNameTramite}"></h:outputText>
+                             </b:column>
+
+                         </b:row>
+
+                         <b:row style="margin-top:15px;">
+                             <b:column smallScreen="4" mediumScreen="4" largeScreen="4">
+                                 <b:label value="Fecha : "></b:label>
+                             </b:column>
+                             <b:column smallScreen="2" mediumScreen="2" largeScreen="2">
+                                 <h:outputText styleClass="title" value="#{viewcita.modelCita.strFechaReservada}"></h:outputText>
+                             </b:column>
+                         </b:row>
+                         <b:row>
+                             <b:column smallScreen="4" mediumScreen="4" largeScreen="4">
+                                 <b:label value="Hora : "></b:label>
+                             </b:column>
+                             <b:column smallScreen="2" mediumScreen="2" largeScreen="2">
+                                 <h:outputText styleClass="title" value="#{viewcita.modelCita.strHoraReservada}"></h:outputText>
+                             </b:column>
+                         </b:row>
+                     </b:row>
+                 </b:container>
+                 <b:row>
+                     <b:column mediumScreen="10" largeScreen="10" smallScreen="6"></b:column>
+                     <b:column mediumScreen="2" largeScreen="2" smallScreen="6">
+                         <b:commandButton value="Regresar" styleClass="btn btn-default" action="#{viewcita.regresar()}"></b:commandButton>
+                     </b:column>
+                 </b:row>
+             </b:panel>
+         </b:form>
       </b:container>
    </ui:define>
 </ui:composition>
