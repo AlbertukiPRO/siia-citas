@@ -10,7 +10,6 @@ import mx.uatx.siia.citas.citasBusiness.CitaBusiness;
 import mx.uatx.siia.citas.citasBusiness.MethodsGenerics;
 import mx.uatx.siia.citas.citasBusiness.ObjectMapperUtils;
 import mx.uatx.siia.citas.dto.ConfiguacionesDTO;
-import mx.uatx.siia.citas.enums.ServiciosReportes;
 import mx.uatx.siia.citas.enums.URLs;
 import mx.uatx.siia.citas.models.Eventos;
 import mx.uatx.siia.comun.helper.VistasHelper;
@@ -74,7 +73,8 @@ public class AdminCitasBean implements Serializable {
     private String strHourServiceEnd;
     private String strCurrentLocalDate;
     private String strDuracionCita;
-    private String strValueDateField;
+    private String strValueDateFieldA;
+    private String strValueDateFieldB;
     private final String strUser;
     private String strlang;
 
@@ -119,9 +119,9 @@ public class AdminCitasBean implements Serializable {
             List<CitasTO> citas = ObjectMapperUtils.mapAll(localList, CitasTO.class);
 
             for (CitasTO misCitas : citas){
-                String[] params = new String[]{misCitas.getIntIdCita().toString(), misCitas.getIntIdAlumno().toString(), strIdArea};
+                String[] params = new String[]{misCitas.getIntIdCita().toString(), misCitas.getLongHistorialAcademico().toString(), strIdArea};
                 listEventos.add(new Eventos(
-                        "Cita de " + misCitas.getIntIdAlumno(),
+                        "Cita de " + misCitas.getIntMatricula(),
                         MethodsGenerics.getDateToFullCalendar(misCitas.getStrFechaReservada() + " " + misCitas.getStrHoraReservada()),
                         params
                 ));
@@ -210,29 +210,26 @@ public class AdminCitasBean implements Serializable {
     public void generarReporte(){
         ResultadoTO resultado;
         HashMap<String, Object> parameters = new HashMap<>();
-        List<CitasTO> misCitas;
         List<GeneriReportFields> lista = null;
         JRBeanCollectionDataSource colDat;
-        String[] params;
 
         String fechalocal = MethodsGenerics.getCurrentDate();
         String nameFile = null;
 
         switch (strkindTramite){
             case "1":
-                params = new String[]{strIdArea, strkindTramite};
-
-//                resultado = citaBusiness.getMisCitasOfService(params, ServiciosReportes.GetAllCitasOnTramite.getValor());
-                resultado = citaBusiness.GenerarReportePorTipoTramite(Long.parseLong(strkindTramite), Long.parseLong(strIdArea));
-                misCitas = ObjectMapperUtils.mapAll((List<SIMSCITAS>) resultado.getObjeto(), CitasTO.class);
-                colDat = new JRBeanCollectionDataSource(misCitas);
+                resultado = citaBusiness.GenerarReportePorTipoTramite(Long.parseLong(strCurrentTramite), Long.parseLong(strIdArea), strValueDateFieldA, strValueDateFieldB);
+                logger.info(resultado.getObjeto().toString());
+                colDat = new JRBeanCollectionDataSource((List<MisCitas>) resultado.getObjeto());
                 parameters.put("JRBeanCollectionData", colDat);
 
-                // TODO -> CHECK IF THE FILE TO PDF NEEDS TO PASS THE SAME VARIABLES NAMES IN THE FIELDS.
-
-                nameFile = "ReporteCitaOnTramite";
+                nameFile = "ReporteCitasGlobal";
                 lista = new ArrayList<>();
-                lista.add(0, new GeneriReportFields("Departamento de Registro y control escolar", strLocalNameTramite, fechalocal, ""));
+                lista.add(0, new GeneriReportFields("Departamento de Registro y control escolar",
+                        strLocalNameTramite,
+                        fechalocal,
+                        "Reporte por tipo de tramite",
+                        strValueDateFieldA+" al "+strValueDateFieldB));
                 break;
 
 //            case "2":
@@ -352,12 +349,21 @@ public class AdminCitasBean implements Serializable {
     public String getStrCurrentTramite() {
         return strCurrentTramite;
     }
-    public String getStrValueDateField() {
-        return strValueDateField;
+    public String getStrValueDateFieldA() {
+        return strValueDateFieldA;
     }
-    public void setStrValueDateField(String strValueDateField) {
-        this.strValueDateField = strValueDateField;
+    public void setStrValueDateFieldA(String strValueDateFieldA) {
+        this.strValueDateFieldA = strValueDateFieldA;
     }
+
+    public String getStrValueDateFieldB() {
+        return strValueDateFieldB;
+    }
+
+    public void setStrValueDateFieldB(String strValueDateFieldB) {
+        this.strValueDateFieldB = strValueDateFieldB;
+    }
+
     public TramitesBusiness getTramitesBusiness() {
         return tramitesBusiness;
     }

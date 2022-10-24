@@ -4,8 +4,34 @@ public class GeneriReportFields {
     private String area;
     private String fecha;
     private String dateprint;
-
     private String tramite;
+    private String tiporeporte;
+    private String rangoFechas;
+
+
+
+    public GeneriReportFields(String area, String tramite, String dateprint, String tipo, String rangoFechas) {
+        this.area = area;
+        this.tramite = tramite;
+        this.dateprint = dateprint;
+        this.tiporeporte = tipo;
+        this.rangoFechas = rangoFechas;
+    }
+    public String getTiporeporte() {
+        return tiporeporte;
+    }
+
+    public void setTiporeporte(String tiporeporte) {
+        this.tiporeporte = tiporeporte;
+    }
+
+    public String getRangoFechas() {
+        return rangoFechas;
+    }
+
+    public void setRangoFechas(String rangoFechas) {
+        this.rangoFechas = rangoFechas;
+    }
 
     public String getDateprint() {
         return dateprint;
@@ -22,24 +48,6 @@ public class GeneriReportFields {
     public void setDateprint(String dateprint) {
         this.dateprint = dateprint;
     }
-
-    public GeneriReportFields(String area, String tramite, String dateprint, String a){
-        this.area = area;
-        this.tramite = tramite;
-        this.dateprint = dateprint;
-    }
-
-    public GeneriReportFields(String area, String fecha, String dateprint) {
-        this.area = area;
-        this.fecha = fecha;
-        this.dateprint = dateprint;
-    }
-
-    public GeneriReportFields(String nombreArea, String fecha) {
-        this.area = nombreArea;
-        this.fecha = fecha;
-    }
-
     public String getArea() {
         return area;
     }
