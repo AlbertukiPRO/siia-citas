@@ -1,13 +1,14 @@
 package mx.uatx.siia.citas.controller;
 
-import mx.uatx.siia.citas.MisCitas;
 import mx.uatx.siia.citas.SIMSCITAS;
 import mx.uatx.siia.citas.areas.business.AreasBusiness;
+import mx.uatx.siia.citas.citasBusiness.CitaBusiness;
 import mx.uatx.siia.citas.citasBusiness.ObjectMapperUtils;
-import mx.uatx.siia.citas.enums.URLs;
+import mx.uatx.siia.citas.enums.EstatusCitas;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.serviciosUniversitarios.dto.CitasTO;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
+import mx.uatx.siia.serviciosUniversitarios.enums.SeveridadMensajeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +16,8 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.util.ResourceBundle;
 
@@ -36,6 +39,9 @@ public class viewCitaBean implements Serializable {
     @ManagedProperty("#{areasBusiness}")
     private AreasBusiness areasBusiness;
 
+    @ManagedProperty("#{citaBusiness}")
+    private CitaBusiness citaBusiness;
+
     private final VistasHelper vHelp = new VistasHelper();
 
 
@@ -54,6 +60,8 @@ public class viewCitaBean implements Serializable {
 //        ResultadoTO resultado = areasBusiness.obtenerCita(2, URLs.MiCita.getValor(), params);
         ResultadoTO resultado = areasBusiness.obtenerCita(Long.parseLong(matricula), Long.parseLong(id));
         modelCita = ObjectMapperUtils.map((SIMSCITAS) resultado.getObjeto(), CitasTO.class);
+
+        retroalimentacion = modelCita.getStrRetroalimentacion();
     }
 
     public void regresar(){
@@ -61,7 +69,41 @@ public class viewCitaBean implements Serializable {
     }
 
     public void sendRetro(){
-        // TODO SAVE RETRO TO CITA.
+         ExternalContext data =  FacesContext.getCurrentInstance().getExternalContext();
+         data.getFlash().put("idarea", idarea);
+         data.getFlash().put("idcita", id);
+         data.getFlash().put("matricula", matricula);
+
+        ResultadoTO resultado = citaBusiness.guardarRetro(modelCita.getIntIdCita(), retroalimentacion);
+        if (resultado.isBlnValido()) {
+            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msg.citas.retro.save.ok");
+            vHelp.pintarMensajes( msj,resultado);
+        }else{
+            resultado.agregarMensaje(SeveridadMensajeEnum.ERROR, "comun.msg.citas.retro.save.error");
+            vHelp.pintarMensajes( msj,resultado);
+        }
+    }
+
+    public void citaCompletada(){
+        ResultadoTO resultado = citaBusiness.cambiarEstatus(modelCita.getIntIdCita(), EstatusCitas.CitaCompleta.getValor());
+        if (resultado.isBlnValido()){
+            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citass.estatus.change.exito");
+            vHelp.pintarMensajes(msj, resultado);
+        }else {
+            resultado.agregarMensaje(SeveridadMensajeEnum.ERROR, "comun.msj.citass.estatus.change.someerror");
+            vHelp.pintarMensajes(msj, resultado);
+        }
+    }
+
+    public void citaCancelar(){
+        ResultadoTO resultado = citaBusiness.cambiarEstatus(modelCita.getIntIdCita(), EstatusCitas.CitaCancelada.getValor());
+        if (resultado.isBlnValido()){
+            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citass.estatus.change.exito");
+            vHelp.pintarMensajes(msj, resultado);
+        }else {
+            resultado.agregarMensaje(SeveridadMensajeEnum.ERROR, "comun.msj.citass.estatus.change.someerror");
+            vHelp.pintarMensajes(msj, resultado);
+        }
     }
 
     public AreasBusiness getAreasBusiness() {
@@ -86,6 +128,14 @@ public class viewCitaBean implements Serializable {
 
     public void setIdarea(String idarea) {
         this.idarea = idarea;
+    }
+
+    public CitaBusiness getCitaBusiness() {
+        return citaBusiness;
+    }
+
+    public void setCitaBusiness(CitaBusiness citaBusiness) {
+        this.citaBusiness = citaBusiness;
     }
 
     public String getMatricula() {

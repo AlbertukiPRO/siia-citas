@@ -51,7 +51,7 @@
                                                 <b:dataTableColumn value="#{item.strFechaReservada} a las #{item.strHoraReservada}" label="Fecha y Hora"></b:dataTableColumn>
                                                 <b:dataTableColumn  value="#{item.strEstatus}" label="Estatus"></b:dataTableColumn>
                                                 <b:dataTableColumn label="Comprobante">
-                                                    <b:commandButton value=" " iconAwesome="file-pdf-o" styleClass="btn btn-default"></b:commandButton>
+                                                    <b:commandButton action="#{misictas.generarReporte(item.strIdCita)}" onclick="javascript:return false;" iconAwesome="file-pdf-o" styleClass="btn btn-default"></b:commandButton>
                                                 </b:dataTableColumn>
                                                 <b:dataTableColumn label="Cancelar" rendered="#{misictas.isCancelable(item.strEstatus)}">
                                                     <b:commandButton iconAwesome="trash-o"

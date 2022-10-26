@@ -10,6 +10,7 @@ import mx.uatx.siia.citas.citasBusiness.CitaBusiness;
 import mx.uatx.siia.citas.citasBusiness.MethodsGenerics;
 import mx.uatx.siia.citas.citasBusiness.ObjectMapperUtils;
 import mx.uatx.siia.citas.dto.ConfiguacionesDTO;
+import mx.uatx.siia.citas.enums.EstatusCitas;
 import mx.uatx.siia.citas.enums.URLs;
 import mx.uatx.siia.citas.models.Eventos;
 import mx.uatx.siia.comun.helper.VistasHelper;
@@ -120,9 +121,14 @@ public class AdminCitasBean implements Serializable {
             List<CitasTO> citas = ObjectMapperUtils.mapAll(localList, CitasTO.class);
 
             for (CitasTO misCitas : citas){
-                String[] params = new String[]{misCitas.getIntIdCita().toString(), misCitas.getLongHistorialAcademico().toString(), strIdArea};
+                String[] params = new String[]{
+                        misCitas.getIntIdCita().toString(),
+                        misCitas.getLongHistorialAcademico().toString(),
+                        strIdArea,
+                        misCitas.getStrEstatus().equals(EstatusCitas.CitaAgendada.getValor()) ? "#3a87ad" : ( misCitas.getStrEstatus().equals(EstatusCitas.CitaCompleta.getValor()) ? "#2ecc71" : (misCitas.getStrEstatus().equals(EstatusCitas.CitaCancelada.getValor()) ? "#2c3e50" : ( misCitas.getStrEstatus().equals(EstatusCitas.CitaPospuesta.getValor()) ? "#8e44ad" : "#ff7f50" ) ) )
+                };
                 listEventos.add(new Eventos(
-                        "Cita de " + misCitas.getIntMatricula(),
+                        "Cita de " + misCitas.getStrNombreUser() +" - "+ misCitas.getIntMatricula(),
                         MethodsGenerics.getDateToFullCalendar(misCitas.getStrFechaReservada() + " " + misCitas.getStrHoraReservada()),
                         params
                 ));

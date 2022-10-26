@@ -8,6 +8,12 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 template="/layouts/template.xhtml">
    <ui:define name="content">
+       <f:metadata>
+           <!--Takes the study param and sets it into the destination bean's property-->
+           <f:viewParam name="idarea" value="#{viewcita.idarea}" />
+           <f:viewParam name="idcita" value="#{viewcita.id}" />
+           <f:viewParam name="matricula" value="#{viewcita.matricula}" />
+       </f:metadata>
       <b:container fluid="true">
          <b:form>
              <b:panel title="Cita de #{viewcita.modelCita.strNombreUser}" largeScreen="8" collapsible="true">
@@ -89,6 +95,47 @@
                              </f:facet>
                          </b:inputText>
                      </b:column>
+
+                     <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
+                         <b:inputText readonly="true"
+                                      label="Correo Electronico:"
+                                      labelColMd="4"
+                                      value="#{viewcita.modelCita.strCorreo}">
+                             <f:facet name="prepend">
+                                 <b:iconAwesome name="envelope-o"></b:iconAwesome>
+                             </f:facet>
+                         </b:inputText>
+                     </b:column>
+                     <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
+                         <b:inputText readonly="true"
+                                      label="Facultad:"
+                                      labelColMd="4"
+                                      value="#{viewcita.modelCita.strFacultad}">
+                             <f:facet name="prepend">
+                                 <b:iconAwesome name="graduation-cap"></b:iconAwesome>
+                             </f:facet>
+                         </b:inputText>
+                     </b:column>
+                     <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
+                         <b:inputText readonly="true"
+                                      label="Programa Educativo:"
+                                      labelColMd="4"
+                                      value="#{viewcita.modelCita.strPrograma}">
+                             <f:facet name="prepend">
+                                 <b:iconAwesome name="laptop"></b:iconAwesome>
+                             </f:facet>
+                         </b:inputText>
+                     </b:column>
+                     <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
+                         <b:inputText readonly="true"
+                                      label="Datos Generales:"
+                                      labelColMd="4"
+                                      value=" #{viewcita.modelCita.strGrado}° - #{viewcita.modelCita.strGrupo}">
+                             <f:facet name="prepend">
+                                 <b:iconAwesome name="list-alt"></b:iconAwesome>
+                             </f:facet>
+                         </b:inputText>
+                     </b:column>
                  </b:row>
                  <span class="separador"></span>
                  <span class="separador"></span>
@@ -102,17 +149,29 @@
                          <b:row>
                              <b:column mediumScreen="5" largeScreen="5" smallScreen="5"></b:column>
                              <b:column mediumScreen="2" largeScreen="2" smallScreen="2">
-                                 <b:commandButton value="Enviar retroalimentacion" action="#{viewcita.sendRetro()}" icon="send-o" styleClass="btn btn-default"></b:commandButton>
+                                 <b:commandButton value="Enviar retroalimentacion" action="#{viewcita.sendRetro()}" icon="send-o" styleClass="btn btn-default">
+                                     <f:param name="idarea" value="#{viewcita.idarea}"></f:param>
+                                     <f:param name="idcita" value="#{viewcita.id}"></f:param>
+                                     <f:param name="matricula" value="#{viewcita.matricula}"></f:param>
+                                 </b:commandButton>
                              </b:column>
                          </b:row>
                      </b:formGroup>
                  </b:row>
                  <b:row>
                     <b:column mediumScreen="2" smallScreen="6" largeScreen="2">
-                        <b:commandButton value="Cita completada" styleClass="btn btn-default" icon="check-square-o" />
+                        <b:commandButton value="Cita completada" action="#{viewcita.citaCompletada()}" styleClass="btn btn-default" icon="check-square-o" >
+                            <f:param name="idarea" value="#{viewcita.idarea}"></f:param>
+                            <f:param name="idcita" value="#{viewcita.id}"></f:param>
+                            <f:param name="matricula" value="#{viewcita.matricula}"></f:param>
+                        </b:commandButton>
                     </b:column>
                      <b:column mediumScreen="2" smallScreen="6" largeScreen="2">
-                         <b:commandButton value="Cancelar cita"  styleClass="btn btn-default"  icon="exclamation-triangle" />
+                         <b:commandButton value="Cancelar cita" action="#{viewcita.citaCancelar()}" styleClass="btn btn-default"  icon="exclamation-triangle" >
+                             <f:param name="idarea" value="#{viewcita.idarea}"></f:param>
+                             <f:param name="idcita" value="#{viewcita.id}"></f:param>
+                             <f:param name="matricula" value="#{viewcita.matricula}"></f:param>
+                         </b:commandButton>
                      </b:column>
                  </b:row>
                  <span class="separador"></span>
@@ -121,7 +180,11 @@
                  <b:row>
                      <b:column mediumScreen="10" largeScreen="10" smallScreen="6"></b:column>
                      <b:column mediumScreen="2" largeScreen="2" smallScreen="6">
-                         <b:commandButton value="Regresar" styleClass="btn btn-default" action="#{viewcita.regresar()}"></b:commandButton>
+                         <b:commandButton value="Regresar" styleClass="btn btn-default" action="#{viewcita.regresar()}">
+                             <f:param name="idarea" value="#{viewcita.idarea}"></f:param>
+                             <f:param name="idcita" value="#{viewcita.id}"></f:param>
+                             <f:param name="matricula" value="#{viewcita.matricula}"></f:param>
+                         </b:commandButton>
                      </b:column>
                  </b:row>
              </b:panel>

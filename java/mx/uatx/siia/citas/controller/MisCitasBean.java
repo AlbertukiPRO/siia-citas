@@ -2,8 +2,10 @@ package mx.uatx.siia.citas.controller;
 
 import mx.uatx.siia.citas.MisCitas;
 import mx.uatx.siia.citas.citasBusiness.CitaBusiness;
+import mx.uatx.siia.citas.enums.EstatusCitas;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
+import mx.uatx.siia.serviciosUniversitarios.enums.SeveridadMensajeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,7 +98,25 @@ public class MisCitasBean implements Serializable {
     }
 
     public boolean isCancelable(String estatus){
-        return estatus.equals("Agendada");
+        return estatus.equals(EstatusCitas.CitaAgendada.getValor());
+    }
+
+    public void generarReporte(String idcita){
+
+        ResultadoTO resultado = citaBusiness.obtenerCitaToReport(Integer.parseInt(idcita));
+
+        if (resultado.isBlnValido()){
+            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.generarReporte.ok");
+            vHelp.pintarMensajes(msj, resultado);
+            FillReport((MisCitas) resultado.getObjeto());
+        }else{
+            resultado.agregarMensaje(SeveridadMensajeEnum.ERROR, "comun.msj.citas.generarReporte.error");
+            vHelp.pintarMensajes(msj, resultado);
+        }
+    }
+
+    private void FillReport(MisCitas citas){
+
     }
 
     public void SetModalCancelar(String tramite){
