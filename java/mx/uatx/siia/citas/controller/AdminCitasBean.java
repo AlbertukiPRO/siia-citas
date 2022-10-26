@@ -59,6 +59,7 @@ public class AdminCitasBean implements Serializable {
     private List<SelectItem> listTramites;
     private List<String> listDaysToCheck;
     private List<String> listDayswasRemoved;
+    private List<String> listEstatus;
     private List<Eventos> listEventos;
     private String mesActual;
     private String strDia;
@@ -68,7 +69,7 @@ public class AdminCitasBean implements Serializable {
     private String strCurrentTramite;
     private String strCalendarValue;
     private String strDateDisablesCalendar;
-
+    private String strCurrentEstatus;
     private String strHourServiceStar;
     private String strHourServiceEnd;
     private String strCurrentLocalDate;
@@ -79,7 +80,7 @@ public class AdminCitasBean implements Serializable {
     private String strlang;
 
     private boolean hasDataTramites = false;
-    private boolean hasFielDate = false;
+    private boolean hasComboStatus = false;
     private boolean hasUpdateListHorarios = false;
     private boolean wasDayDisable = true;
     private boolean hasDiastoDisable = false;
@@ -133,23 +134,34 @@ public class AdminCitasBean implements Serializable {
     public void saveDataA(){
         logger.info("--- Guardando datos de la configuracion ---");
 
-        HashMap<String, Object> datacollect = new HashMap<>();
+        String[] params =new String[]{strHourServiceStar, strHourServiceEnd, strDuracionCita};
+        ResultadoTO resultado = areasBusiness.guardarConfiguracionesArea(Long.parseLong(strIdArea), params);
 
-        datacollect.put("idarea", strIdArea);
-        datacollect.put("horainicion", strHourServiceStar);
-        datacollect.put("horafin", strHourServiceEnd);
-        datacollect.put("duracion", strDuracionCita);
-
-        ResultadoTO resultado = citaBusiness.saveDataDB(datacollect, URLs.InsertData.getValor()+"?savesetting=true");
-        Map<String, Object> response = (Map<String, Object>) resultado.getObjeto();
-
-        if (response.get("codefromservice").equals("1")){
+        if (resultado.isBlnValido()){
             resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.admin.savedataconfig.ok");
             vHelp.pintarMensajes(msj,resultado);
         }else{
-            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.admin.savedataconfig.error");
+            resultado.agregarMensaje(SeveridadMensajeEnum.ERROR, "comun.msj.citas.admin.savedataconfig.error");
             vHelp.pintarMensajes(msj,resultado);
         }
+
+//        HashMap<String, Object> datacollect = new HashMap<>();
+//
+//        datacollect.put("idarea", strIdArea);
+//        datacollect.put("horainicion", strHourServiceStar);
+//        datacollect.put("horafin", strHourServiceEnd);
+//        datacollect.put("duracion", strDuracionCita);
+//
+//        ResultadoTO resultado = citaBusiness.saveDataDB(datacollect, URLs.InsertData.getValor()+"?savesetting=true");
+//        Map<String, Object> response = (Map<String, Object>) resultado.getObjeto();
+//
+//        if (response.get("codefromservice").equals("1")){
+//            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.admin.savedataconfig.ok");
+//            vHelp.pintarMensajes(msj,resultado);
+//        }else{
+//            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.admin.savedataconfig.error");
+//            vHelp.pintarMensajes(msj,resultado);
+//        }
     }
 
     public void saveDataB() {
@@ -202,7 +214,7 @@ public class AdminCitasBean implements Serializable {
         List<SelectItem> selectItems = new ArrayList<>();
         selectItems.add(0, new SelectItem("1", "Reporte por tipo de tramite"));
         selectItems.add(1, new SelectItem("2", "Reporte global de cita"));
-        selectItems.add(2, new SelectItem("3", "Reporte por fecha"));
+        selectItems.add(2, new SelectItem("3", "Reporte por estatus"));
 
         return selectItems;
     }
@@ -210,7 +222,7 @@ public class AdminCitasBean implements Serializable {
     public void generarReporte(){
         ResultadoTO resultado;
         HashMap<String, Object> parameters = new HashMap<>();
-        List<GeneriReportFields> lista = null;
+        List<GeneriReportFields> extraParams = null;
         JRBeanCollectionDataSource colDat;
 
         String fechalocal = MethodsGenerics.getCurrentDate();
@@ -218,45 +230,31 @@ public class AdminCitasBean implements Serializable {
 
         switch (strkindTramite){
             case "1":
-                resultado = citaBusiness.GenerarReportePorTipoTramite(Long.parseLong(strCurrentTramite), Long.parseLong(strIdArea), strValueDateFieldA, strValueDateFieldB);
-                logger.info(resultado.getObjeto().toString());
+                resultado = citaBusiness.GenerarReportePorTipoTramite(Long.parseLong(strCurrentTramite), Long.parseLong(strIdArea), MethodsGenerics.formtDateDB(strValueDateFieldA), MethodsGenerics.formtDateDB(strValueDateFieldB));
                 colDat = new JRBeanCollectionDataSource((List<MisCitas>) resultado.getObjeto());
                 parameters.put("JRBeanCollectionData", colDat);
 
-                nameFile = "ReporteCitasGlobal";
-                lista = new ArrayList<>();
-                lista.add(0, new GeneriReportFields("Departamento de Registro y control escolar",
+                nameFile = "ReporteCitas";
+                extraParams = new ArrayList<>();
+                extraParams.add(0, new GeneriReportFields("Departamento de Registro y control escolar",
                         strLocalNameTramite,
                         fechalocal,
                         "Reporte por tipo de tramite",
-                        strValueDateFieldA+" al "+strValueDateFieldB));
+                        MethodsGenerics.formatDate(strValueDateFieldA)+" al "+MethodsGenerics.formatDate(strValueDateFieldB)));
                 break;
-
-//            case "2":
-//                params = new String[]{strIdArea};
-//                resultado = citaBusiness.getMisCitasOfService(params, ServiciosReportes.GetAllCitasOnArea.getValor());
-//                misCitas = (List<MisCitas>) resultado.getObjeto();
-//                colDat = new JRBeanCollectionDataSource(misCitas);
-//                parameters.put("JRBeanCollectionData", colDat);
-//
-//                nameFile = "ReporteCitasGlobal";
-//                lista = new ArrayList<>();
-//                lista.add(0, new GeneriReportFields("Departamento de Registro y control escolar", fechalocal));
-//                break;
-//
-//            case "3":
-//                params = new String[]{strIdArea, MethodsGenerics.formatDate(strValueDateField)};
-//                resultado = citaBusiness.getMisCitasOfService(params, ServiciosReportes.GetAllCitasOnFecha.getValor());
-//                misCitas = (List<MisCitas>) resultado.getObjeto();
-//                colDat = new JRBeanCollectionDataSource(misCitas);
-//                parameters.put("JRBeanCollectionData", colDat);
-//
-//                nameFile = "ReporteCitasOnDate";
-//                lista = new ArrayList<>();
-//                lista.add(0, new GeneriReportFields("Departamento de Registro y control escolar", strLocalNameTramite, MethodsGenerics.formatDate(strValueDateField)));
-//                break;
+            case "2":
+                nameFile = "ReporteCitas";
+                resultado = citaBusiness.GenerarReporteCitasGlobal(Long.parseLong(strIdArea), MethodsGenerics.formtDateDB(strValueDateFieldA), MethodsGenerics.formtDateDB(strValueDateFieldB));
+                colDat = new JRBeanCollectionDataSource((List<MisCitas>) resultado.getObjeto());
+                parameters.put("JRBeanCollectionData", colDat);
+                extraParams = new ArrayList<>();
+                extraParams.add(0, new GeneriReportFields("Departamento de Registro y control escolar",
+                        strLocalNameTramite,
+                        fechalocal,
+                        "Reporte global de citas",
+                        MethodsGenerics.formatDate(strValueDateFieldA)+" al "+MethodsGenerics.formatDate(strValueDateFieldB)));
         }
-        downloadPDF(nameFile, lista, parameters);
+        downloadPDF(nameFile, extraParams, parameters);
     }
 
     public void downloadPDF(String nameFile, List<?> lista, HashMap<String, Object> parameters ){
@@ -273,10 +271,10 @@ public class AdminCitasBean implements Serializable {
                 hasDataTramites = true;
             }
         }else if (strkindTramite.equals("3")){
-            hasFielDate = true;
+            hasComboStatus = true;
         }else{
             hasDataTramites=false;
-            hasFielDate=false;
+            hasComboStatus =false;
         }
     }
 
@@ -290,7 +288,7 @@ public class AdminCitasBean implements Serializable {
     public void RenderDaysToCalendar(){
         logger.info("---- Render days");
         listDayswasRemoved = new ArrayList<>();
-        ResultadoTO resultado = citaBusiness.getHoursOfCalendarDisable(strIdArea, MethodsGenerics.formatDate(strCalendarValue));
+        ResultadoTO resultado = citaBusiness.getHoursOfCalendarDisable(Long.parseLong(strIdArea), MethodsGenerics.formatDate(strCalendarValue));
         List<String> fromDBhorarios = (List<String>) resultado.getObjeto();
 
         strCurrentLocalDate = MethodsGenerics.formatDate(strCalendarValue);
@@ -408,9 +406,9 @@ public class AdminCitasBean implements Serializable {
     public List<String> getListDaysToCheck() {
         return listDaysToCheck;
     }
-    public boolean isHasFielDate() {return hasFielDate;}
-    public void setHasFielDate(boolean hasFielDate) {
-        this.hasFielDate = hasFielDate;
+    public boolean isHasComboStatus() {return hasComboStatus;}
+    public void setHasComboStatus(boolean hasComboStatus) {
+        this.hasComboStatus = hasComboStatus;
     }
     public void setListDaysToCheck(List<String> listDaysToCheck) {
         this.listDaysToCheck = listDaysToCheck;
@@ -518,6 +516,22 @@ public class AdminCitasBean implements Serializable {
 
     public String getStrIDH() {
         return strIDH;
+    }
+
+    public String getStrCurrentEstatus() {
+        return strCurrentEstatus;
+    }
+
+    public void setStrCurrentEstatus(String strCurrentEstatus) {
+        this.strCurrentEstatus = strCurrentEstatus;
+    }
+
+    public List<String> getListEstatus() {
+        return listEstatus;
+    }
+
+    public void setListEstatus(List<String> listEstatus) {
+        this.listEstatus = listEstatus;
     }
 
     public void setStrIDH(String strIDH) {

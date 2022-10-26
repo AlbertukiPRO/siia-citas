@@ -15,6 +15,7 @@
                         <b:tab title="Calendario">
                             <b:fullCalendar lang="#{admin.strlang}"
                                             events="#{admin.toJson()}"
+                                            defaultView="basicWeek"
                                             eventClick="
                                             function(calEvent, jsEvent, view){
                                                 $(this).css('background', 'red');
@@ -77,6 +78,24 @@
                                                 </b:selectOneMenu>
                                             </b:row>
                                         </b:formGroup>
+                                        <b:formGroup rendered="#{admin.hasComboStatus}">
+                                            <b:row>
+                                                <b:selectOneMenu value="#{admin.strCurrentEstatus}"
+                                                                 colMd="12" colLg="12" colSm="12"
+                                                                 id="selectEstatus"
+                                                                 labelStyle="text-aling:left;"
+                                                                 label="Seleccione el tipo de estatus"
+                                                                 labelColLg="12"
+                                                                 ajax="true"
+                                                                 rendered="#{admin.hasComboStatus}"
+                                                                 required="true"
+                                                                 update="@form"
+                                                >
+                                                    <f:selectItem itemLabel="Seleccione un estatus" value="none" itemValue="none"/>
+                                                    <f:selectItems value="#{admin.listEstatus}"/>
+                                                </b:selectOneMenu>
+                                            </b:row>
+                                        </b:formGroup>
                                         <b:formGroup>
                                             <b:container>
                                                 <h:outputLabel value="Ingrese un rago de fechas: "></h:outputLabel>
@@ -84,18 +103,16 @@
                                             <b:row>
                                                 <b:dateTimePicker value="#{admin.strValueDateFieldA}"
                                                               showTime="false"
-                                                              disabledDates="#{admin.strDateDisablesCalendar}"
                                                               labelColMd="12" labelColLg="12"
-                                                              label="Limite de fecha A: "
+                                                              label="Limite de fecha A: " required="true"
                                                               mediumScreen="8" labelMediumScreen="12" largeScreen="10" smallScreen="12">
                                                 </b:dateTimePicker>
                                             </b:row>
                                             <b:row>
                                                 <b:dateTimePicker value="#{admin.strValueDateFieldB}"
                                                               showTime="false"
-                                                              disabledDates="#{admin.strDateDisablesCalendar}"
                                                               labelColMd="12" labelColLg="12"
-                                                              label="Limite de fecha B: "
+                                                              label="Limite de fecha B: " required="true"
                                                               mediumScreen="8" labelMediumScreen="12" largeScreen="10" smallScreen="12">
                                                 </b:dateTimePicker>
                                             </b:row>

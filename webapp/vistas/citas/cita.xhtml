@@ -46,7 +46,7 @@
                                                 <b:dataTableColumn value="CI#{item.strIdCita}" label="ID"></b:dataTableColumn>
                                                 <b:dataTableColumn value="#{item.strDescripcionCita}" label="Datos Cita"></b:dataTableColumn>
                                                 <b:dataTableColumn value="#{item.area}" label="Area"></b:dataTableColumn>
-                                                <b:dataTableColumn value="#{item.tramite}" label="Tramite"></b:dataTableColumn>
+                                                <b:dataTableColumn value="#{item.strNameTramite}" label="Tramite"></b:dataTableColumn>
                                                 <b:dataTableColumn value="#{item.strRepuesta}" label="Retroalimentación"></b:dataTableColumn>
                                                 <b:dataTableColumn value="#{item.strFechaReservada} a las #{item.strHoraReservada}" label="Fecha y Hora"></b:dataTableColumn>
                                                 <b:dataTableColumn  value="#{item.strEstatus}" label="Estatus"></b:dataTableColumn>
@@ -57,7 +57,7 @@
                                                     <b:commandButton iconAwesome="trash-o"
                                                                       styleClass="btn btn-default"
                                                                       onclick="$('#modalCancelar').modal(); javascript:return false; "
-                                                                      actionListener="#{misictas.SetModalCancelar(item.tramite)}">
+                                                                      actionListener="#{misictas.SetModalCancelar(item.strNameTramite)}">
                                                     </b:commandButton>
                                                 </b:dataTableColumn>
                                             </b:dataTable>
