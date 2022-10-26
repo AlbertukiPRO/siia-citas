@@ -11,73 +11,113 @@
       <b:container fluid="true">
          <b:form>
              <b:panel title="Cita de #{viewcita.modelCita.strNombreUser}" largeScreen="8" collapsible="true">
-                 <b:container style="width: 60%; height:611px;background-image: url('/SIIA/resources/imagenes/citas/toviewcita.png');background-size: contain;background-repeat: no-repeat;">
-                     <b:row>
-                         <b:column mediumScreen="12" largeScreen="12" smallScreen="12"><span class="separador"></span></b:column>
-                     </b:row>
-                     <b:row style="margin-top:100px;margin-left: 10px; font-size:12px">
-                         <b:column smallScreen="12" mediumScreen="4" largeScreen="4" >
-                             <b:label value="Nombre del alumno: "></b:label>
-                         </b:column>
-                         <b:column smallScreen="12" mediumScreen="6" largeScreen="6">
-                             <h:outputText styleClass="title" value="#{viewcita.modelCita.strNombreUser}"></h:outputText>
-                         </b:column>
+                 <b:row>
+                     <h5><h:outputText style="color:#5E0723;font-weight: bold;margin-left: 50px;" value="Resumen cita"></h:outputText></h5>
+                     <br/>
+                     <br/>
+                     <b:column mediumScreen="7" largeScreen="7" smallScreen="12">
+                         <b:inputText readonly="true"
+                                      label="Matricula:"
+                                      labelStyle="width:100px;"
+                                      value="#{viewcita.modelCita.intMatricula}"
+                                      labelColMd="4">
+                             <f:facet name="prepend">
+                                 <b:iconAwesome name="tag"></b:iconAwesome>
+                             </f:facet>
+                         </b:inputText>
+                     </b:column>
+                     <b:column  mediumScreen="12" largeScreen="12"  smallScreen="12">
+                         <b:inputText readonly="true"
+                                      label="Nombre Usuario"
+                                      labelStyle="width:100px"
+                                      labelColMd="4"
+                                      value="#{viewcita.modelCita.strNombreUser}">
+                             <f:facet name="prepend">
+                                 <b:iconAwesome name="user"></b:iconAwesome>
+                             </f:facet>
+                         </b:inputText>
+                     </b:column>
 
-                         <span class="separador"></span>
-                         <b:row style="margin-top:15px;">
-                             <b:column smallScreen="4" mediumScreen="4" largeScreen="4">
-                                 <b:label value="Grado : "></b:label>
-                             </b:column>
-                             <b:column smallScreen="2" mediumScreen="2" largeScreen="2">
-                                 <h:outputText styleClass="title" value="#{viewcita.modelCita.strGrado}"></h:outputText>
-                             </b:column>
-                             <b:column smallScreen="4" mediumScreen="4" largeScreen="4">
-                                 <b:label value="Grupo : "></b:label>
-                             </b:column>
-                             <b:column smallScreen="2" mediumScreen="2" largeScreen="2">
-                                 <h:outputText styleClass="title" value="#{viewcita.modelCita.strGrupo}"></h:outputText>
-                             </b:column>
+                     <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
+                         <b:inputText readonly="true"
+                                      id="showarealabel"
+                                      label="Area:"
+                                      labelStyle="width:100px"
+                                      labelColMd="4"
+                                      value="#{viewcita.modelCita.strNameArea}">
+                             <f:facet name="prepend">
+                                 <b:iconAwesome name="bank"></b:iconAwesome>
+                             </f:facet>
+                         </b:inputText>
+                     </b:column>
 
-                         </b:row>
+                     <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
+                         <b:inputText readonly="true"
+                                      label="Tramite:"
+                                      id="tramitefield"
+                                      labelColMd="4"
+                                      labelStyle="width:100px"
+                                      value="#{viewcita.modelCita.strNameTramite}">
+                             <f:facet name="prepend">
+                                 <b:iconAwesome name="archive"></b:iconAwesome>
+                             </f:facet>
+                         </b:inputText>
+                     </b:column>
 
-                         <b:row style="margin-top:15px;">
-                             <b:column smallScreen="6" mediumScreen="6" largeScreen="6">
-                                 <b:label value="Area : "></b:label>
-                             </b:column>
-                             <b:column smallScreen="6" mediumScreen="6" largeScreen="6">
-                                 <h:outputText styleClass="title" value="#{viewcita.modelCita.strNameArea}"></h:outputText>
-                             </b:column>
-                         </b:row>
+                     <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
+                         <b:inputText readonly="true"
+                                      label="Fecha Cita:"
+                                      labelColMd="4"
+                                      id="fechacurrent"
+                                      labelStyle="width:100px"
+                                      value="#{viewcita.modelCita.strFechaReservada}">
+                             <f:facet name="prepend">
+                                 <b:iconAwesome name="calendar"></b:iconAwesome>
+                             </f:facet>
+                         </b:inputText>
+                     </b:column>
 
-
-                         <b:row style="margin-top:15px;">
-                             <b:column smallScreen="6" mediumScreen="6" largeScreen="6">
-                                 <b:label value="Tramite : "></b:label>
-                             </b:column>
-                             <b:column smallScreen="6" mediumScreen="6" largeScreen="6">
-                                 <h:outputText styleClass="title" value="#{viewcita.modelCita.strNameTramite}"></h:outputText>
-                             </b:column>
-
-                         </b:row>
-
-                         <b:row style="margin-top:15px;">
-                             <b:column smallScreen="4" mediumScreen="4" largeScreen="4">
-                                 <b:label value="Fecha : "></b:label>
-                             </b:column>
-                             <b:column smallScreen="2" mediumScreen="2" largeScreen="2">
-                                 <h:outputText styleClass="title" value="#{viewcita.modelCita.strFechaReservada}"></h:outputText>
-                             </b:column>
-                         </b:row>
+                     <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
+                         <b:inputText readonly="true"
+                                      id="combohoras"
+                                      label="Hora Cita:"
+                                      labelColMd="4"
+                                      labelStyle="width:100px"
+                                      value="#{viewcita.modelCita.strHoraReservada}">
+                             <f:facet name="prepend">
+                                 <b:iconAwesome name="clock-o"></b:iconAwesome>
+                             </f:facet>
+                         </b:inputText>
+                     </b:column>
+                 </b:row>
+                 <span class="separador"></span>
+                 <span class="separador"></span>
+                 <b:row>
+                     <b:formGroup>
+                         <b:inputTextarea value="#{viewcita.retroalimentacion}"
+                                          colLg="12" colMd="12" colSm="12"
+                                          label="Retroalimentacion "
+                         >
+                         </b:inputTextarea>
                          <b:row>
-                             <b:column smallScreen="4" mediumScreen="4" largeScreen="4">
-                                 <b:label value="Hora : "></b:label>
-                             </b:column>
-                             <b:column smallScreen="2" mediumScreen="2" largeScreen="2">
-                                 <h:outputText styleClass="title" value="#{viewcita.modelCita.strHoraReservada}"></h:outputText>
+                             <b:column mediumScreen="5" largeScreen="5" smallScreen="5"></b:column>
+                             <b:column mediumScreen="2" largeScreen="2" smallScreen="2">
+                                 <b:commandButton value="Enviar retroalimentacion" action="#{viewcita.sendRetro()}" icon="send-o" styleClass="btn btn-default"></b:commandButton>
                              </b:column>
                          </b:row>
-                     </b:row>
-                 </b:container>
+                     </b:formGroup>
+                 </b:row>
+                 <b:row>
+                    <b:column mediumScreen="2" smallScreen="6" largeScreen="2">
+                        <b:commandButton value="Cita completada" styleClass="btn btn-default" icon="check-square-o" />
+                    </b:column>
+                     <b:column mediumScreen="2" smallScreen="6" largeScreen="2">
+                         <b:commandButton value="Cancelar cita"  styleClass="btn btn-default"  icon="exclamation-triangle" />
+                     </b:column>
+                 </b:row>
+                 <span class="separador"></span>
+                 <span class="separador"></span>
+                 <span class="separador"></span>
                  <b:row>
                      <b:column mediumScreen="10" largeScreen="10" smallScreen="6"></b:column>
                      <b:column mediumScreen="2" largeScreen="2" smallScreen="6">

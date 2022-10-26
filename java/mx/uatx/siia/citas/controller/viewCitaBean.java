@@ -46,6 +46,7 @@ public class viewCitaBean implements Serializable {
     @ManagedProperty(value = "#{param.matricula}")
     private String matricula;
     private CitasTO modelCita;
+    private String retroalimentacion;
 
     @PostConstruct
     public void init(){
@@ -57,6 +58,10 @@ public class viewCitaBean implements Serializable {
 
     public void regresar(){
         vHelp.redireccionar("/vistas/administracionCitas/index.uat");
+    }
+
+    public void sendRetro(){
+        // TODO SAVE RETRO TO CITA.
     }
 
     public AreasBusiness getAreasBusiness() {
@@ -93,6 +98,14 @@ public class viewCitaBean implements Serializable {
 
     public CitasTO getModelCita() {
         return modelCita;
+    }
+
+    public String getRetroalimentacion() {
+        return retroalimentacion;
+    }
+
+    public void setRetroalimentacion(String retroalimentacion) {
+        this.retroalimentacion = retroalimentacion;
     }
 
     public void setModelCita(CitasTO modelCita) {
