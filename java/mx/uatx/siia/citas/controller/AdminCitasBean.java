@@ -267,6 +267,17 @@ public class AdminCitasBean implements Serializable {
                         fechalocal,
                         "Reporte global de citas",
                         MethodsGenerics.formatDate(strValueDateFieldA)+" al "+MethodsGenerics.formatDate(strValueDateFieldB)));
+            case "3":
+                nameFile = "ReporteCitas";
+                resultado = citaBusiness.GenerarReportePorEstatus(Long.parseLong(strIdArea), strCurrentEstatus, MethodsGenerics.formtDateDB(strValueDateFieldA), MethodsGenerics.formtDateDB(strValueDateFieldB));
+                colDat = new JRBeanCollectionDataSource((List<MisCitas>) resultado.getObjeto());
+                parameters.put("JRBeanCollectionData", colDat);
+                extraParams = new ArrayList<>();
+                extraParams.add(0, new GeneriReportFields("Departamento de Registro y control escolar",
+                        strLocalNameTramite,
+                        fechalocal,
+                        "Reporte citas por estatus "+strCurrentEstatus,
+                        MethodsGenerics.formatDate(strValueDateFieldA)+" al "+MethodsGenerics.formatDate(strValueDateFieldB)));
         }
         downloadPDF(nameFile, extraParams, parameters);
     }
