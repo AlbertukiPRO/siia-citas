@@ -102,16 +102,17 @@ public class MisCitasBean implements Serializable {
     }
 
     public void generarReporte(String idcita){
+        if(!idcita.isEmpty()){
+            ResultadoTO resultado = citaBusiness.obtenerCitaToReport(Integer.parseInt(idcita));
 
-        ResultadoTO resultado = citaBusiness.obtenerCitaToReport(Integer.parseInt(idcita));
-
-        if (resultado.isBlnValido()){
-            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.generarReporte.ok");
-            vHelp.pintarMensajes(msj, resultado);
-            FillReport((MisCitas) resultado.getObjeto());
-        }else{
-            resultado.agregarMensaje(SeveridadMensajeEnum.ERROR, "comun.msj.citas.generarReporte.error");
-            vHelp.pintarMensajes(msj, resultado);
+            if (resultado.isBlnValido()){
+                resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.generarReporte.ok");
+                vHelp.pintarMensajes(msj, resultado);
+                FillReport((MisCitas) resultado.getObjeto());
+            }else{
+                resultado.agregarMensaje(SeveridadMensajeEnum.ERROR, "comun.msj.citas.generarReporte.error");
+                vHelp.pintarMensajes(msj, resultado);
+            }
         }
     }
 

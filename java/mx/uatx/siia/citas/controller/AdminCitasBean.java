@@ -60,7 +60,7 @@ public class AdminCitasBean implements Serializable {
     private List<SelectItem> listTramites;
     private List<String> listDaysToCheck;
     private List<String> listDayswasRemoved;
-    private List<String> listEstatus;
+    private List<SelectItem> listEstatus;
     private List<Eventos> listEventos;
     private String mesActual;
     private String strDia;
@@ -150,24 +150,6 @@ public class AdminCitasBean implements Serializable {
             resultado.agregarMensaje(SeveridadMensajeEnum.ERROR, "comun.msj.citas.admin.savedataconfig.error");
             vHelp.pintarMensajes(msj,resultado);
         }
-
-//        HashMap<String, Object> datacollect = new HashMap<>();
-//
-//        datacollect.put("idarea", strIdArea);
-//        datacollect.put("horainicion", strHourServiceStar);
-//        datacollect.put("horafin", strHourServiceEnd);
-//        datacollect.put("duracion", strDuracionCita);
-//
-//        ResultadoTO resultado = citaBusiness.saveDataDB(datacollect, URLs.InsertData.getValor()+"?savesetting=true");
-//        Map<String, Object> response = (Map<String, Object>) resultado.getObjeto();
-//
-//        if (response.get("codefromservice").equals("1")){
-//            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.admin.savedataconfig.ok");
-//            vHelp.pintarMensajes(msj,resultado);
-//        }else{
-//            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.admin.savedataconfig.error");
-//            vHelp.pintarMensajes(msj,resultado);
-//        }
     }
 
     public void saveDataB() {
@@ -225,6 +207,32 @@ public class AdminCitasBean implements Serializable {
         return selectItems;
     }
 
+    public List<SelectItem> getListKindOfEstatus(){
+        List<SelectItem> selectItems = new ArrayList<>();
+        selectItems.add(0, new SelectItem(EstatusCitas.CitaAgendada.getValor(),EstatusCitas.CitaAgendada.getValor()));
+        selectItems.add(1, new SelectItem(EstatusCitas.CitaPospuesta.getValor(),EstatusCitas.CitaPospuesta.getValor()));
+        selectItems.add(2, new SelectItem(EstatusCitas.CitaCancelada.getValor(),EstatusCitas.CitaCancelada.getValor()));
+        selectItems.add(3, new SelectItem(EstatusCitas.CitaCaducada.getValor(),EstatusCitas.CitaCaducada.getValor()));
+        selectItems.add(4, new SelectItem(EstatusCitas.CitaCompleta.getValor(),EstatusCitas.CitaCompleta.getValor()));
+
+        return selectItems;
+    }
+
+    public void listerpostReporte(){
+        if (strkindTramite.equals("1")){
+            ResultadoTO res = tramitesBusiness.obtenerTramites(Integer.parseInt(strIdArea));
+            setListTramites((List<SelectItem>) res.getObjeto());
+            if (res.isBlnValido()){
+                hasDataTramites = true;
+            }
+        }else if (strkindTramite.equals("3")){
+            hasComboStatus = true;
+            listEstatus = getListKindOfEstatus();
+        }else{
+            hasDataTramites=false;
+            hasComboStatus =false;
+        }
+    }
     public void generarReporte(){
         ResultadoTO resultado;
         HashMap<String, Object> parameters = new HashMap<>();
@@ -268,21 +276,6 @@ public class AdminCitasBean implements Serializable {
         vHelp.llenarYObtenerBytesReporteJasperPDF(ruta, nameFile, lista, parameters);
     }
 
-
-    public void listerpostReporte(){
-        if (strkindTramite.equals("1")){
-            ResultadoTO res = tramitesBusiness.obtenerTramites(Integer.parseInt(strIdArea));
-            setListTramites((List<SelectItem>) res.getObjeto());
-            if (res.isBlnValido()){
-                hasDataTramites = true;
-            }
-        }else if (strkindTramite.equals("3")){
-            hasComboStatus = true;
-        }else{
-            hasDataTramites=false;
-            hasComboStatus =false;
-        }
-    }
 
     public void listenergetnameTramite(){
         for (SelectItem list : listTramites) {
@@ -532,11 +525,11 @@ public class AdminCitasBean implements Serializable {
         this.strCurrentEstatus = strCurrentEstatus;
     }
 
-    public List<String> getListEstatus() {
+    public List<SelectItem> getListEstatus() {
         return listEstatus;
     }
 
-    public void setListEstatus(List<String> listEstatus) {
+    public void setListEstatus(List<SelectItem> listEstatus) {
         this.listEstatus = listEstatus;
     }
 
