@@ -17,6 +17,7 @@ import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.reportes.GeneriReportFields;
 import mx.uatx.siia.serviciosUniversitarios.dto.CitasTO;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
+import mx.uatx.siia.serviciosUniversitarios.dto.TramitesTO;
 import mx.uatx.siia.serviciosUniversitarios.enums.SeveridadMensajeEnum;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.slf4j.Logger;
@@ -87,6 +88,12 @@ public class AdminCitasBean implements Serializable {
     private boolean hasDiastoDisable = false;
     private boolean switchMode = false;
     private String strIDH;
+
+    // FORM PARAMS to new Tramite
+
+    private String strNombreTramite;
+    private String strDescripcion;
+    private String strRequisitos;
 
     public AdminCitasBean(){
         strIDH = "30643";
@@ -340,7 +347,38 @@ public class AdminCitasBean implements Serializable {
         return new Gson().toJson(listEventos);
     }
 
+    public List<SelectItem> toListTramites(){
+        ResultadoTO res = tramitesBusiness.obtenerTramites(Integer.parseInt(strIdArea));
+        return (List<SelectItem>) res.getObjeto();
+    }
 
+    public void borrarTramite(String value){
+        System.out.println(value);
+    }
+
+    public void updateEventos(){
+        ResultadoTO resultadoTO = areasBusiness.obtenerEventos(strIdArea);
+        List<SIMSCITAS> localList = (List<SIMSCITAS>) resultadoTO.getObjeto();
+        List<CitasTO> citas = ObjectMapperUtils.mapAll(localList, CitasTO.class);
+
+        for (CitasTO misCitas : citas){
+            String[] params = new String[]{
+                    misCitas.getIntIdCita().toString(),
+                    misCitas.getLongHistorialAcademico().toString(),
+                    strIdArea,
+                    misCitas.getStrEstatus().equals(EstatusCitas.CitaAgendada.getValor()) ? "#3a87ad" : ( misCitas.getStrEstatus().equals(EstatusCitas.CitaCompleta.getValor()) ? "#2ecc71" : (misCitas.getStrEstatus().equals(EstatusCitas.CitaCancelada.getValor()) ? "#2c3e50" : ( misCitas.getStrEstatus().equals(EstatusCitas.CitaPospuesta.getValor()) ? "#8e44ad" : "#ff7f50" ) ) )
+            };
+            listEventos.add(new Eventos(
+                    "Cita de " + misCitas.getStrNombreUser() +" - "+ misCitas.getIntMatricula(),
+                    MethodsGenerics.getDateToFullCalendar(misCitas.getStrFechaReservada() + " " + misCitas.getStrHoraReservada()),
+                    params
+            ));
+        }
+    }
+
+    public void guardarTramite(){
+        ResultadoTO resultado = areasBusiness.guardarTramite(Long.parseLong(strIdArea), strNombreTramite, strDescripcion, strRequisitos);
+    }
 
     /**
      * @apiNote Metoddos Setter and Getters.
@@ -534,6 +572,30 @@ public class AdminCitasBean implements Serializable {
 
     public void setStrCurrentEstatus(String strCurrentEstatus) {
         this.strCurrentEstatus = strCurrentEstatus;
+    }
+
+    public String getStrNombreTramite() {
+        return strNombreTramite;
+    }
+
+    public void setStrNombreTramite(String strNombreTramite) {
+        this.strNombreTramite = strNombreTramite;
+    }
+
+    public String getStrDescripcion() {
+        return strDescripcion;
+    }
+
+    public void setStrDescripcion(String strDescripcion) {
+        this.strDescripcion = strDescripcion;
+    }
+
+    public String getStrRequisitos() {
+        return strRequisitos;
+    }
+
+    public void setStrRequisitos(String strRequisitos) {
+        this.strRequisitos = strRequisitos;
     }
 
     public List<SelectItem> getListEstatus() {
