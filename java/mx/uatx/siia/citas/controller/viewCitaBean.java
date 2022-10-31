@@ -54,6 +54,8 @@ public class viewCitaBean implements Serializable {
     private CitasTO modelCita;
     private String retroalimentacion;
 
+    private boolean blockUI = false;
+
     @PostConstruct
     public void init(){
         String[] params = new String[]{idarea,matricula,id};
@@ -62,6 +64,7 @@ public class viewCitaBean implements Serializable {
         modelCita = ObjectMapperUtils.map((SIMSCITAS) resultado.getObjeto(), CitasTO.class);
 
         retroalimentacion = modelCita.getStrRetroalimentacion();
+        blockUI = modelCita.getStrEstatus().equals(EstatusCitas.CitaCompleta.getValor()) || modelCita.getStrEstatus().equals(EstatusCitas.CitaCancelada.getValor()) ;
     }
 
     public void regresar(){
@@ -86,7 +89,9 @@ public class viewCitaBean implements Serializable {
 
     public void citaCompletada(){
         ResultadoTO resultado = citaBusiness.cambiarEstatus(modelCita.getIntIdCita(), EstatusCitas.CitaCompleta.getValor());
-        if (resultado.isBlnValido()){
+        ResultadoTO resultado2 = citaBusiness.liberarHorarios(modelCita.getStrFechaReservada(), modelCita.getStrHoraReservada());
+        // TODO Liberar horarios de las citas completadas.
+        if (resultado.isBlnValido() && resultado2.isBlnValido()){
             resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citass.estatus.change.exito");
             vHelp.pintarMensajes(msj, resultado);
         }else {
@@ -97,7 +102,8 @@ public class viewCitaBean implements Serializable {
 
     public void citaCancelar(){
         ResultadoTO resultado = citaBusiness.cambiarEstatus(modelCita.getIntIdCita(), EstatusCitas.CitaCancelada.getValor());
-        if (resultado.isBlnValido()){
+        ResultadoTO resultado2 = citaBusiness.liberarHorarios(modelCita.getStrFechaReservada(), modelCita.getStrHoraReservada());
+        if (resultado.isBlnValido() && resultado2.isBlnValido()){
             resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citass.estatus.change.exito");
             vHelp.pintarMensajes(msj, resultado);
         }else {
@@ -156,6 +162,14 @@ public class viewCitaBean implements Serializable {
 
     public void setRetroalimentacion(String retroalimentacion) {
         this.retroalimentacion = retroalimentacion;
+    }
+
+    public boolean isBlockUI() {
+        return blockUI;
+    }
+
+    public void setBlockUI(boolean blockUI) {
+        this.blockUI = blockUI;
     }
 
     public void setModelCita(CitasTO modelCita) {

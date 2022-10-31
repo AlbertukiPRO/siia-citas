@@ -378,6 +378,11 @@ public class AdminCitasBean implements Serializable {
 
     public void guardarTramite(){
         ResultadoTO resultado = areasBusiness.guardarTramite(Long.parseLong(strIdArea), strNombreTramite, strDescripcion, strRequisitos);
+        if(resultado.isBlnValido())
+            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.nuevotramite.ok");
+        else
+            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.nuevotramite.error");
+        vHelp.pintarMensajes(msj, resultado);
     }
 
     /**

@@ -90,7 +90,8 @@
                           <!-- Seccion Izquierda FORMULARIO -->
                           <b:row>
                              <b:formGroup>
-                                <!--               COMBO DE AREAS             -->
+                                <!--               COMBO DE AREAS
+                                                 update="@form:**:trami @form:**:showarealabel"-->
                                 <b:row>
                                    <b:selectOneMenu value="#{nuevacita.strCurrentArea}"
                                                     colMd="12" colLg="12" colSm="12"
@@ -99,7 +100,7 @@
                                                     requiredMessage="#{nuevacita.msj['comun.msj.citas.selectarearq']}"
                                                     labelColLg="12"
                                                     ajax="true"
-                                                    update="@form:**:trami @form:**:showarealabel"
+                                                    update="@form"
                                                     rendered="#{nuevacita.hasDataAreas}">
 
                                       <f:selectItem itemLabel="Seleccione una area" value="none" itemValue="none"/>
@@ -113,7 +114,7 @@
                                    </b:selectOneMenu>
                                 </b:row>
                              </b:formGroup>
-                             <b:formGroup id="trami" >
+                             <b:formGroup id="trami" rendered="#{nuevacita.hasDataTramites}">
                                 <!--               COMBO DE TRAMITES             -->
                                 <b:row>
                                    <b:selectOneMenu value="#{nuevacita.strCurrentTramite}"
@@ -216,8 +217,8 @@
                        <!-- Seperador -->
                        <b:column mediumScreen="1" largeScreen="1" smallScreen="12"></b:column>
                        <!-- Seccion Dereacha Datos de la cita -->
-                       <b:column mediumScreen="5" largeScreen="5" smallScreen="5" rendered="#{nuevacita.hasDataTramites}">
-                          <b:row id="panel" rendered="#{nuevacita.hasDataTramites}">
+                       <b:column mediumScreen="5" largeScreen="5" smallScreen="5" rendered="#{nuevacita.hasHorarios}">
+                          <b:row id="panel" rendered="#{nuevacita.hasHorarios}">
                              <h5><h:outputText style="color:#5E0723;font-weight: bold;" value="Resumen cita"></h:outputText></h5>
                              <br/>
                              <br/>
@@ -297,9 +298,11 @@
                              </b:column>
                           </b:row>
                           <span class="separador" />
+                          <span class="separador" />
+                          <span class="separador" />
                           <b:row>
                              <b:column smallScreen="12" mediumScreen="3" largeScreen="3">
-                                <b:container id="linkgo" rendered="#{nuevacita.hasHorarios}" style="margin-top:15px;width:300px">
+                                <b:container id="linkgo" rendered="#{nuevacita.hasHorarios}" style="margin-top:25px;width:300px">
                                    <h5><h:outputText value="Requisitos de tramite:" style="color:#5E0723;font-weight: bold;"></h:outputText></h5>
                                    <b:label severity="primary" style="font-size:10px;margin-top:10px" value="#{nuevacita.msj['comun.label.citas.requisitoslabel']}">
                                    </b:label>
@@ -315,7 +318,8 @@
                                 <b:container style="margin-top:15px;width:10px">
                                    <b:commandButton styleClass="btn btn-default"
                                                     value="Agendar cita"
-                                                    update="@form:**:growluno"
+                                                    disabled="#{nuevacita.citaAgendada}"
+                                                    update="@form:**:growluno @this"
                                                     actionListener="#{nuevacita.agendarCita(auth.sesion.idHistorialAcademico) }"
                                                     oncomplete="$('.btndownload').click();">
                                    </b:commandButton>

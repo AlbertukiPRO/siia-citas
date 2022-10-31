@@ -16,7 +16,12 @@
        </f:metadata>
       <b:container fluid="true">
          <b:form>
-             <b:panel title="Cita de #{viewcita.modelCita.strNombreUser}" largeScreen="8" collapsible="true">
+             <b:panel largeScreen="8" collapsible="true" contentDisabled="#{viewcita.blockUI}">
+                 <f:facet name="heading">
+                     <i class="fa fa-calendar-o" style="padding-right:20px" />
+                     <h:outputText value="Cita de #{viewcita.modelCita.strNombreUser} " />
+                     <b:badge style="margin-left:10px; background-color:#5cb85c" value="#{viewcita.modelCita.strEstatus}"  />
+                 </f:facet>
                  <b:row>
                      <h5><h:outputText style="color:#5E0723;font-weight: bold;margin-left: 50px;" value="Resumen cita"></h:outputText></h5>
                      <br/>
@@ -116,7 +121,7 @@
                              </f:facet>
                          </b:inputText>
                      </b:column>
-                     <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
+                     <b:column mediumScreen="12" largeScreen="12" smallScreen="12">
                          <b:inputText readonly="true"
                                       label="Programa Educativo:"
                                       labelColMd="4"
@@ -126,9 +131,15 @@
                              </f:facet>
                          </b:inputText>
                      </b:column>
+                     <b:column mediumScreen="12" largeScreen="12" smallScreen="12">
+                         <b:inputTextarea value="#{viewcita.modelCita.strDescripcionCita}"
+                                          readonly="true"
+                                          colLg="12" colMd="12" colSm="12"
+                                          label="Descripcion Cita:"></b:inputTextarea>
+                     </b:column>
                      <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
                          <b:inputText readonly="true"
-                                      label="Datos Generales:"
+                                      label="Grado y grupo:"
                                       labelColMd="4"
                                       value=" #{viewcita.modelCita.strGrado}° - #{viewcita.modelCita.strGrupo}">
                              <f:facet name="prepend">
@@ -177,17 +188,17 @@
                  <span class="separador"></span>
                  <span class="separador"></span>
                  <span class="separador"></span>
-                 <b:row>
-                     <b:column mediumScreen="10" largeScreen="10" smallScreen="6"></b:column>
-                     <b:column mediumScreen="2" largeScreen="2" smallScreen="6">
-                         <b:commandButton value="Regresar" styleClass="btn btn-default" action="#{viewcita.regresar()}">
-                             <f:param name="idarea" value="#{viewcita.idarea}"></f:param>
-                             <f:param name="idcita" value="#{viewcita.id}"></f:param>
-                             <f:param name="matricula" value="#{viewcita.matricula}"></f:param>
-                         </b:commandButton>
-                     </b:column>
-                 </b:row>
              </b:panel>
+             <b:row>
+                 <b:column mediumScreen="10" largeScreen="10" smallScreen="6"></b:column>
+                 <b:column mediumScreen="2" largeScreen="2" smallScreen="6">
+                     <b:commandButton value="Regresar" styleClass="btn btn-default" action="#{viewcita.regresar()}">
+                         <f:param name="idarea" value="#{viewcita.idarea}"></f:param>
+                         <f:param name="idcita" value="#{viewcita.id}"></f:param>
+                         <f:param name="matricula" value="#{viewcita.matricula}"></f:param>
+                     </b:commandButton>
+                 </b:column>
+             </b:row>
          </b:form>
       </b:container>
    </ui:define>

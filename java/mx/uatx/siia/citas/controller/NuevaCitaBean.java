@@ -103,10 +103,11 @@ public class NuevaCitaBean implements Serializable {
     public void listenerPostAreas(){
         ResultadoTO res = tramitesBusiness.obtenerTramites(Integer.parseInt(strCurrentArea));
         listTramites = (List<SelectItem>) res.getObjeto();
-
+        logger.info(strCurrentArea);
         listAreas.forEach(selectItem -> {
-            if ( selectItem.getValue().equals(strCurrentArea))
-                setStrLocalArea(selectItem.getLabel());
+            logger.info("Inside foreach =>" +selectItem.getValue());
+            if ( selectItem.getValue().toString().equals(strCurrentArea))
+                strLocalArea = selectItem.getLabel();
             else mostrarNotification(FacesMessage.SEVERITY_FATAL, "ERROR:", "No se pudo cargar el area correctamente");
         });
 
@@ -148,6 +149,7 @@ public class NuevaCitaBean implements Serializable {
 
         hasHorarios = true;
         hasCalendar = true;
+        strCurrentCalendar= null;
     }
 
 
@@ -174,6 +176,7 @@ public class NuevaCitaBean implements Serializable {
     public void generarPDF(){
         System.out.println("--- GENERANDO PDF ---");
         try {
+            // TODO OBTENER EL ID DE LA CITA.
             final String foliocita = "CIA7B";
             final String datePrint = MethodsGenerics.getCurrentDate();
 
@@ -290,14 +293,14 @@ public class NuevaCitaBean implements Serializable {
      */
     public String getLink(){
         String link = "";
-        Requisitos[] lista = Requisitos.values();
-
-        for (Requisitos requisitos : lista) {
-            String[] data = requisitos.getUrl();
-            if (strCurrentTramite != null) {
-                if (strCurrentTramite.equals(data[1])) {
-                    link = data[0];
-                }
+        for (SelectItem tramite : listTramites){
+            System.out.println(tramite.getDescription().split("/")[0]);
+            logger.info(tramite.getValue().toString());
+            if (tramite.getValue().toString().equals(strCurrentTramite)) {
+                if (tramite.getDescription().split("/")[0].equals("http") || tramite.getDescription().split("/")[0].equals("https") )
+                    link = tramite.getDescription();
+                else
+                    link = vHelp.obtenerRuta()+"/tramitesCita.uat?id="+tramite.getValue();
             }
         }
         return link;

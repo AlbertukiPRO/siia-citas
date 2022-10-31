@@ -13,7 +13,6 @@
                     <b:tabView activeIndex="0">
                         <b:tab title="Calendario">
                           <h:form>
-                              <b:poll interval="10000" update="@form:**:calendariocitas" actionListener="#{admin.updateEventos}">
                                   <b:fullCalendar lang="#{admin.strlang}"
                                                   id="calendariocitas"
                                                   events="#{admin.toJson()}"
@@ -25,7 +24,6 @@
                                             }"
                                                   weekends="false">
                                   </b:fullCalendar>
-                              </b:poll>
                           </h:form>
                         </b:tab>
                         <b:tab title="Reportes">
@@ -226,7 +224,7 @@
                                                 </b:column>
                                                 <b:column mediumScreen="1" smallScreen="1" largeScreen="1"></b:column>
                                                 <b:column mediumScreen="3" largeScreen="3" smallScreen="3">
-                                                    <b:commandButton value="Obtener" update="@form" action="#{admin.RenderDaysToCalendar()}"></b:commandButton>
+                                                    <b:commandButton value="Obtener" action="#{admin.RenderDaysToCalendar()}"></b:commandButton>
                                                 </b:column>
                                             </b:row>
                                             <span class="separador"></span>
@@ -236,7 +234,7 @@
                                                     <h:outputText styleClass="title text-center" style="font-size: 20px;" value="Fecha seleccionada: #{admin.strCurrentLocalDate}"></h:outputText>
                                                 </b:column>
                                                 <b:column mediumScreen="2" smallScreen="12" largeScreen="2">
-                                                    <b:commandButton value="Desactivar dia" update="@form" action="#{admin.disableDay()}" iconAwesome="lock"></b:commandButton>
+                                                    <b:commandButton value="Desactivar dia" action="#{admin.disableDay()}" iconAwesome="lock"></b:commandButton>
                                                 </b:column>
                                             </b:row>
                                             <b:row>
@@ -279,13 +277,18 @@
                                     <b:panel title="Tramites" collapsed="true">
                                         <span class="separador"></span>
                                         <h:outputText value="Administra los tramites del area."></h:outputText>
+                                        <span class="separador"></span>
+                                        <span class="separador"></span>
+                                        <span class="separador"></span>
+                                        <span class="separador"></span>
                                         <b:row>
-                                            <b:column largeScreen="10" smallScreen="10" mediumScreen="10">
+                                            <b:column largeScreen="2" mediumScreen="2" smallScreen="2"></b:column>
+                                            <b:column largeScreen="8" smallScreen="8" mediumScreen="8">
                                                 <h:outputText styleClass="title" value="Lista de Tramites"></h:outputText>
                                             </b:column>
                                             <b:column mediumScreen="2" largeScreen="2" smallScreen="2">
                                                 <b:commandButton  iconAwesome="plus"
-                                                                  onclick="$('#modaltramite').modal(); javascript:return false; "
+                                                                  onclick="$('#modalnuevotramite').modal(); javascript:return false; "
                                                                   value="agregar">
                                                 </b:commandButton>
                                             </b:column>
@@ -322,11 +325,12 @@
                 <h3>Formulario</h3>
                 <h:form>
                     <b:row>
-                        <b:column mediumScreen="7" largeScreen="7" smallScreen="12">
+                        <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
                             <b:inputText
                                          label="Nombre Tramite:"
-                                         labelStyle="width:100px;"
+                                         labelStyle="width:200px;"
                                          value="#{admin.strNombreTramite}"
+                                         mediumScreen="12" smallScreen="12" largeScreen="12"
                                          labelColMd="4">
                                 <f:facet name="prepend">
                                     <b:iconAwesome name="tag"></b:iconAwesome>
@@ -335,12 +339,13 @@
                         </b:column>
                     </b:row>
                     <b:row>
-                        <b:column mediumScreen="7" largeScreen="7" smallScreen="12">
+                        <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
                             <b:inputText
                                     label="Descripcion Tramite:"
-                                    labelStyle="width:100px;"
+                                    labelStyle="width:200px;"
+                                    mediumScreen="12" smallScreen="12" largeScreen="12"
                                     value="#{admin.strDescripcion}"
-                                    labelColMd="4">
+                                    labelColMd="12">
                                 <f:facet name="prepend">
                                     <b:iconAwesome name="list-alt"></b:iconAwesome>
                                 </f:facet>
@@ -348,30 +353,26 @@
                         </b:column>
                     </b:row>
                     <b:row>
-                        <b:column mediumScreen="7" largeScreen="7" smallScreen="12">
-                            <b:inputText
-                                    label="Requisitos tramite [url] *:"
-                                    labelStyle="width:100px;"
-                                    value="#{admin.strRequisitos}"
-                                    labelColMd="4">
-                                <f:facet name="prepend">
-                                    <b:iconAwesome name="graduation-cap"></b:iconAwesome>
-                                </f:facet>
-                            </b:inputText>
+                        <b:column mediumScreen="12" largeScreen="12" smallScreen="12">
+                            <b:inputTextarea value="#{admin.strRequisitos}"
+                                             colLg="12" colMd="12" colSm="12"
+                                             mediumScreen="12" smallScreen="12" largeScreen="12"
+                                             labelStyle="width:200px;"
+                                             label="Requisitos tramite: [url o texto] *:">
+                            </b:inputTextarea>
                         </b:column>
                     </b:row>
                     <b:row>
                         <b:column mediumScreen="10" largeScreen="10" smallScreen="6"></b:column>
                         <b:column mediumScreen="2" largeScreen="2" smallScreen="6">
-                            <b:commandButton value="Guardar" styleClass="btn btn-default" action="#{admin.guardarTramite()}">
-                            </b:commandButton>
+                            <b:commandButton value="Guardar" styleClass="btn btn-default" action="#{admin.guardarTramite()}"></b:commandButton>
                         </b:column>
                     </b:row>
                 </h:form>
             </b:well>
 
             <f:facet name="footer">
-                <b:button value="Lo tengo!" look="btn btn-default" dismiss="modal" />
+                <b:button value="Cerrar" look="btn btn-default" dismiss="modal" />
             </f:facet>
         </b:modal>
     </ui:define>
