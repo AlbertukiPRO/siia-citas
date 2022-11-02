@@ -15,7 +15,6 @@ import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -103,9 +102,7 @@ public class NuevaCitaBean implements Serializable {
     public void listenerPostAreas(){
         ResultadoTO res = tramitesBusiness.obtenerTramites(Integer.parseInt(strCurrentArea));
         listTramites = (List<SelectItem>) res.getObjeto();
-        logger.info(strCurrentArea);
         listAreas.forEach(selectItem -> {
-            logger.info("Inside foreach =>" +selectItem.getValue());
             if ( selectItem.getValue().toString().equals(strCurrentArea))
                 strLocalArea = selectItem.getLabel();
             else mostrarNotification(FacesMessage.SEVERITY_FATAL, "ERROR:", "No se pudo cargar el area correctamente");
@@ -152,17 +149,6 @@ public class NuevaCitaBean implements Serializable {
         strCurrentCalendar= null;
     }
 
-
-    /**
-     * @Listeners que reservar el horario temporalmente en la DB.
-     */
-    public void listenerPostHorario(){
-        System.out.println("--- Reservando hora => ["+strCurrentHora+"]");
-
-
-        // TODO Remenber check before instert Cita in DB to Validate the Schudele is available.
-    }
-
     /**
      * @apiNote Metodo para obtener las configuraciones del área y mantenerlas en una Lista.
      */
@@ -173,11 +159,11 @@ public class NuevaCitaBean implements Serializable {
         listaConfig = ObjectMapperUtils.map(listfromdb, ConfiguacionesDTO.class);
     }
 
-    public void generarPDF(){
+    public void generarPDF(String idhistorical){
         System.out.println("--- GENERANDO PDF ---");
-        try {
-            // TODO OBTENER EL ID DE LA CITA.
-            final String foliocita = "CIA7B";
+        ResultadoTO resultado = citaBusiness.obtenerIDfromCita(Long.parseLong(idhistorical));
+        if (resultado.isBlnValido()){
+            Integer foliocita = (Integer) resultado.getObjeto();
             final String datePrint = MethodsGenerics.getCurrentDate();
 
             ArrayList<FieldsNuevaCita> datos = new ArrayList<>();
@@ -185,11 +171,11 @@ public class NuevaCitaBean implements Serializable {
                     strLocalNombreUser,
                     MethodsGenerics.formatDate(strLocalFecha),
                     strLocalTramite,
-                    "Ingenieria en computación - FCBIyT",
+                    listDatosAlumno.get(3),
                     strLocalMatricula,
                     strCurrentHora,
                     strMotivoCita,
-                    foliocita,
+                    "CI"+foliocita,
                     getLink(),
                     datePrint
             ));
@@ -211,10 +197,10 @@ public class NuevaCitaBean implements Serializable {
             parameters.put("qrvalue", strLocalNombreUser+","+strLocalMatricula);
             vHelp.llenarYObtenerBytesReporteJasperPDF(rutaFiles, sourFileName, datos, parameters);
 
-        } catch (Exception e) {
-            mostrarNotification(FacesMessage.SEVERITY_WARN, "ERROR:", "no se pudo generar el pdf");
-            throw new RuntimeException("It's not possible to generate the pdf report.", e);
+        }else{
+            mostrarNotification(FacesMessage.SEVERITY_WARN, "ERROR:", "Ups! no pudimos obtener los datos intentalo mas tarde.");
         }
+
     }
 
     /**
@@ -275,7 +261,10 @@ public class NuevaCitaBean implements Serializable {
 
         if (resultadoH.isBlnValido()) {
             ListHorariosShow = listHorarios;
-            mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Fechas temporal reservada correctamente.");
+            if (ListHorariosShow.size() != 0)
+                mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Lista de horarios cargada encontrada");
+            else
+                mostrarNotification(FacesMessage.SEVERITY_WARN, "ALERT:", "Lo sentimos no tenemos horarios para este dia, intenta con otro");
         } else
             mostrarNotification(FacesMessage.SEVERITY_WARN, "WARN:", "No se pudo obtener los horarios para esta fecha intenta con otra");
     }
@@ -294,13 +283,11 @@ public class NuevaCitaBean implements Serializable {
     public String getLink(){
         String link = "";
         for (SelectItem tramite : listTramites){
-            System.out.println(tramite.getDescription().split("/")[0]);
-            logger.info(tramite.getValue().toString());
             if (tramite.getValue().toString().equals(strCurrentTramite)) {
                 if (tramite.getDescription().split("/")[0].equals("http") || tramite.getDescription().split("/")[0].equals("https") )
-                    link = tramite.getDescription();
-                else
                     link = vHelp.obtenerRuta()+"/tramitesCita.uat?id="+tramite.getValue();
+                else
+                    link = tramite.getDescription();
             }
         }
         return link;
@@ -314,38 +301,40 @@ public class NuevaCitaBean implements Serializable {
         ResultadoTO flag1 = citaBusiness.validarTramite(idhistorical, Integer.parseInt(strCurrentTramite));
         ResultadoTO flag2 = citaBusiness.validarHorario(MethodsGenerics.formatDate(strLocalFecha), strCurrentHora);
 
-        if ((boolean) flag1.getObjeto() &&  (boolean) flag2.getObjeto()){
-            String[] strindate = strLocalFecha.split(" ");
-            if (strindate[0].equals("Sat") || strindate[0].equals("Sun"))
-                mostrarNotification(FacesMessage.SEVERITY_WARN, "WARN:", "Lo sentimos los sabados y domingos no damos servicio intenta otro dia.");
-            else{
-                Map<String, Object> valores = new HashMap<>();
+        if (flag1.isBlnValido() && flag2.isBlnValido()){
+            if ((boolean) flag1.getObjeto() &&  (boolean) flag2.getObjeto()){
+                String[] strindate = strLocalFecha.split(" ");
+                if (strindate[0].equals("Sat") || strindate[0].equals("Sun"))
+                    mostrarNotification(FacesMessage.SEVERITY_WARN, "WARN:", "Lo sentimos los sabados y domingos no damos servicio intenta otro dia.");
+                else{
+                    Map<String, Object> valores = new HashMap<>();
 
-                valores.put("idhistorical", idhistorical);
-                valores.put("matricula",strLocalMatricula);
-                valores.put("idtramite",strCurrentTramite);
-                valores.put("idarea",strCurrentArea);
-                valores.put("descripcion",strMotivoCita);
-                valores.put("fecha",MethodsGenerics.formatDate(strLocalFecha));
-                valores.put("hora",strCurrentHora);
+                    valores.put("idhistorical", idhistorical);
+                    valores.put("matricula",strLocalMatricula);
+                    valores.put("idtramite",strCurrentTramite);
+                    valores.put("idarea",strCurrentArea);
+                    valores.put("descripcion",strMotivoCita);
+                    valores.put("fecha",MethodsGenerics.formatDate(strLocalFecha));
+                    valores.put("hora",strCurrentHora);
 
-                ResultadoTO resultadoTO = citaBusiness.guardarCita(valores);
-                String[] params1 = new String[]{ valores.get("fecha").toString(),valores.get("hora").toString(), "20181837"  };
-                String[] params2 = new String[]{ valores.get("idarea").toString(), "20181837" };
-                logger.info("--- CITAS RUN SAVE HORARIO ---");
-                ResultadoTO resultadoh1 = citaBusiness.reservarHorarios(params1, params2);
-                boolean flaghorarios = (boolean) resultadoh1.getObjeto();
+                    ResultadoTO resultadoTO = citaBusiness.guardarCita(valores);
+                    String[] params1 = new String[]{ valores.get("fecha").toString(),valores.get("hora").toString(), "20181837"  };
+                    String[] params2 = new String[]{ valores.get("idarea").toString(), "20181837" };
+                    logger.info("--- CITAS RUN SAVE HORARIO ---");
+                    ResultadoTO resultadoh1 = citaBusiness.reservarHorarios(params1, params2);
+                    boolean flaghorarios = (boolean) resultadoh1.getObjeto();
 
-                if (resultadoTO.getObjeto().equals(true) && flaghorarios){
-                    System.out.println("|------------------ WAS SUCCESFUL SAVE CITA => "+resultadoTO.getObjeto());
-                    isCitaAgendada = true;
-                    mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Tu cita se agendo correctamente, espera el comprobante");
-                }else   mostrarNotification(FacesMessage.SEVERITY_ERROR, "ERROR:", "No se pudo agendar tu cita");
+                    if (resultadoTO.getObjeto().equals(true) && flaghorarios){
+                        System.out.println("|------------------ WAS SUCCESFUL SAVE CITA => "+resultadoTO.getObjeto());
+                        isCitaAgendada = true;
+                        mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Tu cita se agendo correctamente, espera el comprobante");
+                    }else   mostrarNotification(FacesMessage.SEVERITY_ERROR, "ERROR:", "No se pudo agendar tu cita");
+                }
+            } else {
+                isForHidden = true;
+                mostrarNotification(FacesMessage.SEVERITY_WARN, "ALERT:", "Ups! Parece que ya tienes una cita con este tramite.");
             }
-        } else {
-            isForHidden = true;
-            mostrarNotification(FacesMessage.SEVERITY_FATAL, "ERROR:", " Ups! Parece que ya tienes una cita.");
-        }
+        } else mostrarNotification(FacesMessage.SEVERITY_ERROR, "ERROR:", "Tenemos problemas con el servidor, intentalo mas tarde");
     }
 
     /**
