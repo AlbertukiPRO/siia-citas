@@ -123,23 +123,28 @@ public class AdminCitasBean implements Serializable {
         ResultadoTO resultadoTO = areasBusiness.obtenerEventos(strIdArea);
         List<SIMSCITAS> localList = (List<SIMSCITAS>) resultadoTO.getObjeto();
 
-        if (!localList.isEmpty()){
-            listEventos = new ArrayList<>();
-            List<CitasTO> citas = ObjectMapperUtils.mapAll(localList, CitasTO.class);
+        if (resultadoTO.isBlnValido()){
+            if (!localList.isEmpty()){
+                listEventos = new ArrayList<>();
+                List<CitasTO> citas = ObjectMapperUtils.mapAll(localList, CitasTO.class);
 
-            for (CitasTO misCitas : citas){
-                String[] params = new String[]{
-                        misCitas.getIntIdCita().toString(),
-                        misCitas.getLongHistorialAcademico().toString(),
-                        strIdArea,
-                        misCitas.getStrEstatus().equals(EstatusCitas.CitaAgendada.getValor()) ? "#3a87ad" : ( misCitas.getStrEstatus().equals(EstatusCitas.CitaCompleta.getValor()) ? "#2ecc71" : (misCitas.getStrEstatus().equals(EstatusCitas.CitaCancelada.getValor()) ? "#2c3e50" : ( misCitas.getStrEstatus().equals(EstatusCitas.CitaPospuesta.getValor()) ? "#8e44ad" : "#ff7f50" ) ) )
-                };
-                listEventos.add(new Eventos(
-                        "Cita de " + misCitas.getStrNombreUser() +" - "+ misCitas.getIntMatricula(),
-                        MethodsGenerics.getDateToFullCalendar(misCitas.getStrFechaReservada() + " " + misCitas.getStrHoraReservada()),
-                        params
-                ));
+                for (CitasTO misCitas : citas){
+                    String[] params = new String[]{
+                            misCitas.getIntIdCita().toString(),
+                            misCitas.getLongHistorialAcademico().toString(),
+                            strIdArea,
+                            misCitas.getStrEstatus().equals(EstatusCitas.CitaAgendada.getValor()) ? "#3a87ad" : ( misCitas.getStrEstatus().equals(EstatusCitas.CitaCompleta.getValor()) ? "#2ecc71" : (misCitas.getStrEstatus().equals(EstatusCitas.CitaCancelada.getValor()) ? "#2c3e50" : ( misCitas.getStrEstatus().equals(EstatusCitas.CitaPospuesta.getValor()) ? "#8e44ad" : "#ff7f50" ) ) )
+                    };
+                    listEventos.add(new Eventos(
+                            "Cita de " + misCitas.getStrNombreUser() +" - "+ misCitas.getIntMatricula(),
+                            MethodsGenerics.getDateToFullCalendar(misCitas.getStrFechaReservada() + " " + misCitas.getStrHoraReservada()),
+                            params
+                    ));
+                }
             }
+        }else{
+            resultado.agregarMensaje(SeveridadMensajeEnum.ERROR, "comun.msj.admin.eventos.error");
+            vHelp.pintarMensajes(msj, resultado);
         }
         strlang = "es";
     }
@@ -159,7 +164,7 @@ public class AdminCitasBean implements Serializable {
         }
     }
 
-    public void saveDataB() {
+    public void saveDataB() { // todo method to change
         logger.info("---- Guardar datos de la lista de dias desactivados --- ");
 
         HashMap<String, Object> datacollect = new HashMap<>();
@@ -190,7 +195,7 @@ public class AdminCitasBean implements Serializable {
     public void disableDay(){
         String[] params = new String[]{strIdArea, strCurrentLocalDate, "20082306"};
         ResultadoTO resultado = areasBusiness.desactivarDia(params);
-        if ((boolean) resultado.getObjeto()) {
+        if (resultado.isBlnValido()) {
             resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msg.citas.daysave.ok");
             vHelp.pintarMensajes(msj, resultado);
             wasDayDisable = false;
@@ -274,6 +279,7 @@ public class AdminCitasBean implements Serializable {
                         fechalocal,
                         "Reporte global de citas",
                         MethodsGenerics.formatDate(strValueDateFieldA)+" al "+MethodsGenerics.formatDate(strValueDateFieldB)));
+                break;
             case "3":
                 nameFile = "ReporteCitas";
                 resultado = citaBusiness.GenerarReportePorEstatus(Long.parseLong(strIdArea), strCurrentEstatus, MethodsGenerics.formtDateDB(strValueDateFieldA), MethodsGenerics.formtDateDB(strValueDateFieldB));
@@ -285,15 +291,33 @@ public class AdminCitasBean implements Serializable {
                         fechalocal,
                         "Reporte citas por estatus "+strCurrentEstatus,
                         MethodsGenerics.formatDate(strValueDateFieldA)+" al "+MethodsGenerics.formatDate(strValueDateFieldB)));
+                break;
         }
         downloadPDF(nameFile, extraParams, parameters);
     }
 
     public void downloadPDF(String nameFile, List<?> lista, HashMap<String, Object> parameters ){
         String ruta = "resources/reportes/citas";
-        vHelp.llenarYObtenerBytesReporteJasperPDF(ruta, nameFile, lista, parameters);
+        ResultadoTO resultado = new ResultadoTO(true);
+        resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.admin.reporte.ok");
+        vHelp.pintarMensajes(msj, resultado);
+        try {
+            vHelp.llenarYObtenerBytesReporteJasperPDF(ruta, nameFile, lista, parameters);
+        }catch (Exception e){
+            resultado.agregarMensaje(SeveridadMensajeEnum.ERROR, "comun.msj.citas.admin.reporte.error");
+            vHelp.pintarMensajes(msj, resultado);
+        }
     }
 
+    private String obtenerImgToReport(Integer idarea){
+        // TODO BORRAR ESTO Y PONER EL ENCABEZADO 3 src/main/webapp/resources/imagenes/encabezadoReporte3.png como img dinamic
+        String rutaimg = vHelp.obtenerRuta();
+        switch (idarea){
+            case 1:
+                rutaimg += "/resources/imagenes/";
+        }
+        return rutaimg;
+    }
 
     public void listenergetnameTramite(){
         for (SelectItem list : listTramites) {
@@ -304,33 +328,44 @@ public class AdminCitasBean implements Serializable {
 
     public void RenderDaysToCalendar(){
         logger.info("---- Render days");
-        listDayswasRemoved = new ArrayList<>();
+
+        //RENDER OF DAYS ABLES TO DISABLE
         ResultadoTO resultado = citaBusiness.getHoursOfCalendarDisable(Long.parseLong(strIdArea), MethodsGenerics.formatDate(strCalendarValue));
-        List<String> fromDBhorarios = (List<String>) resultado.getObjeto();
+        if (resultado.isBlnValido()){
+            List<String> fromDBhorarios = (List<String>) resultado.getObjeto();
 
-        strCurrentLocalDate = MethodsGenerics.formatDate(strCalendarValue);
+            strCurrentLocalDate = MethodsGenerics.formatDate(strCalendarValue);
 
-        listDaysToCheck = MethodsGenerics.generarHorarios(
-                Integer.parseInt(strHourServiceStar.replace(':', '0'))/1000,
-                Integer.parseInt(strHourServiceEnd.replace(':','0'))/1000,
-                Integer.parseInt(strDuracionCita),
-                fromDBhorarios
-        );
-        wasDayDisable=true;
-        hasDiastoDisable=true;
+            listDaysToCheck = MethodsGenerics.generarHorarios(
+                    Integer.parseInt(strHourServiceStar.replace(':', '0'))/1000,
+                    Integer.parseInt(strHourServiceEnd.replace(':','0'))/1000,
+                    Integer.parseInt(strDuracionCita),
+                    fromDBhorarios
+            );
+            wasDayDisable=true;
+            hasDiastoDisable=true;
+        }else {
+            resultado.agregarMensaje(SeveridadMensajeEnum.ALERTA, "comun.msj.citas.admin.horarios.error");
+            vHelp.pintarMensajes(msj, resultado);
+        }
+
+        // RENDER LIST OF DAYS RESERVED
+        listDayswasRemoved = (List<String>) resultado.getObjeto();
     }
 
-    public void deletefromlistdays(String strCalendarValue){
-        logger.info("to delete:"+strCalendarValue);
-        listDayswasRemoved.add(strCalendarValue);
-        boolean ope = listDaysToCheck.remove(strCalendarValue);
-        ResultadoTO resultado = new ResultadoTO();
-        if (ope) {
+    public void deletefromlistdays(String hora){
+        logger.info("to delete:"+hora);
+        String[] params1 = new String[]{strCurrentLocalDate, hora, "20181837"};
+        String[] params2 = new String[]{strIdArea, "20181837"};
+        ResultadoTO resultado = citaBusiness.reservarHorarios(params1, params2);
+        if (resultado.isBlnValido()) {
+            listDayswasRemoved.add(hora);
+            listDaysToCheck.remove(hora);
             resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.fechas.ok");
             hasUpdateListHorarios = true;
         }
         else
-            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.fechas.loaderror");
+            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.admin.fechas.error");
 
         vHelp.pintarMensajes(msj, resultado);
     }

@@ -194,11 +194,6 @@
 
                                       <f:selectItem itemLabel="Seleccione su horario" value="none" itemValue="none"></f:selectItem>
                                       <f:selectItems value="#{nuevacita.returnHorariosList()}"></f:selectItems>
-
-                                      <f:ajax
-                                              event="change"
-                                              listener="#{nuevacita.listenerPostHorario()}">
-                                      </f:ajax>
                                    </b:selectOneMenu>
                                 </b:formGroup>
                              </b:row>
@@ -326,7 +321,7 @@
                                    <b:commandButton styleClass="btn btn-default btndownload"
                                                     style="visibility:hidden;"
                                                     value="Imprimir Reporte"
-                                                    action="#{nuevacita.generarPDF()}">
+                                                    action="#{nuevacita.generarPDF(auth.sesion.idHistorialAcademico)}">
                                    </b:commandButton>
                                 </b:container>
                              </b:column>
