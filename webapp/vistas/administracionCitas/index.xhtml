@@ -98,7 +98,25 @@
                                                 </b:selectOneMenu>
                                             </b:row>
                                         </b:formGroup>
-                                        <b:formGroup>
+
+                                        <b:formGroup rendered="#{admin.hasComboMes}">
+                                            <b:row>
+                                                <b:selectOneMenu value="#{admin.strCurrentMes}"
+                                                                 colMd="12" colLg="12" colSm="12"
+                                                                 id="selectMes"
+                                                                 labelStyle="text-aling:left;"
+                                                                 label="Seleccione el mes de criterio"
+                                                                 labelColLg="12"
+                                                                 ajax="true"
+                                                                 required="true"
+                                                                 update="@form"
+                                                >
+                                                    <f:selectItem itemLabel="Seleccione un mes" value="none" itemValue="none"/>
+                                                    <f:selectItems value="#{admin.listMeses}"/>
+                                                </b:selectOneMenu>
+                                            </b:row>
+                                        </b:formGroup>
+                                        <b:formGroup rendered="#{admin.isrequired}">
                                             <b:container>
                                                 <h:outputLabel value="Ingrese un rago de fechas: "></h:outputLabel>
                                             </b:container>
@@ -106,7 +124,7 @@
                                                 <b:dateTimePicker value="#{admin.strValueDateFieldA}"
                                                               showTime="false"
                                                               labelColMd="12" labelColLg="12"
-                                                              label="Limite de fecha A: " required="true"
+                                                              label="Limite de fecha A: " required="#{admin.isrequired}"
                                                               mediumScreen="8" labelMediumScreen="12" largeScreen="10" smallScreen="12">
                                                 </b:dateTimePicker>
                                             </b:row>
@@ -114,7 +132,7 @@
                                                 <b:dateTimePicker value="#{admin.strValueDateFieldB}"
                                                               showTime="false"
                                                               labelColMd="12" labelColLg="12"
-                                                              label="Limite de fecha B: " required="true"
+                                                              label="Limite de fecha B: " required="#{admin.isrequired}"
                                                               mediumScreen="8" labelMediumScreen="12" largeScreen="10" smallScreen="12">
                                                 </b:dateTimePicker>
                                             </b:row>
@@ -137,16 +155,15 @@
                                     <b:panel title="Configura el area" collapsed="true">
                                         <b:column mediumScreen="12" smallScreen="12" largeScreen="12">
                                             <b:container style="padding:25px;">
-                                                <h:outputText styleClass="title" style="font-size: 20px;" value="Configura el area para ajustar el servico de citas."></h:outputText>
+                                                <h:outputText styleClass="title" style="font-size: 15px;" value="Configuración de los horarios de atencion de citas."></h:outputText>
                                             </b:container>
                                             <span class="separador"></span>
-                                            <b:row>
-                                                <h:outputText styleClass="title" value="Horarios de atención"></h:outputText>
-                                            </b:row>
                                             <b:formGroup>
                                                 <b:row>
                                                     <b:column mediumScreen="4" largeScreen="4" smallScreen="12">
-                                                        <b:inputText value="#{admin.strHourServiceStar}" placeholder="8:00">
+                                                        <b:inputText value="#{admin.strHourServiceStar}" placeholder="8:00"
+                                                                     update="@form:**:btnsaveconfiga"
+                                                                     tooltip="Hora de inicio del servico de las citas - formato 24:00">
                                                             <f:facet name="prepend">
                                                                 <h:outputText value="Inicio:"></h:outputText>
                                                                 <b:iconAwesome name="fa-clock-o"></b:iconAwesome>
@@ -158,7 +175,8 @@
                                                     </b:column>
                                                     <span class="separador"></span>
                                                     <b:column mediumScreen="4" largeScreen="4" smallScreen="12">
-                                                        <b:inputText value="#{admin.strHourServiceEnd}" placeholder="13:00">
+                                                        <b:inputText value="#{admin.strHourServiceEnd}" update="@form:**:btnsaveconfiga" placeholder="13:00"
+                                                                     tooltip="Hora de fin del servico de las citas - formato 24:00">
                                                             <f:facet name="prepend">
                                                                 <h:outputText value="Cierre:"></h:outputText>
                                                                 <b:iconAwesome name="fa-clock-o"></b:iconAwesome>
@@ -170,9 +188,11 @@
                                                     </b:column>
                                                     <span class="separador"></span>
                                                     <b:column mediumScreen="4" largeScreen="4" smallScreen="12">
-                                                        <b:inputText value="#{admin.strDuracionCita}" placeholder="20 min">
+                                                        <b:inputText value="#{admin.strDuracionCita}" placeholder="20 min"
+                                                                     update="@form:**:btnsaveconfiga"
+                                                                     tooltip="Tiempo aproximado del servicio de citas en minutos.">
                                                             <f:facet name="prepend">
-                                                                <h:outputText value="Duración Cita:"></h:outputText>
+                                                                <h:outputText value="Duración:"></h:outputText>
                                                                 <b:iconAwesome name="fa-clock-o"></b:iconAwesome>
                                                             </f:facet>
                                                             <f:facet name="append">
@@ -187,9 +207,8 @@
                                             <span class="separador"></span>
                                             <b:formGroup>
                                                 <b:row>
-                                                    <b:column mediumScreen="6" largeScreen="6" smallScreen="12"></b:column>
                                                     <b:column mediumScreen="6" largeScreen="6" smallScreen="12">
-                                                        <b:commandButton action="#{admin.saveDataA()}" value="Guardar configuración"></b:commandButton>
+                                                        <b:commandButton action="#{admin.saveDataA()}" id="btnsaveconfiga" disabled="#{admin.validButtonSaveConfig()}" value="Guardar configuración"></b:commandButton>
                                                     </b:column>
                                                 </b:row>
                                             </b:formGroup>
@@ -202,9 +221,9 @@
                                 <b:row>
                                     <b:panel title="Fechas de servicio" collapsed="true">
                                         <b:formGroup>
-                                            <b:row>
-                                                <h:outputText styleClass="title" value="Agrega fechas inhabiles de servicios"></h:outputText>
-                                            </b:row>
+                                            <b:container style="padding:25px;">
+                                                <h:outputText styleClass="title" style="font-size: 15px;" value="Configure las fechas y horas de servicio por ejemplo desahiblite el dia o reserve horas las cuales no seran mostradas a los usuarios."></h:outputText>
+                                            </b:container>
                                             <span class="separador"></span>
                                             <span class="separador"></span>
                                             <b:row>
@@ -231,14 +250,18 @@
                                             <span class="separador"></span>
                                             <b:row rendered="#{admin.hasDiastoDisable}">
                                                 <b:column mediumScreen="10" smallScreen="12" largeScreen="10">
-                                                    <h:outputText styleClass="title text-center" style="font-size: 20px;" value="Fecha seleccionada: #{admin.strCurrentLocalDate}"></h:outputText>
+                                                    <h:outputText styleClass="title text-center" style="font-size: 20px;margin: 15px" value="Fecha seleccionada: #{admin.strCurrentLocalDate}"></h:outputText>
                                                 </b:column>
                                                 <b:column mediumScreen="2" smallScreen="12" largeScreen="2">
-                                                    <b:commandButton value="Desactivar dia" action="#{admin.disableDay()}" iconAwesome="lock"></b:commandButton>
+                                                    <b:commandButton value="Desactivar dia" tooltip="" action="#{admin.disableDay()}" iconAwesome="lock"></b:commandButton>
                                                 </b:column>
                                             </b:row>
-                                            <b:row>
-                                                <b:column mediumScreen="5" largeScreen="5" smallScreen="5" rendered="#{admin.wasDayDisable}">
+                                            <b:row rendered="#{admin.wasDayDisable}">
+                                                <b:column smallScreen="1" mediumScreen="1" largeScreen="12"></b:column>
+                                                <b:column mediumScreen="5" largeScreen="5" smallScreen="5" >
+                                                    <span class="separador"></span>
+                                                    <b:badge value="Horarios disponibles para los usuarios" style="margin:15px;background-color:#5cb85c"></b:badge>
+                                                    <span class="separador"></span>
                                                     <ui:repeat value="#{admin.listDaysToCheck}" var="daycalendar">
                                                         <b:column smallScreen="12" largeScreen="12" mediumScreen="12">
                                                             <b:iconAwesome name="fa-clock-o"><h:outputText style="margin-left: 15px;margin-right: 15px" styleClass="secondary-text" value="#{daycalendar}"></h:outputText></b:iconAwesome>
@@ -249,47 +272,41 @@
                                                 <b:column smallScreen="1" mediumScreen="1" largeScreen="1">
                                                     <b:row><b:iconAwesome name="fa-angle-double-right"></b:iconAwesome></b:row>
                                                     <b:row><b:iconAwesome name="fa-angle-double-right"></b:iconAwesome></b:row>
+                                                    <b:row><b:iconAwesome name="fa-angle-double-right"></b:iconAwesome></b:row>
+                                                    <b:row><b:iconAwesome name="fa-angle-double-right"></b:iconAwesome></b:row>
+                                                    <b:row><b:iconAwesome name="fa-angle-double-right"></b:iconAwesome></b:row>
+                                                    <b:row><b:iconAwesome name="fa-angle-double-right"></b:iconAwesome></b:row>
                                                 </b:column>
                                                 <b:column mediumScreen="5" largeScreen="5" smallScreen="5">
+                                                    <span class="separador"></span>
+                                                    <b:badge value="Horarios no disponibles para los usuarios" style="margin:15px;color:white;background-color:#34495e"></b:badge>
+                                                    <span class="separador"></span>
                                                     <ui:repeat value="#{admin.listDayswasRemoved}" var="dayremove">
                                                         <b:column smallScreen="12" largeScreen="12" mediumScreen="12">
-                                                            <b:iconAwesome name="fa-clock-o"><h:outputText style="margin-left: 15px;margin-right: 15px" styleClass="secondary-text" value="#{dayremove}"></h:outputText></b:iconAwesome>
-                                                            <b:commandButton icon="eraser" update="@form" tooltip="Regrese este horario de atencion para el dia seleccionado" action="#{admin.rollbackday(dayremove)}"></b:commandButton>
+                                                            <b:iconAwesome name="clock-o"><h:outputText style="margin-left: 15px;margin-right: 15px" styleClass="secondary-text" value=" #{dayremove}"></h:outputText></b:iconAwesome>
+                                                            <b:commandButton icon="arrow-left" update="@form" tooltip="Regrese este horario de atencion para el dia seleccionado" action="#{admin.rollbackday(dayremove)}"></b:commandButton>
                                                         </b:column>
                                                     </ui:repeat>
                                                 </b:column>
                                             </b:row>
                                             <span class="separador"></span>
-                                            <br/>
-                                            <b:row>
-                                                <b:column mediumScreen="8" largeScreen="8" smallScreen="12">
-                                                    <b:commandButton
-                                                            value="Guardar cambios"
-                                                            action="#{admin.saveDataB()}"
-                                                            tooltip="Guarda los horarios para la fecha seleccionada actual">
-                                                    </b:commandButton>
-                                                </b:column>
-                                            </b:row>
                                         </b:formGroup>
                                     </b:panel>
                                 </b:row>
                                 <b:row>
                                     <b:panel title="Tramites" collapsed="true">
-                                        <span class="separador"></span>
-                                        <h:outputText value="Administra los tramites del area."></h:outputText>
-                                        <span class="separador"></span>
-                                        <span class="separador"></span>
-                                        <span class="separador"></span>
-                                        <span class="separador"></span>
+                                        <b:container style="padding:25px;">
+                                            <h:outputText styleClass="title" style="font-size: 15px;" value="Agregue o elimine tramites dependiendo en base a sus area o departamento"></h:outputText>
+                                        </b:container>
                                         <b:row>
-                                            <b:column largeScreen="2" mediumScreen="2" smallScreen="2"></b:column>
+                                            <b:column largeScreen="2" mediumScreen="2" smallScreen="12"></b:column>
                                             <b:column largeScreen="8" smallScreen="8" mediumScreen="8">
                                                 <h:outputText styleClass="title" value="Lista de Tramites"></h:outputText>
                                             </b:column>
                                             <b:column mediumScreen="2" largeScreen="2" smallScreen="2">
                                                 <b:commandButton  iconAwesome="plus"
                                                                   onclick="$('#modalnuevotramite').modal(); javascript:return false; "
-                                                                  value="agregar">
+                                                                  value="Agregar">
                                                 </b:commandButton>
                                             </b:column>
                                         </b:row>
@@ -301,7 +318,7 @@
                                                    <b:container>
                                                        <b:row>
                                                            <b:column mediumScreen="6" largeScreen="6" smallScreen="10">
-                                                               <h:outputText value="#{tramite.getLabel()}"></h:outputText>
+                                                               <b:iconAwesome name="fa-plug"><h:outputText value="#{tramite.getLabel()}" style="margin-top:15px;margin-bottom: 15px;"></h:outputText></b:iconAwesome>
                                                            </b:column>
                                                            <b:column mediumScreen="6" largeScreen="6" smallScreen="2">
                                                                <b:commandButton iconAwesome="trash-o" action="#{admin.borrarTramite(tramite.getValue())}"></b:commandButton>

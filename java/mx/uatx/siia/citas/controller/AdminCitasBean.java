@@ -11,13 +11,11 @@ import mx.uatx.siia.citas.citasBusiness.MethodsGenerics;
 import mx.uatx.siia.citas.citasBusiness.ObjectMapperUtils;
 import mx.uatx.siia.citas.dto.ConfiguacionesDTO;
 import mx.uatx.siia.citas.enums.EstatusCitas;
-import mx.uatx.siia.citas.enums.URLs;
 import mx.uatx.siia.citas.models.Eventos;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.reportes.GeneriReportFields;
 import mx.uatx.siia.serviciosUniversitarios.dto.CitasTO;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
-import mx.uatx.siia.serviciosUniversitarios.dto.TramitesTO;
 import mx.uatx.siia.serviciosUniversitarios.enums.SeveridadMensajeEnum;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.slf4j.Logger;
@@ -55,7 +53,7 @@ public class AdminCitasBean implements Serializable {
 
     private final VistasHelper vHelp = new VistasHelper();
 
-    private List<String> listMeses;
+    private List<SelectItem> listMeses;
     private List<String> listDias;
     private List<MisCitas> listCitas;
     private List<SelectItem> listTramites;
@@ -63,6 +61,8 @@ public class AdminCitasBean implements Serializable {
     private List<String> listDayswasRemoved;
     private List<SelectItem> listEstatus;
     private List<Eventos> listEventos;
+
+    private ConfiguacionesDTO configuacionesDTOS;
     private String mesActual;
     private String strDia;
     private String strIdArea;
@@ -78,15 +78,18 @@ public class AdminCitasBean implements Serializable {
     private String strDuracionCita;
     private String strValueDateFieldA;
     private String strValueDateFieldB;
+    private String strCurrentMes;
     private final String strUser;
     private String strlang;
 
     private boolean hasDataTramites = false;
     private boolean hasComboStatus = false;
+    private boolean hasComboMes = false;
     private boolean hasUpdateListHorarios = false;
     private boolean wasDayDisable = true;
     private boolean hasDiastoDisable = false;
     private boolean switchMode = false;
+    private boolean isrequired = true;
     private String strIDH;
 
     // FORM PARAMS to new Tramite
@@ -95,26 +98,26 @@ public class AdminCitasBean implements Serializable {
     private String strDescripcion;
     private String strRequisitos;
 
-    public AdminCitasBean(){
+    public AdminCitasBean() {
         strIDH = "30643";
         strIdArea = "65";
         strUser = "20082306"; // TODO cambiar por las datos del usuario.
     }
 
-    public void getDaysDisable(){
+    public void getDaysDisable() {
         logger.info("----- Generando Fechas no abiles");
         ResultadoTO resultado = areasBusiness.obtenerDiasInhabiles(strIdArea);
-        strDateDisablesCalendar = MethodsGenerics.formattingStringFechasCalendar( (List<String>) resultado.getObjeto());
+        strDateDisablesCalendar = MethodsGenerics.formattingStringFechasCalendar((List<String>) resultado.getObjeto());
     }
 
     @PostConstruct
-    public void innit(){
+    public void innit() {
         getDaysDisable();
-        logger.info("Getting Setting from Area [idArea] =>"+strIdArea);
+        logger.info("Getting Setting from Area [idArea] =>" + strIdArea);
         ResultadoTO resultado = areasBusiness.obtenerConfiguracionArea(strIdArea);
         SiPaAreasConfiguraciones dataConfig = (SiPaAreasConfiguraciones) resultado.getObjeto();
 
-        ConfiguacionesDTO configuacionesDTOS = ObjectMapperUtils.map(dataConfig, ConfiguacionesDTO.class);
+        configuacionesDTOS = ObjectMapperUtils.map(dataConfig, ConfiguacionesDTO.class);
 
         strDuracionCita = configuacionesDTOS.getDuracionCitas();
         strHourServiceEnd = configuacionesDTOS.getHoraServicioFin();
@@ -123,76 +126,48 @@ public class AdminCitasBean implements Serializable {
         ResultadoTO resultadoTO = areasBusiness.obtenerEventos(strIdArea);
         List<SIMSCITAS> localList = (List<SIMSCITAS>) resultadoTO.getObjeto();
 
-        if (resultadoTO.isBlnValido()){
-            if (!localList.isEmpty()){
+        if (resultadoTO.isBlnValido()) {
+            if (!localList.isEmpty()) {
                 listEventos = new ArrayList<>();
                 List<CitasTO> citas = ObjectMapperUtils.mapAll(localList, CitasTO.class);
 
-                for (CitasTO misCitas : citas){
+                for (CitasTO misCitas : citas) {
                     String[] params = new String[]{
                             misCitas.getIntIdCita().toString(),
                             misCitas.getLongHistorialAcademico().toString(),
                             strIdArea,
-                            misCitas.getStrEstatus().equals(EstatusCitas.CitaAgendada.getValor()) ? "#3a87ad" : ( misCitas.getStrEstatus().equals(EstatusCitas.CitaCompleta.getValor()) ? "#2ecc71" : (misCitas.getStrEstatus().equals(EstatusCitas.CitaCancelada.getValor()) ? "#2c3e50" : ( misCitas.getStrEstatus().equals(EstatusCitas.CitaPospuesta.getValor()) ? "#8e44ad" : "#ff7f50" ) ) )
+                            misCitas.getStrEstatus().equals(EstatusCitas.CitaAgendada.getValor()) ? "#3a87ad" : (misCitas.getStrEstatus().equals(EstatusCitas.CitaCompleta.getValor()) ? "#2ecc71" : (misCitas.getStrEstatus().equals(EstatusCitas.CitaCancelada.getValor()) ? "#2c3e50" : (misCitas.getStrEstatus().equals(EstatusCitas.CitaPospuesta.getValor()) ? "#8e44ad" : "#ff7f50")))
                     };
                     listEventos.add(new Eventos(
-                            "Cita de " + misCitas.getStrNombreUser() +" - "+ misCitas.getIntMatricula(),
+                            "Cita de " + misCitas.getStrNombreUser() + " - " + misCitas.getIntMatricula(),
                             MethodsGenerics.getDateToFullCalendar(misCitas.getStrFechaReservada() + " " + misCitas.getStrHoraReservada()),
                             params
                     ));
                 }
             }
-        }else{
+        } else {
             resultado.agregarMensaje(SeveridadMensajeEnum.ERROR, "comun.msj.admin.eventos.error");
             vHelp.pintarMensajes(msj, resultado);
         }
         strlang = "es";
     }
 
-    public void saveDataA(){
+    public void saveDataA() {
         logger.info("--- Guardando datos de la configuracion ---");
 
-        String[] params =new String[]{strHourServiceStar, strHourServiceEnd, strDuracionCita};
+        String[] params = new String[]{strHourServiceStar, strHourServiceEnd, strDuracionCita};
         ResultadoTO resultado = areasBusiness.guardarConfiguracionesArea(Long.parseLong(strIdArea), params);
 
-        if (resultado.isBlnValido()){
+        if (resultado.isBlnValido()) {
             resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.admin.savedataconfig.ok");
-            vHelp.pintarMensajes(msj,resultado);
-        }else{
+            vHelp.pintarMensajes(msj, resultado);
+        } else {
             resultado.agregarMensaje(SeveridadMensajeEnum.ERROR, "comun.msj.citas.admin.savedataconfig.error");
-            vHelp.pintarMensajes(msj,resultado);
+            vHelp.pintarMensajes(msj, resultado);
         }
     }
 
-    public void saveDataB() { // todo method to change
-        logger.info("---- Guardar datos de la lista de dias desactivados --- ");
-
-        HashMap<String, Object> datacollect = new HashMap<>();
-        datacollect.put("lista", listDayswasRemoved);
-        datacollect.put("idarea", strIdArea);
-        datacollect.put("fecha", strCurrentLocalDate);
-        datacollect.put("user", strUser);
-
-       if (hasUpdateListHorarios){
-           ResultadoTO resultado = citaBusiness.saveDataDB(datacollect, URLs.InsertData.getValor()+"?savedays=true");
-           Map<String, Object> response = (Map<String, Object>) resultado.getObjeto();
-
-           if (response.get("codefromservice").equals("1")){
-               resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.admin.savedataconfig.ok");
-               vHelp.pintarMensajes(msj, resultado);
-           }else{
-               resultado.agregarMensaje(SeveridadMensajeEnum.ERROR, "comun.msj.citas.admin.savedataconfig.error");
-               vHelp.pintarMensajes(msj, resultado);
-           }
-       }else{
-           ResultadoTO resultado = new ResultadoTO();
-           resultado.agregarMensaje(SeveridadMensajeEnum.ALERTA,"comun.info.citasadmin.listhorariosnoupdate");
-           vHelp.pintarMensajes(msj, resultado);
-       }
-    }
-
-
-    public void disableDay(){
+    public void disableDay() {
         String[] params = new String[]{strIdArea, strCurrentLocalDate, "20082306"};
         ResultadoTO resultado = areasBusiness.desactivarDia(params);
         if (resultado.isBlnValido()) {
@@ -206,46 +181,67 @@ public class AdminCitasBean implements Serializable {
     }
 
     /**
-     * @apiNote Metodo temporal para tipos de reportes
      * @return List<SelectItems>
+     * @apiNote Metodo temporal para tipos de reportes
      */
 
-    public List<SelectItem> getListKindReportes(){
+    public List<SelectItem> getListKindReportes() {
         List<SelectItem> selectItems = new ArrayList<>();
         selectItems.add(0, new SelectItem("1", "Reporte por tipo de tramite"));
         selectItems.add(1, new SelectItem("2", "Reporte global de cita"));
         selectItems.add(2, new SelectItem("3", "Reporte por estatus"));
+        selectItems.add(3, new SelectItem("4", "Reporte por mes"));
 
         return selectItems;
     }
 
-    public List<SelectItem> getListKindOfEstatus(){
+    public List<SelectItem> getListKindOfEstatus() {
         List<SelectItem> selectItems = new ArrayList<>();
-        selectItems.add(0, new SelectItem(EstatusCitas.CitaAgendada.getValor(),EstatusCitas.CitaAgendada.getValor()));
-        selectItems.add(1, new SelectItem(EstatusCitas.CitaPospuesta.getValor(),EstatusCitas.CitaPospuesta.getValor()));
-        selectItems.add(2, new SelectItem(EstatusCitas.CitaCancelada.getValor(),EstatusCitas.CitaCancelada.getValor()));
-        selectItems.add(3, new SelectItem(EstatusCitas.CitaCaducada.getValor(),EstatusCitas.CitaCaducada.getValor()));
-        selectItems.add(4, new SelectItem(EstatusCitas.CitaCompleta.getValor(),EstatusCitas.CitaCompleta.getValor()));
+        selectItems.add(0, new SelectItem(EstatusCitas.CitaAgendada.getValor(), EstatusCitas.CitaAgendada.getValor()));
+        selectItems.add(1, new SelectItem(EstatusCitas.CitaPospuesta.getValor(), EstatusCitas.CitaPospuesta.getValor()));
+        selectItems.add(2, new SelectItem(EstatusCitas.CitaCancelada.getValor(), EstatusCitas.CitaCancelada.getValor()));
+        selectItems.add(3, new SelectItem(EstatusCitas.CitaCaducada.getValor(), EstatusCitas.CitaCaducada.getValor()));
+        selectItems.add(4, new SelectItem(EstatusCitas.CitaCompleta.getValor(), EstatusCitas.CitaCompleta.getValor()));
 
         return selectItems;
     }
 
-    public void listerpostReporte(){
-        if (strkindTramite.equals("1")){
-            ResultadoTO res = tramitesBusiness.obtenerTramites(Integer.parseInt(strIdArea));
-            setListTramites((List<SelectItem>) res.getObjeto());
-            if (res.isBlnValido()){
-                hasDataTramites = true;
-            }
-        }else if (strkindTramite.equals("3")){
-            hasComboStatus = true;
-            listEstatus = getListKindOfEstatus();
-        }else{
-            hasDataTramites=false;
-            hasComboStatus =false;
+    public void listerpostReporte() {
+        switch (strkindTramite) {
+            case "1":
+                ResultadoTO res = tramitesBusiness.obtenerTramites(Integer.parseInt(strIdArea));
+                setListTramites((List<SelectItem>) res.getObjeto());
+                if (res.isBlnValido()) {
+                    hasDataTramites = true;
+                }
+                isrequired = true;
+                hasComboMes = false;
+                hasComboStatus = false;
+                break;
+            case "3":
+                hasComboStatus = true;
+                isrequired = true;
+                hasComboMes = false;
+                hasDataTramites = false;
+                listEstatus = getListKindOfEstatus();
+                break;
+            case "4":
+                hasComboMes = true;
+                hasComboStatus = false;
+                hasDataTramites = false;
+                listMeses = MethodsGenerics.Meses();
+                isrequired = false;
+                break;
+            default:
+                hasDataTramites = false;
+                hasComboStatus = false;
+                hasComboMes = false;
+                isrequired = true;
+                break;
         }
     }
-    public void generarReporte(){
+
+    public void generarReporte() {
         ResultadoTO resultado;
         HashMap<String, Object> parameters = new HashMap<>();
         List<GeneriReportFields> extraParams = null;
@@ -254,7 +250,7 @@ public class AdminCitasBean implements Serializable {
         String fechalocal = MethodsGenerics.getCurrentDate();
         String nameFile = null;
 
-        switch (strkindTramite){
+        switch (strkindTramite) {
             case "1":
                 resultado = citaBusiness.GenerarReportePorTipoTramite(Long.parseLong(strCurrentTramite), Long.parseLong(strIdArea), MethodsGenerics.formtDateDB(strValueDateFieldA), MethodsGenerics.formtDateDB(strValueDateFieldB));
                 colDat = new JRBeanCollectionDataSource((List<MisCitas>) resultado.getObjeto());
@@ -266,7 +262,7 @@ public class AdminCitasBean implements Serializable {
                         strLocalNameTramite,
                         fechalocal,
                         "Reporte por tipo de tramite",
-                        MethodsGenerics.formatDate(strValueDateFieldA)+" al "+MethodsGenerics.formatDate(strValueDateFieldB)));
+                        MethodsGenerics.formatDate(strValueDateFieldA) + " al " + MethodsGenerics.formatDate(strValueDateFieldB)));
                 break;
             case "2":
                 nameFile = "ReporteCitas";
@@ -278,7 +274,7 @@ public class AdminCitasBean implements Serializable {
                         strLocalNameTramite,
                         fechalocal,
                         "Reporte global de citas",
-                        MethodsGenerics.formatDate(strValueDateFieldA)+" al "+MethodsGenerics.formatDate(strValueDateFieldB)));
+                        MethodsGenerics.formatDate(strValueDateFieldA) + " al " + MethodsGenerics.formatDate(strValueDateFieldB)));
                 break;
             case "3":
                 nameFile = "ReporteCitas";
@@ -289,62 +285,86 @@ public class AdminCitasBean implements Serializable {
                 extraParams.add(0, new GeneriReportFields("Departamento de Registro y control escolar",
                         strLocalNameTramite,
                         fechalocal,
-                        "Reporte citas por estatus "+strCurrentEstatus,
-                        MethodsGenerics.formatDate(strValueDateFieldA)+" al "+MethodsGenerics.formatDate(strValueDateFieldB)));
+                        "Reporte citas por estatus " + strCurrentEstatus,
+                        MethodsGenerics.formatDate(strValueDateFieldA) + " al " + MethodsGenerics.formatDate(strValueDateFieldB)));
+                break;
+            case "4":
+                nameFile = "ReporteCitas";
+                String year = "/"+MethodsGenerics.getCurrentDate().split("/")[2];
+                String[] partDate = strCurrentMes.split(",");
+                String mestoSend = partDate[0]+year+","+partDate[1]+year;
+                logger.info("DATE TO SEND QUERy => "+mestoSend);
+
+                String strMes = "";
+                for (SelectItem selectItem : listMeses){
+                    if (selectItem.getValue().equals(strCurrentMes)) {
+                        strMes = selectItem.getLabel();
+                    }
+                }
+
+                resultado = citaBusiness.GenerarReportePorMes(Long.parseLong(strIdArea), mestoSend);
+                colDat = new JRBeanCollectionDataSource((List<MisCitas>) resultado.getObjeto());
+                parameters.put("JRBeanCollectionData", colDat);
+                extraParams = new ArrayList<>();
+                extraParams.add(0, new GeneriReportFields("Departamento de Registro y control escolar",
+                        strLocalNameTramite,
+                        fechalocal,
+                        "Reporte de citas por mes ",
+                        ""+strMes));
                 break;
         }
         downloadPDF(nameFile, extraParams, parameters);
     }
 
-    public void downloadPDF(String nameFile, List<?> lista, HashMap<String, Object> parameters ){
+    public void downloadPDF(String nameFile, List<?> lista, HashMap<String, Object> parameters) {
         String ruta = "resources/reportes/citas";
         ResultadoTO resultado = new ResultadoTO(true);
         resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.admin.reporte.ok");
         vHelp.pintarMensajes(msj, resultado);
         try {
             vHelp.llenarYObtenerBytesReporteJasperPDF(ruta, nameFile, lista, parameters);
-        }catch (Exception e){
+        } catch (Exception e) {
             resultado.agregarMensaje(SeveridadMensajeEnum.ERROR, "comun.msj.citas.admin.reporte.error");
             vHelp.pintarMensajes(msj, resultado);
         }
     }
 
-    private String obtenerImgToReport(Integer idarea){
+    private String obtenerImgToReport(Integer idarea) {
         // TODO BORRAR ESTO Y PONER EL ENCABEZADO 3 src/main/webapp/resources/imagenes/encabezadoReporte3.png como img dinamic
         String rutaimg = vHelp.obtenerRuta();
-        switch (idarea){
+        switch (idarea) {
             case 1:
                 rutaimg += "/resources/imagenes/";
         }
         return rutaimg;
     }
 
-    public void listenergetnameTramite(){
+    public void listenergetnameTramite() {
         for (SelectItem list : listTramites) {
             if (list.getValue() == strkindTramite)
                 strLocalNameTramite = list.getLabel();
         }
     }
 
-    public void RenderDaysToCalendar(){
+    public void RenderDaysToCalendar() {
         logger.info("---- Render days");
 
         //RENDER OF DAYS ABLES TO DISABLE
         ResultadoTO resultado = citaBusiness.getHoursOfCalendarDisable(Long.parseLong(strIdArea), MethodsGenerics.formatDate(strCalendarValue));
-        if (resultado.isBlnValido()){
+        if (resultado.isBlnValido()) {
             List<String> fromDBhorarios = (List<String>) resultado.getObjeto();
 
             strCurrentLocalDate = MethodsGenerics.formatDate(strCalendarValue);
 
             listDaysToCheck = MethodsGenerics.generarHorarios(
-                    Integer.parseInt(strHourServiceStar.replace(':', '0'))/1000,
-                    Integer.parseInt(strHourServiceEnd.replace(':','0'))/1000,
+                    Integer.parseInt(strHourServiceStar.replace(':', '0')) / 1000,
+                    Integer.parseInt(strHourServiceEnd.replace(':', '0')) / 1000,
                     Integer.parseInt(strDuracionCita),
                     fromDBhorarios
             );
-            wasDayDisable=true;
-            hasDiastoDisable=true;
-        }else {
+            wasDayDisable = true;
+            hasDiastoDisable = true;
+        } else {
             resultado.agregarMensaje(SeveridadMensajeEnum.ALERTA, "comun.msj.citas.admin.horarios.error");
             vHelp.pintarMensajes(msj, resultado);
         }
@@ -353,8 +373,8 @@ public class AdminCitasBean implements Serializable {
         listDayswasRemoved = (List<String>) resultado.getObjeto();
     }
 
-    public void deletefromlistdays(String hora){
-        logger.info("to delete:"+hora);
+    public void deletefromlistdays(String hora) {
+        logger.info("to delete:" + hora);
         String[] params1 = new String[]{strCurrentLocalDate, hora, "20181837"};
         String[] params2 = new String[]{strIdArea, "20181837"};
         ResultadoTO resultado = citaBusiness.reservarHorarios(params1, params2);
@@ -363,61 +383,71 @@ public class AdminCitasBean implements Serializable {
             listDaysToCheck.remove(hora);
             resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.fechas.ok");
             hasUpdateListHorarios = true;
-        }
-        else
+            vHelp.pintarMensajes(msj, resultado);
+        } else {
             resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.admin.fechas.error");
+            vHelp.pintarMensajes(msj, resultado);
+        }
 
-        vHelp.pintarMensajes(msj, resultado);
+
     }
 
-    public void rollbackday(String dayremove)
-    {
-        ResultadoTO resultado = new ResultadoTO();
-        listDaysToCheck.add(dayremove);
-        resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.fechas.ok");
-        listDayswasRemoved.remove(dayremove);
+    public void rollbackday(String dayremove) {
+        ResultadoTO resultado = citaBusiness.liberarHorarios(strCurrentLocalDate, dayremove);
+        if (resultado.isBlnValido()) {
+            listDaysToCheck.add(dayremove);
+            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.fechas.ok");
+            listDayswasRemoved.remove(dayremove);
+        } else {
+            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.admin.fechas.error");
+            vHelp.pintarMensajes(msj, resultado);
+        }
     }
 
-    public String toJson(){
+    public String toJson() {
         return new Gson().toJson(listEventos);
     }
 
-    public List<SelectItem> toListTramites(){
+    public List<SelectItem> toListTramites() {
         ResultadoTO res = tramitesBusiness.obtenerTramites(Integer.parseInt(strIdArea));
         return (List<SelectItem>) res.getObjeto();
     }
 
-    public void borrarTramite(String value){
+    public void borrarTramite(String value) {
         System.out.println(value);
     }
 
-    public void updateEventos(){
+    public void updateEventos() {
         ResultadoTO resultadoTO = areasBusiness.obtenerEventos(strIdArea);
         List<SIMSCITAS> localList = (List<SIMSCITAS>) resultadoTO.getObjeto();
         List<CitasTO> citas = ObjectMapperUtils.mapAll(localList, CitasTO.class);
 
-        for (CitasTO misCitas : citas){
+        for (CitasTO misCitas : citas) {
             String[] params = new String[]{
                     misCitas.getIntIdCita().toString(),
                     misCitas.getLongHistorialAcademico().toString(),
                     strIdArea,
-                    misCitas.getStrEstatus().equals(EstatusCitas.CitaAgendada.getValor()) ? "#3a87ad" : ( misCitas.getStrEstatus().equals(EstatusCitas.CitaCompleta.getValor()) ? "#2ecc71" : (misCitas.getStrEstatus().equals(EstatusCitas.CitaCancelada.getValor()) ? "#2c3e50" : ( misCitas.getStrEstatus().equals(EstatusCitas.CitaPospuesta.getValor()) ? "#8e44ad" : "#ff7f50" ) ) )
+                    misCitas.getStrEstatus().equals(EstatusCitas.CitaAgendada.getValor()) ? "#3a87ad" : (misCitas.getStrEstatus().equals(EstatusCitas.CitaCompleta.getValor()) ? "#2ecc71" : (misCitas.getStrEstatus().equals(EstatusCitas.CitaCancelada.getValor()) ? "#2c3e50" : (misCitas.getStrEstatus().equals(EstatusCitas.CitaPospuesta.getValor()) ? "#8e44ad" : "#ff7f50")))
             };
             listEventos.add(new Eventos(
-                    "Cita de " + misCitas.getStrNombreUser() +" - "+ misCitas.getIntMatricula(),
+                    "Cita de " + misCitas.getStrNombreUser() + " - " + misCitas.getIntMatricula(),
                     MethodsGenerics.getDateToFullCalendar(misCitas.getStrFechaReservada() + " " + misCitas.getStrHoraReservada()),
                     params
             ));
         }
     }
 
-    public void guardarTramite(){
+    public void guardarTramite() {
         ResultadoTO resultado = areasBusiness.guardarTramite(Long.parseLong(strIdArea), strNombreTramite, strDescripcion, strRequisitos);
-        if(resultado.isBlnValido())
+        if (resultado.isBlnValido())
             resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.nuevotramite.ok");
         else
             resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.nuevotramite.error");
         vHelp.pintarMensajes(msj, resultado);
+    }
+
+    public boolean validButtonSaveConfig(){
+        return !configuacionesDTOS.getDuracionCitas().equals(strDuracionCita) || !configuacionesDTOS.getHoraServicioFin().equals(strHourServiceEnd) || !configuacionesDTOS.getHoraServicioInicio().equals(strHourServiceStar);
     }
 
     /**
@@ -513,7 +543,7 @@ public class AdminCitasBean implements Serializable {
     public Logger getLogger() {
         return logger;
     }
-    public List<String> getListMeses() {
+    public List<SelectItem> getListMeses() {
         return listMeses;
     }
     public String getMesActual() {
@@ -548,7 +578,7 @@ public class AdminCitasBean implements Serializable {
     public void setStrHourServiceEnd(String strHourServiceEnd) {
         this.strHourServiceEnd = strHourServiceEnd;
     }
-    public void setListMeses(List<String> listMeses) {
+    public void setListMeses(List<SelectItem> listMeses) {
         this.listMeses = listMeses;
     }
     public ResourceBundle getMsj() {
@@ -644,6 +674,38 @@ public class AdminCitasBean implements Serializable {
 
     public void setListEstatus(List<SelectItem> listEstatus) {
         this.listEstatus = listEstatus;
+    }
+
+    public ConfiguacionesDTO getConfiguacionesDTOS() {
+        return configuacionesDTOS;
+    }
+
+    public void setConfiguacionesDTOS(ConfiguacionesDTO configuacionesDTOS) {
+        this.configuacionesDTOS = configuacionesDTOS;
+    }
+
+    public boolean isHasComboMes() {
+        return hasComboMes;
+    }
+
+    public void setHasComboMes(boolean hasComboMes) {
+        this.hasComboMes = hasComboMes;
+    }
+
+    public String getStrCurrentMes() {
+        return strCurrentMes;
+    }
+
+    public void setStrCurrentMes(String strCurrentMes) {
+        this.strCurrentMes = strCurrentMes;
+    }
+
+    public boolean isIsrequired() {
+        return isrequired;
+    }
+
+    public void setIsrequired(boolean isrequired) {
+        this.isrequired = isrequired;
     }
 
     public void setStrIDH(String strIDH) {
