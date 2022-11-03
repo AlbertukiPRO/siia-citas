@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:b="http://bootsfaces.net/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="/layouts/template.xhtml">
+   <ui:define name="content">
+
+      <b:container fluid="true">
+
+         <b:row>
+            <b:column span="2"></b:column>
+            <b:column span="8">
+               <b:row>
+                  <h:form>
+                     <b:column span="8">
+                        <b:panel title="#{msj['comun.panel.iniciar.sesion']}"
+                                 collapsible="false">
+                           <b:row dir="rtl">
+                              <b:column span="6" dir="rtl">
+
+                              </b:column>
+                              <b:column span="5">
+
+                              </b:column>
+                              <b:column span="1">
+                                 <b:commandButton type="button" icon="question-sign"
+                                                  update="@none" oncomplete="$('.modalAyuda').modal();">
+                                 </b:commandButton>
+
+                              </b:column>
+                           </b:row>
+                           <b:row>
+                              <b:column span="12">
+                                 <b:selectOneMenu value="#{adminlogin.strCurrentAreaId}"
+                                                  colMd="12" colLg="12" colSm="12"
+                                                  id="selectArea"
+                                                  label="Seleccione su área o departamento"
+                                                  labelColLg="12"
+                                                  ajax="true"
+                                                  update="@form">
+
+                                    <f:selectItem itemLabel="Seleccione" value="none" itemValue="none"></f:selectItem>
+                                    <f:selectItems value="#{adminlogin.getListAreas()}"></f:selectItems>
+
+                                    <f:ajax
+                                            event="change"
+                                            listener="#{adminlogin.listerpostReporte}">
+                                    </f:ajax>
+                                 </b:selectOneMenu>
+                              </b:column>
+                              <b:column span="12">
+                                 <b:inputText placeholder="#{msj['comun.ph.usuario']}"
+                                              rendered="true"
+                                              label="#{msj['comun.label.usuario']}" required="true"
+                                              requiredMessage="#{msj['comun.reqm.usuario']}"
+                                              name="j_username" onkeydown="#{msj['comun.kp.teclaedit']}"
+                                              onkeypress="#{msj['comun.kp.usuario']}"
+                                              value="#{adminlogin.strUsuario}" />
+                                 <b:messages for="@previous" redisplay="true" recursive="true" />
+                              </b:column>
+
+
+                           </b:row>
+
+                           <b:row dir="rtl">
+
+                              <b:column span="6" />
+                              <b:column span="6">
+                                 <b:commandButton
+                                         value="#{msj['comun.accion.iniciar.sesion']}"
+                                         rendered="true"
+                                         tooltip="#{msj['comun.accion.iniciar.sesion.tooltip']}"
+                                         action="#{adminlogin.login()}" />
+
+                              </b:column>
+                           </b:row>
+                        </b:panel>
+                     </b:column>
+                  </h:form>
+               </b:row>
+            </b:column>
+            <b:column span="2"></b:column>
+         </b:row>
+
+      </b:container>
+
+   </ui:define>
+</ui:composition>

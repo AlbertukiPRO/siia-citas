@@ -65,6 +65,9 @@ public class AdminCitasBean implements Serializable {
     private ConfiguacionesDTO configuacionesDTOS;
     private String mesActual;
     private String strDia;
+    private int type = 1;
+    private int numCitas = 0;
+    @ManagedProperty(value = "#{adminlogin.strCurrentAreaId}")
     private String strIdArea;
     private String strkindTramite;
     private String strLocalNameTramite;
@@ -90,24 +93,27 @@ public class AdminCitasBean implements Serializable {
     private boolean hasDiastoDisable = false;
     private boolean switchMode = false;
     private boolean isrequired = true;
-    private String strIDH;
 
-    // FORM PARAMS to new Tramite
+    private boolean disablebtnConfig = true;
 
     private String strNombreTramite;
     private String strDescripcion;
     private String strRequisitos;
 
     public AdminCitasBean() {
-        strIDH = "30643";
-        strIdArea = "65";
-        strUser = "20082306"; // TODO cambiar por las datos del usuario.
+        //30643
+        strUser = "20082306";
     }
 
     public void getDaysDisable() {
         logger.info("----- Generando Fechas no abiles");
         ResultadoTO resultado = areasBusiness.obtenerDiasInhabiles(strIdArea);
-        strDateDisablesCalendar = MethodsGenerics.formattingStringFechasCalendar((List<String>) resultado.getObjeto());
+        if (resultado.isBlnValido())
+            strDateDisablesCalendar = MethodsGenerics.formattingStringFechasCalendar((List<String>) resultado.getObjeto());
+        else {
+            resultado.agregarMensaje(SeveridadMensajeEnum.ERROR, "comun.msg.citas.areas.config.error");
+            vHelp.pintarMensajes(msj, resultado);
+        }
     }
 
     @PostConstruct
@@ -115,9 +121,18 @@ public class AdminCitasBean implements Serializable {
         getDaysDisable();
         logger.info("Getting Setting from Area [idArea] =>" + strIdArea);
         ResultadoTO resultado = areasBusiness.obtenerConfiguracionArea(strIdArea);
-        SiPaAreasConfiguraciones dataConfig = (SiPaAreasConfiguraciones) resultado.getObjeto();
+        if (resultado.isBlnValido()){
+            SiPaAreasConfiguraciones dataConfig = (SiPaAreasConfiguraciones) resultado.getObjeto();
 
-        configuacionesDTOS = ObjectMapperUtils.map(dataConfig, ConfiguacionesDTO.class);
+            configuacionesDTOS = ObjectMapperUtils.map(dataConfig, ConfiguacionesDTO.class);
+        } else {
+            configuacionesDTOS = new ConfiguacionesDTO();
+            configuacionesDTOS.setDuracionCitas("30");
+            configuacionesDTOS.setHoraServicioInicio("08:00");
+            configuacionesDTOS.setHoraServicioFin("14:00");
+            vHelp.pintarMensajes(msj, resultado);
+            type = 2;
+        }
 
         strDuracionCita = configuacionesDTOS.getDuracionCitas();
         strHourServiceEnd = configuacionesDTOS.getHoraServicioFin();
@@ -130,7 +145,7 @@ public class AdminCitasBean implements Serializable {
             if (!localList.isEmpty()) {
                 listEventos = new ArrayList<>();
                 List<CitasTO> citas = ObjectMapperUtils.mapAll(localList, CitasTO.class);
-
+                numCitas = citas.size();
                 for (CitasTO misCitas : citas) {
                     String[] params = new String[]{
                             misCitas.getIntIdCita().toString(),
@@ -156,7 +171,7 @@ public class AdminCitasBean implements Serializable {
         logger.info("--- Guardando datos de la configuracion ---");
 
         String[] params = new String[]{strHourServiceStar, strHourServiceEnd, strDuracionCita};
-        ResultadoTO resultado = areasBusiness.guardarConfiguracionesArea(Long.parseLong(strIdArea), params);
+        ResultadoTO resultado = areasBusiness.guardarConfiguracionesArea(Long.parseLong(strIdArea), params, type);
 
         if (resultado.isBlnValido()) {
             resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.admin.savedataconfig.ok");
@@ -329,16 +344,6 @@ public class AdminCitasBean implements Serializable {
         }
     }
 
-    private String obtenerImgToReport(Integer idarea) {
-        // TODO BORRAR ESTO Y PONER EL ENCABEZADO 3 src/main/webapp/resources/imagenes/encabezadoReporte3.png como img dinamic
-        String rutaimg = vHelp.obtenerRuta();
-        switch (idarea) {
-            case 1:
-                rutaimg += "/resources/imagenes/";
-        }
-        return rutaimg;
-    }
-
     public void listenergetnameTramite() {
         for (SelectItem list : listTramites) {
             if (list.getValue() == strkindTramite)
@@ -447,7 +452,12 @@ public class AdminCitasBean implements Serializable {
     }
 
     public boolean validButtonSaveConfig(){
-        return !configuacionesDTOS.getDuracionCitas().equals(strDuracionCita) || !configuacionesDTOS.getHoraServicioFin().equals(strHourServiceEnd) || !configuacionesDTOS.getHoraServicioInicio().equals(strHourServiceStar);
+        if (!configuacionesDTOS.getDuracionCitas().equals(strDuracionCita) ||
+                !configuacionesDTOS.getHoraServicioFin().equals(strHourServiceEnd) ||
+                !configuacionesDTOS.getHoraServicioInicio().equals(strHourServiceStar)) {
+            disablebtnConfig = false;
+        }
+        return disablebtnConfig;
     }
 
     /**
@@ -632,10 +642,6 @@ public class AdminCitasBean implements Serializable {
         this.switchMode = switchMode;
     }
 
-    public String getStrIDH() {
-        return strIDH;
-    }
-
     public String getStrCurrentEstatus() {
         return strCurrentEstatus;
     }
@@ -700,15 +706,27 @@ public class AdminCitasBean implements Serializable {
         this.strCurrentMes = strCurrentMes;
     }
 
+    public int getNumCitas() {
+        return numCitas;
+    }
+
+    public void setNumCitas(int numCitas) {
+        this.numCitas = numCitas;
+    }
+
     public boolean isIsrequired() {
         return isrequired;
     }
 
-    public void setIsrequired(boolean isrequired) {
-        this.isrequired = isrequired;
+    public boolean isDisablebtnConfig() {
+        return disablebtnConfig;
     }
 
-    public void setStrIDH(String strIDH) {
-        this.strIDH = strIDH;
+    public void setDisablebtnConfig(boolean disablebtnConfig) {
+        this.disablebtnConfig = disablebtnConfig;
+    }
+
+    public void setIsrequired(boolean isrequired) {
+        this.isrequired = isrequired;
     }
 }

@@ -105,7 +105,6 @@ public class NuevaCitaBean implements Serializable {
         listAreas.forEach(selectItem -> {
             if ( selectItem.getValue().toString().equals(strCurrentArea))
                 strLocalArea = selectItem.getLabel();
-            else mostrarNotification(FacesMessage.SEVERITY_FATAL, "ERROR:", "No se pudo cargar el area correctamente");
         });
 
         hasDataTramites = res.isBlnValido();

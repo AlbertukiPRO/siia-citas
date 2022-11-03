@@ -8,10 +8,29 @@
                 template="/layouts/template.xhtml">
     <ui:define name="content">
         <b:container fluid="true">
-            <b:panel title="Panel de control - Citas" largeScreen="8" collapsible="false">
+            <b:panel title="Panel de control de citas - " largeScreen="8" collapsible="false">
+                <f:facet name="heading">
+                    <i class="fa fa-calendar-o" style="padding-right:20px" />
+                    <b:badge style="margin-left:10px; background-color:#e74c3c" value="#{adminlogin.strCurrentLabelArea}" ></b:badge>
+                </f:facet>
                 <b:container styleClass="panel-body" fluid="true">
                     <b:tabView activeIndex="0">
                         <b:tab title="Calendario">
+                            <b:container styleClass="content" style="padding:15px; margin-bottom:15px;">
+                                <b:row>
+                                    <b:column style="text-align: center;" span="8">
+                                        <h3>
+                                            Bienvenido
+                                            <h:outputText style="font-weight: bold" value="#{adminlogin.strUsuario}"></h:outputText>
+                                             - <h:outputText value="#{adminlogin.strCurrentLabelArea}"></h:outputText>
+                                        </h3>
+                                    </b:column>
+                                    <b:column span="4">
+                                        <h:outputText value="No. citas agendadas: "></h:outputText>
+                                        <b:badge value="#{ admin.numCitas}"></b:badge>
+                                    </b:column>
+                                </b:row>
+                            </b:container>
                           <h:form>
                                   <b:fullCalendar lang="#{admin.strlang}"
                                                   id="calendariocitas"
