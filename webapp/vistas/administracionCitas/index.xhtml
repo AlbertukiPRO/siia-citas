@@ -340,7 +340,7 @@
                                                                <b:iconAwesome name="fa-plug"><h:outputText value="#{tramite.getLabel()}" style="margin-top:15px;margin-bottom: 15px;"></h:outputText></b:iconAwesome>
                                                            </b:column>
                                                            <b:column mediumScreen="6" largeScreen="6" smallScreen="2">
-                                                               <b:commandButton iconAwesome="trash-o" action="#{admin.borrarTramite(tramite.getValue())}"></b:commandButton>
+                                                               <b:commandButton iconAwesome="trash-o" update="@form" action="#{admin.borrarTramite(tramite.getValue())}"></b:commandButton>
                                                            </b:column>
                                                        </b:row>
                                                    </b:container>
@@ -389,7 +389,8 @@
                         </b:column>
                     </b:row>
                     <b:row>
-                        <b:column mediumScreen="12" largeScreen="12" smallScreen="12">
+                        <b:selectBooleanCheckbox span="12" value="#{admin.linkTextArea}" caption="Es un dirección de internet"></b:selectBooleanCheckbox>
+                        <b:column mediumScreen="12" largeScreen="12" smallScreen="12" style="margin-top:15px;">
                             <b:inputTextarea value="#{admin.strRequisitos}"
                                              colLg="12" colMd="12" colSm="12"
                                              mediumScreen="12" smallScreen="12" largeScreen="12"

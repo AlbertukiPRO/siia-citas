@@ -295,15 +295,28 @@
                           <span class="separador" />
                           <span class="separador" />
                           <span class="separador" />
-                          <b:row>
+                          <b:row rendered="#{nuevacita.showlinktramitereq}">
                              <b:column smallScreen="12" mediumScreen="3" largeScreen="3">
                                 <b:container id="linkgo" rendered="#{nuevacita.hasHorarios}" style="margin-top:25px;width:300px">
                                    <h5><h:outputText value="Requisitos de tramite:" style="color:#5E0723;font-weight: bold;"></h:outputText></h5>
                                    <b:label severity="primary" style="font-size:10px;margin-top:10px" value="#{nuevacita.msj['comun.label.citas.requisitoslabel']}">
                                    </b:label>
-                                   <a href="#{nuevacita.getLink()}" target="_blank">Ver requisitos</a>
+                                   <a href="#{nuevacita.strRequisitos}" target="_blank">Ver requisitos</a>
                                 </b:container>
                              </b:column>
+                          </b:row>
+                          <b:row rendered="#{nuevacita.showlinktext}">
+                             <b:column smallScreen="12" mediumScreen="3" largeScreen="3">
+                                <b:container  rendered="#{nuevacita.hasHorarios}" style="margin-top:25px;width:300px">
+                                   <h5><h:outputText value="Requisitos de tramite:" style="color:#5E0723;font-weight: bold;"></h:outputText></h5>
+                                    <b:row>
+                                       <b:label severity="primary" style="font-size:10px;margin-top:10px" value="#{nuevacita.msj['comun.label.citas.requisitoslabel']}">
+                                       </b:label>
+                                    </b:row>
+                                   <h:outputText value="#{nuevacita.strRequisitos}"></h:outputText>
+                                </b:container>
+                             </b:column>
+
                           </b:row>
                           <br/>
                           <b:row>

@@ -93,7 +93,7 @@ public class AdminCitasBean implements Serializable {
     private boolean hasDiastoDisable = false;
     private boolean switchMode = false;
     private boolean isrequired = true;
-
+    private boolean isLinkTextArea = false;
     private boolean disablebtnConfig = true;
 
     private String strNombreTramite;
@@ -404,7 +404,7 @@ public class AdminCitasBean implements Serializable {
             resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.fechas.ok");
             listDayswasRemoved.remove(dayremove);
         } else {
-            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.admin.fechas.error");
+            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.fechas.ok.recover");
             vHelp.pintarMensajes(msj, resultado);
         }
     }
@@ -419,7 +419,14 @@ public class AdminCitasBean implements Serializable {
     }
 
     public void borrarTramite(String value) {
-        System.out.println(value);
+        ResultadoTO resultado = areasBusiness.deleteTramite(Long.parseLong(value));
+        if (resultado.isBlnValido()){
+            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msg.citas.admin.tramites.ok");
+            vHelp.pintarMensajes(msj, resultado);
+        }else{
+            resultado.agregarMensaje(SeveridadMensajeEnum.ERROR, "comun.msg.citas.admin.tramites.error");
+            vHelp.pintarMensajes(msj, resultado);
+        }
     }
 
     public void updateEventos() {
@@ -443,7 +450,8 @@ public class AdminCitasBean implements Serializable {
     }
 
     public void guardarTramite() {
-        ResultadoTO resultado = areasBusiness.guardarTramite(Long.parseLong(strIdArea), strNombreTramite, strDescripcion, strRequisitos);
+        String requisito = isLinkTextArea ? strRequisitos : "[text],"+strRequisitos;
+        ResultadoTO resultado = areasBusiness.guardarTramite(Long.parseLong(strIdArea), strNombreTramite, strDescripcion, requisito);
         if (resultado.isBlnValido())
             resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citas.nuevotramite.ok");
         else
@@ -720,6 +728,14 @@ public class AdminCitasBean implements Serializable {
 
     public boolean isDisablebtnConfig() {
         return disablebtnConfig;
+    }
+
+    public boolean isLinkTextArea() {
+        return isLinkTextArea;
+    }
+
+    public void setLinkTextArea(boolean linkTextArea) {
+        isLinkTextArea = linkTextArea;
     }
 
     public void setDisablebtnConfig(boolean disablebtnConfig) {

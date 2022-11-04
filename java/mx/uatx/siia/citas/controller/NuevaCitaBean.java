@@ -8,7 +8,6 @@ import mx.uatx.siia.citas.citasBusiness.CitaBusiness;
 import mx.uatx.siia.citas.citasBusiness.MethodsGenerics;
 import mx.uatx.siia.citas.citasBusiness.ObjectMapperUtils;
 import mx.uatx.siia.citas.dto.ConfiguacionesDTO;
-import mx.uatx.siia.citas.enums.Requisitos;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.reportes.FieldsNuevaCita;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
@@ -58,6 +57,9 @@ public class NuevaCitaBean implements Serializable {
         public boolean flagHorarioReservado = false;
         private boolean hasDataAreas = false;
         private boolean showDataEstudiante = false;
+        private boolean showlinktramitereq = false;
+        private boolean showlinktext = false;
+
         @NotNull
         private String strFechasDisableCalendar = null;
         @NotNull
@@ -81,6 +83,7 @@ public class NuevaCitaBean implements Serializable {
         private String strProgramaEdu;
         private String tomaxDate;
         private String tominDate;
+        private String strRequisitos;
 
     /**
      * @BusinessProperties
@@ -143,6 +146,8 @@ public class NuevaCitaBean implements Serializable {
         tomaxDate = MethodsGenerics.lessOneDay((long) 60, false);
         tominDate = MethodsGenerics.lessOneDay((long) 30, true);
 
+        requisitosTramite();
+
         hasHorarios = true;
         hasCalendar = true;
         strCurrentCalendar= null;
@@ -175,7 +180,7 @@ public class NuevaCitaBean implements Serializable {
                     strCurrentHora,
                     strMotivoCita,
                     "CI"+foliocita,
-                    getLink(),
+                    strRequisitos,
                     datePrint
             ));
 
@@ -279,17 +284,26 @@ public class NuevaCitaBean implements Serializable {
     /**
      * @return String link con la direccion de los requisitos del trámite
      */
-    public String getLink(){
-        String link = "";
+    public void requisitosTramite(){
+        StringBuilder requisito = new StringBuilder();
         for (SelectItem tramite : listTramites){
             if (tramite.getValue().toString().equals(strCurrentTramite)) {
-                if (tramite.getDescription().split("/")[0].equals("http") || tramite.getDescription().split("/")[0].equals("https") )
-                    link = vHelp.obtenerRuta()+"/tramitesCita.uat?id="+tramite.getValue();
-                else
-                    link = tramite.getDescription();
+                String[] type = tramite.getDescription().split(",");
+                if (type[0].equals("[text]")){
+                    showlinktext = true;
+                    showlinktramitereq = false;
+                    type[0]="";
+                    for (String s : type) {
+                        requisito.append("-").append(s);
+                    }
+                }else {
+                    requisito.append(tramite.getDescription());
+                    showlinktext = false;
+                    showlinktramitereq = true;
+                }
             }
         }
-        return link;
+        strRequisitos = requisito.toString();
     }
 
     /**
@@ -632,6 +646,30 @@ public class NuevaCitaBean implements Serializable {
 
     public boolean isShowDataEstudiante() {
         return showDataEstudiante;
+    }
+
+    public boolean isShowlinktramitereq() {
+        return showlinktramitereq;
+    }
+
+    public void setShowlinktramitereq(boolean showlinktramitereq) {
+        this.showlinktramitereq = showlinktramitereq;
+    }
+
+    public boolean isShowlinktext() {
+        return showlinktext;
+    }
+
+    public void setShowlinktext(boolean showlinktext) {
+        this.showlinktext = showlinktext;
+    }
+
+    public String getStrRequisitos() {
+        return strRequisitos;
+    }
+
+    public void setStrRequisitos(String strRequisitos) {
+        this.strRequisitos = strRequisitos;
     }
 
     public void setShowDataEstudiante(boolean showDataEstudiante) {
