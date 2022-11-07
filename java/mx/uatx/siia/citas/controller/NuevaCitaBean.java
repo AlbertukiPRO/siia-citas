@@ -314,40 +314,45 @@ public class NuevaCitaBean implements Serializable {
         ResultadoTO flag1 = citaBusiness.validarTramite(idhistorical, Integer.parseInt(strCurrentTramite));
         ResultadoTO flag2 = citaBusiness.validarHorario(MethodsGenerics.formatDate(strLocalFecha), strCurrentHora);
 
-        if (flag1.isBlnValido() && flag2.isBlnValido()){
-            if ((boolean) flag1.getObjeto() &&  (boolean) flag2.getObjeto()){
-                String[] strindate = strLocalFecha.split(" ");
-                if (strindate[0].equals("Sat") || strindate[0].equals("Sun"))
-                    mostrarNotification(FacesMessage.SEVERITY_WARN, "WARN:", "Lo sentimos los sabados y domingos no damos servicio intenta otro dia.");
-                else{
-                    Map<String, Object> valores = new HashMap<>();
 
-                    valores.put("idhistorical", idhistorical);
-                    valores.put("matricula",strLocalMatricula);
-                    valores.put("idtramite",strCurrentTramite);
-                    valores.put("idarea",strCurrentArea);
-                    valores.put("descripcion",strMotivoCita);
-                    valores.put("fecha",MethodsGenerics.formatDate(strLocalFecha));
-                    valores.put("hora",strCurrentHora);
+        try {
+            if (flag1.isBlnValido() && flag2.isBlnValido()){
+                if ((boolean) flag1.getObjeto() &&  (boolean) flag2.getObjeto()){
+                    String[] strindate = strLocalFecha.split(" ");
+                    if (strindate[0].equals("Sat") || strindate[0].equals("Sun"))
+                        mostrarNotification(FacesMessage.SEVERITY_WARN, "WARN:", "Lo sentimos los sabados y domingos no damos servicio intenta otro dia.");
+                    else{
+                        Map<String, Object> valores = new HashMap<>();
 
-                    ResultadoTO resultadoTO = citaBusiness.guardarCita(valores);
-                    String[] params1 = new String[]{ valores.get("fecha").toString(),valores.get("hora").toString(), "20181837"  };
-                    String[] params2 = new String[]{ valores.get("idarea").toString(), "20181837" };
-                    logger.info("--- CITAS RUN SAVE HORARIO ---");
-                    ResultadoTO resultadoh1 = citaBusiness.reservarHorarios(params1, params2);
-                    boolean flaghorarios = (boolean) resultadoh1.getObjeto();
+                        valores.put("idhistorical", idhistorical);
+                        valores.put("matricula",strLocalMatricula);
+                        valores.put("idtramite",strCurrentTramite);
+                        valores.put("idarea",strCurrentArea);
+                        valores.put("descripcion",strMotivoCita);
+                        valores.put("fecha",MethodsGenerics.formatDate(strLocalFecha));
+                        valores.put("hora",strCurrentHora);
 
-                    if (resultadoTO.getObjeto().equals(true) && flaghorarios){
-                        System.out.println("|------------------ WAS SUCCESFUL SAVE CITA => "+resultadoTO.getObjeto());
-                        isCitaAgendada = true;
-                        mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Tu cita se agendo correctamente, espera el comprobante");
-                    }else   mostrarNotification(FacesMessage.SEVERITY_ERROR, "ERROR:", "No se pudo agendar tu cita");
+                        ResultadoTO resultadoTO = citaBusiness.guardarCita(valores);
+                        String[] params1 = new String[]{ valores.get("fecha").toString(),valores.get("hora").toString(), "20181837"  };
+                        String[] params2 = new String[]{ valores.get("idarea").toString(), "20181837" };
+                        logger.info("--- CITAS RUN SAVE HORARIO ---");
+                        ResultadoTO resultadoh1 = citaBusiness.reservarHorarios(params1, params2);
+                        boolean flaghorarios = (boolean) resultadoh1.getObjeto();
+
+                        if (resultadoTO.getObjeto().equals(true) && flaghorarios){
+                            System.out.println("|------------------ WAS SUCCESFUL SAVE CITA => "+resultadoTO.getObjeto());
+                            isCitaAgendada = true;
+                            mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Tu cita se agendo correctamente, espera el comprobante");
+                        }else   mostrarNotification(FacesMessage.SEVERITY_ERROR, "ERROR:", "No se pudo agendar tu cita");
+                    }
+                } else {
+                    isForHidden = true;
+                    mostrarNotification(FacesMessage.SEVERITY_WARN, "ALERT:", "Ups! Parece que ya tienes una cita con este tramite.");
                 }
-            } else {
-                isForHidden = true;
-                mostrarNotification(FacesMessage.SEVERITY_WARN, "ALERT:", "Ups! Parece que ya tienes una cita con este tramite.");
-            }
-        } else mostrarNotification(FacesMessage.SEVERITY_ERROR, "ERROR:", "Tenemos problemas con el servidor, intentalo mas tarde");
+            }else mostrarNotification(FacesMessage.SEVERITY_WARN, "ALERT:", "Ups! Parece que ya tienes una cita con este tramite.");
+        }catch (Exception e){
+            mostrarNotification(FacesMessage.SEVERITY_ERROR, "ERROR:", "Tenemos problemas con el servidor, intentalo mas tarde");
+        }
     }
 
     /**

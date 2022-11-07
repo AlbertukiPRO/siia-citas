@@ -52,14 +52,14 @@
                                         <b:formGroup>
                                             <span class="separador"></span>
                                             <b:container style="padding:25px">
-                                                <h:outputText value="Generar Reportes de las citas para llevar un control"></h:outputText>
+                                                <h:outputText value="#{msj['citas.admin.leyeda.reportes.title']}"></h:outputText>
                                             </b:container>
                                             <span class="separador"></span>
                                             <!-- SELECT ONE MENU de los tipos de reportes -->
                                             <b:selectOneMenu value="#{admin.strkindTramite}"
                                                              colMd="12" colLg="12" colSm="12"
                                                              id="selectReporte"
-                                                             label="Seleccione el tipo de citrerio para generar su reporte"
+                                                             label="#{msj['citas.admin.leyenda.reportes.combo.tramites']}"
                                                              labelColLg="12"
                                                              ajax="true"
                                                              update="reportesform">
@@ -83,14 +83,14 @@
                                                                  colMd="12" colLg="12" colSm="12"
                                                                  id="selectTramite"
                                                                  labelStyle="text-aling:left;"
-                                                                 label="Seleccione el tramite"
+                                                                 label="#{msj['citas.admin.leyenda.reporetes.combo.tramites.option']}"
                                                                  labelColLg="12"
                                                                  ajax="true"
                                                                  rendered="#{admin.hasDataTramites}"
                                                                  required="true"
                                                                  update="@form"
                                                 >
-                                                    <f:selectItem itemLabel="Seleccione un tramite" value="none" itemValue="none"/>
+                                                    <f:selectItem itemLabel="Seleccione un trámite" value="none" itemValue="none"/>
                                                     <f:selectItems value="#{admin.listTramites}"/>
 
                                                     <f:ajax
@@ -105,7 +105,7 @@
                                                                  colMd="12" colLg="12" colSm="12"
                                                                  id="selectEstatus"
                                                                  labelStyle="text-aling:left;"
-                                                                 label="Seleccione el tipo de estatus"
+                                                                 label="#{msj['citas.admin.leyenda.reportes.combo.status']}"
                                                                  labelColLg="12"
                                                                  ajax="true"
                                                                  rendered="#{admin.hasComboStatus}"
@@ -124,7 +124,7 @@
                                                                  colMd="12" colLg="12" colSm="12"
                                                                  id="selectMes"
                                                                  labelStyle="text-aling:left;"
-                                                                 label="Seleccione el mes de criterio"
+                                                                 label="#{msj['citas.admin.leyenda.repores.combo.mes']}"
                                                                  labelColLg="12"
                                                                  ajax="true"
                                                                  required="true"
@@ -137,7 +137,7 @@
                                         </b:formGroup>
                                         <b:formGroup rendered="#{admin.isrequired}">
                                             <b:container>
-                                                <h:outputLabel value="Ingrese un rago de fechas: "></h:outputLabel>
+                                                <h:outputLabel value="#{msj['citas.admin.leyenda.reportes.combo.fechaSelect']} :"></h:outputLabel>
                                             </b:container>
                                             <b:row>
                                                 <b:dateTimePicker value="#{admin.strValueDateFieldA}"
@@ -174,7 +174,7 @@
                                     <b:panel title="Configura el area" collapsed="true">
                                         <b:column mediumScreen="12" smallScreen="12" largeScreen="12">
                                             <b:container style="padding:25px;">
-                                                <h:outputText styleClass="title" style="font-size: 15px;" value="Configuración de los horarios de atencion de citas."></h:outputText>
+                                                <h:outputText styleClass="title" style="font-size: 15px;" value="#{msj['citas.admin.leyenda.confighorario.title']}"></h:outputText>
                                             </b:container>
                                             <span class="separador"></span>
                                             <b:formGroup>
@@ -182,7 +182,7 @@
                                                     <b:column mediumScreen="4" largeScreen="4" smallScreen="12">
                                                         <b:inputText value="#{admin.strHourServiceStar}" placeholder="8:00"
                                                                      update="@form:**:btnsaveconfiga"
-                                                                     tooltip="Hora de inicio del servico de las citas - formato 24:00">
+                                                                     tooltip="#{msj['citas.admin.leyenda.confighorario.tooltip.inicio']}">
                                                             <f:facet name="prepend">
                                                                 <h:outputText value="Inicio:"></h:outputText>
                                                                 <b:iconAwesome name="fa-clock-o"></b:iconAwesome>
@@ -195,7 +195,7 @@
                                                     <span class="separador"></span>
                                                     <b:column mediumScreen="4" largeScreen="4" smallScreen="12">
                                                         <b:inputText value="#{admin.strHourServiceEnd}" update="@form:**:btnsaveconfiga" placeholder="13:00"
-                                                                     tooltip="Hora de fin del servico de las citas - formato 24:00">
+                                                                     tooltip="#{msj['citas.admin.leyenda.confighorario.tooltip2.fin']}">
                                                             <f:facet name="prepend">
                                                                 <h:outputText value="Cierre:"></h:outputText>
                                                                 <b:iconAwesome name="fa-clock-o"></b:iconAwesome>
@@ -209,7 +209,7 @@
                                                     <b:column mediumScreen="4" largeScreen="4" smallScreen="12">
                                                         <b:inputText value="#{admin.strDuracionCita}" placeholder="20 min"
                                                                      update="@form:**:btnsaveconfiga"
-                                                                     tooltip="Tiempo aproximado del servicio de citas en minutos.">
+                                                                     tooltip="#{msj['citas.admin.leyenda.confighorario.tooltip']}">
                                                             <f:facet name="prepend">
                                                                 <h:outputText value="Duración:"></h:outputText>
                                                                 <b:iconAwesome name="fa-clock-o"></b:iconAwesome>
@@ -241,7 +241,7 @@
                                     <b:panel title="Fechas de servicio" collapsed="true">
                                         <b:formGroup>
                                             <b:container style="padding:25px;">
-                                                <h:outputText styleClass="title" style="font-size: 15px;" value="Configure las fechas y horas de servicio por ejemplo desahiblite el dia o reserve horas las cuales no seran mostradas a los usuarios."></h:outputText>
+                                                <h:outputText styleClass="title" style="font-size: 15px;" value="#{msj['citas.admin.leyenda.fechasservicio.title']}"></h:outputText>
                                             </b:container>
                                             <span class="separador"></span>
                                             <span class="separador"></span>
@@ -256,7 +256,7 @@
                                                             value="#{admin.strCalendarValue}"
                                                             showTime="false"
                                                             disabledDates="#{admin.strDateDisablesCalendar}"
-                                                            tooltip="Selecciona una fecha para editar los horarios"
+                                                            tooltip="#{msj['citas.admin.leyenda.fechasservicio.timepiker.tootip']}"
                                                             labelColMd="12" labelColLg="12">
                                                     </b:dateTimePicker>
                                                 </b:column>
@@ -284,7 +284,10 @@
                                                     <ui:repeat value="#{admin.listDaysToCheck}" var="daycalendar">
                                                         <b:column smallScreen="12" largeScreen="12" mediumScreen="12">
                                                             <b:iconAwesome name="fa-clock-o"><h:outputText style="margin-left: 15px;margin-right: 15px" styleClass="secondary-text" value="#{daycalendar}"></h:outputText></b:iconAwesome>
-                                                            <b:commandButton icon="pencil" tooltip="Quite este horario de atencion para el dia seleccionado" update="@form" action="#{admin.deletefromlistdays(daycalendar)}"></b:commandButton>
+                                                            <b:commandButton icon="pencil"
+                                                                             tooltip="#{msj['citas.admin.leyenda.tooltip.fechasservicio.btndelete']}"
+                                                                             update="@form" action="#{admin.deletefromlistdays(daycalendar)}">
+                                                            </b:commandButton>
                                                         </b:column>
                                                     </ui:repeat>
                                                 </b:column>
@@ -303,7 +306,10 @@
                                                     <ui:repeat value="#{admin.listDayswasRemoved}" var="dayremove">
                                                         <b:column smallScreen="12" largeScreen="12" mediumScreen="12">
                                                             <b:iconAwesome name="clock-o"><h:outputText style="margin-left: 15px;margin-right: 15px" styleClass="secondary-text" value=" #{dayremove}"></h:outputText></b:iconAwesome>
-                                                            <b:commandButton icon="arrow-left" update="@form" tooltip="Regrese este horario de atencion para el dia seleccionado" action="#{admin.rollbackday(dayremove)}"></b:commandButton>
+                                                            <b:commandButton icon="arrow-left"
+                                                                             update="@form"
+                                                                             tooltip="#{msj['citas.admin.leyenda.tooltip.fechasservicio.rolback']}"
+                                                                             action="#{admin.rollbackday(dayremove)}"></b:commandButton>
                                                         </b:column>
                                                     </ui:repeat>
                                                 </b:column>
@@ -313,9 +319,10 @@
                                     </b:panel>
                                 </b:row>
                                 <b:row>
-                                    <b:panel title="Tramites" collapsed="true">
+                                    <b:panel title="Trámites" collapsed="true">
                                         <b:container style="padding:25px;">
-                                            <h:outputText styleClass="title" style="font-size: 15px;" value="Agregue o elimine tramites dependiendo en base a sus area o departamento"></h:outputText>
+                                            <h:outputText styleClass="title" style="font-size: 15px;"
+                                                          value="#{msj['citas.admin.leyenda.tramites.title']}"></h:outputText>
                                         </b:container>
                                         <b:row>
                                             <b:column largeScreen="2" mediumScreen="2" smallScreen="12"></b:column>
@@ -356,14 +363,14 @@
                 </b:container>
             </b:panel>
         </b:container>
-        <b:modal id="modalnuevotramite" title="Nuevo tramite" styleClass="modal">
+        <b:modal id="modalnuevotramite" title="Nuevo trámite" styleClass="modal">
             <b:well>
                 <h3>Formulario</h3>
                 <h:form>
                     <b:row>
                         <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
                             <b:inputText
-                                         label="Nombre Tramite:"
+                                         label="Nombre Trámite:"
                                          labelStyle="width:200px;"
                                          value="#{admin.strNombreTramite}"
                                          mediumScreen="12" smallScreen="12" largeScreen="12"
@@ -377,7 +384,7 @@
                     <b:row>
                         <b:column  mediumScreen="12" largeScreen="12" smallScreen="12">
                             <b:inputText
-                                    label="Descripcion Tramite:"
+                                    label="Descripcion Trámite:"
                                     labelStyle="width:200px;"
                                     mediumScreen="12" smallScreen="12" largeScreen="12"
                                     value="#{admin.strDescripcion}"
@@ -389,13 +396,13 @@
                         </b:column>
                     </b:row>
                     <b:row>
-                        <b:selectBooleanCheckbox span="12" value="#{admin.linkTextArea}" caption="Es un dirección de internet"></b:selectBooleanCheckbox>
+                        <b:selectBooleanCheckbox span="12" value="#{admin.linkTextArea}" caption="¿Es un dirección de internet?"></b:selectBooleanCheckbox>
                         <b:column mediumScreen="12" largeScreen="12" smallScreen="12" style="margin-top:15px;">
                             <b:inputTextarea value="#{admin.strRequisitos}"
                                              colLg="12" colMd="12" colSm="12"
                                              mediumScreen="12" smallScreen="12" largeScreen="12"
                                              labelStyle="width:200px;"
-                                             label="Requisitos tramite: [url o texto] *:">
+                                             label="Requisitos trámite: [url o texto] *:">
                             </b:inputTextarea>
                         </b:column>
                     </b:row>

@@ -104,7 +104,7 @@ public class viewCitaBean implements Serializable {
         ResultadoTO resultado = citaBusiness.cambiarEstatus(modelCita.getIntIdCita(), EstatusCitas.CitaCancelada.getValor());
         ResultadoTO resultado2 = citaBusiness.liberarHorarios(modelCita.getStrFechaReservada(), modelCita.getStrHoraReservada());
         if (resultado.isBlnValido() && resultado2.isBlnValido()){
-            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citass.estatus.change.exito");
+            resultado.agregarMensaje(SeveridadMensajeEnum.INFO, "comun.msj.citass.estatus.change.cancelar");
             vHelp.pintarMensajes(msj, resultado);
         }else {
             resultado.agregarMensaje(SeveridadMensajeEnum.ERROR, "comun.msj.citass.estatus.change.someerror");
