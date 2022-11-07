@@ -1,6 +1,6 @@
 package mx.uatx.siia.citas.controller;
 
-import mx.uatx.siia.citas.MisCitas;
+import mx.uatx.siia.citas.entities.MisCitas;
 import mx.uatx.siia.citas.citasBusiness.CitaBusiness;
 import mx.uatx.siia.citas.enums.EstatusCitas;
 import mx.uatx.siia.comun.helper.VistasHelper;

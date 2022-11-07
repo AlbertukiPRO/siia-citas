@@ -1,8 +1,8 @@
 package mx.uatx.siia.citas.controller;
 
 import com.google.gson.Gson;
-import mx.uatx.siia.citas.MisCitas;
-import mx.uatx.siia.citas.SIMSCITAS;
+import mx.uatx.siia.citas.entities.MisCitas;
+import mx.uatx.siia.citas.entities.SIMSCITAS;
 import mx.uatx.siia.citas.Tramites.business.TramitesBusiness;
 import mx.uatx.siia.citas.areas.business.AreasBusiness;
 import mx.uatx.siia.citas.areas.business.SiPaAreasConfiguraciones;

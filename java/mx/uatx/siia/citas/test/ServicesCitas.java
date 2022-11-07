@@ -1,7 +1,7 @@
 package mx.uatx.siia.citas.test;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.*;
-import mx.uatx.siia.citas.MisCitas;
+import mx.uatx.siia.citas.entities.MisCitas;
 import mx.uatx.siia.serviciosUniversitarios.dto.AreasTO;
 import mx.uatx.siia.serviciosUniversitarios.dto.CitasTO;
 import mx.uatx.siia.serviciosUniversitarios.dto.TramitesTO;

@@ -1,6 +1,6 @@
 package mx.uatx.siia.citas.controller;
 
-import mx.uatx.siia.citas.SIMSCITAS;
+import mx.uatx.siia.citas.entities.SIMSCITAS;
 import mx.uatx.siia.citas.areas.business.AreasBusiness;
 import mx.uatx.siia.citas.citasBusiness.CitaBusiness;
 import mx.uatx.siia.citas.citasBusiness.ObjectMapperUtils;
