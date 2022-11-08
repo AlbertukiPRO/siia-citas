@@ -429,26 +429,6 @@ public class AdminCitasBean implements Serializable {
         }
     }
 
-    public void updateEventos() {
-        ResultadoTO resultadoTO = areasBusiness.obtenerEventos(strIdArea);
-        List<SIMSCITAS> localList = (List<SIMSCITAS>) resultadoTO.getObjeto();
-        List<CitasTO> citas = ObjectMapperUtils.mapAll(localList, CitasTO.class);
-
-        for (CitasTO misCitas : citas) {
-            String[] params = new String[]{
-                    misCitas.getIntIdCita().toString(),
-                    misCitas.getLongHistorialAcademico().toString(),
-                    strIdArea,
-                    misCitas.getStrEstatus().equals(EstatusCitas.CitaAgendada.getValor()) ? "#3a87ad" : (misCitas.getStrEstatus().equals(EstatusCitas.CitaCompleta.getValor()) ? "#2ecc71" : (misCitas.getStrEstatus().equals(EstatusCitas.CitaCancelada.getValor()) ? "#2c3e50" : (misCitas.getStrEstatus().equals(EstatusCitas.CitaPospuesta.getValor()) ? "#8e44ad" : "#ff7f50")))
-            };
-            listEventos.add(new Eventos(
-                    "Cita de " + misCitas.getStrNombreUser() + " - " + misCitas.getIntMatricula(),
-                    MethodsGenerics.getDateToFullCalendar(misCitas.getStrFechaReservada() + " " + misCitas.getStrHoraReservada()),
-                    params
-            ));
-        }
-    }
-
     public void guardarTramite() {
         String requisito = isLinkTextArea ? strRequisitos : "[text],"+strRequisitos;
         ResultadoTO resultado = areasBusiness.guardarTramite(Long.parseLong(strIdArea), strNombreTramite, strDescripcion, requisito);

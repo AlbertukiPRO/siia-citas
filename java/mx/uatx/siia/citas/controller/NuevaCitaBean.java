@@ -361,7 +361,7 @@ public class NuevaCitaBean implements Serializable {
      * @param msg String mensaje
      * TODO Metodo Temporal para las notificaciones.
      */
-    public void mostrarNotification(FacesMessage.Severity severity, String title, String msg){
+    private void mostrarNotification(FacesMessage.Severity severity, String title, String msg){
         FacesContext.getCurrentInstance().
                 addMessage(null, new FacesMessage(severity, title, msg));
     }

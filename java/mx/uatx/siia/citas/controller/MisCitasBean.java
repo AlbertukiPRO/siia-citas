@@ -91,6 +91,10 @@ public class MisCitasBean implements Serializable {
         GetCitas();
     }
 
+    public void nuevaCita(){
+        vHelp.redireccionar("/vistas/citas/nuevacita.uat");
+    }
+
     public void GetCitas() {
         ResultadoTO resultado = citaBusiness.obtenerMisCitas(idHistorico);
         listMisCitas = (List<MisCitas>) resultado.getObjeto();
