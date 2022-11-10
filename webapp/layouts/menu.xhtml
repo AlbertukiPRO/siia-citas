@@ -24,6 +24,12 @@
 									  value="#{msj['comun.menu.servicios.solicitarCita']}"
 									  onclick="location.href = 'http://localhost:8081/SIIA/vistas/citas/cita.uat'" />
 
+
+					<b:navCommandLink href="#{msj['comun.menu.servicios.solicitarCita.url']}" process="@this" update="@form"
+									  rendered="#{auth.estaLogueado() and auth.hasRole('SolicitarServicio')}"
+									  value="Administración citas"
+									  onclick="location.href = 'http://localhost:8081/SIIA/vistas/administracionCitas/loginadmincitas.uat'" />
+
 					<b:navCommandLink process="@this" update="@form"
 						rendered="#{auth.estaLogueado() and auth.hasRole('AdministrarMesaAyuda')}"
 						value="#{msj['serviciosUniversitario.admMesaAyuda.menu']}"

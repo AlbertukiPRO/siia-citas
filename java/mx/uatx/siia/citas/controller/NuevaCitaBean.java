@@ -110,9 +110,13 @@ public class NuevaCitaBean implements Serializable {
                 strLocalArea = selectItem.getLabel();
         });
 
-        hasDataTramites = res.isBlnValido();
+        if(res.isBlnValido()) {
+            hasDataTramites = res.isBlnValido();
 
-        inicializarSettings();
+            if (!strCurrentArea.equals("65"))
+                mostrarNotification(FacesMessage.SEVERITY_WARN, "ALERTA: ", "El área que selecciono aún no esta apta para recibir citas.");
+            else   inicializarSettings();
+        }
     }
 
     public void listenerPostProgromaEdu(){
@@ -242,35 +246,41 @@ public class NuevaCitaBean implements Serializable {
      */
     public void ComprobarHorario(){
         logger.info("Comprobar Horario para la fecha => [ "+ MethodsGenerics.formatDate(strCurrentCalendar) +" ]");
-        String[] params = new String[]{strCurrentArea, MethodsGenerics.formatDate(strCurrentCalendar)};
-        ResultadoTO resultadoH = areasBusiness.obtenerHorarios(params);
-        logger.info("--RESULTADO-- \t"+resultadoH.getObjeto());
-        logger.info("-- CONFIG: \t"+listaConfig.toString());
-        List<String> horas = (List<String>) resultadoH.getObjeto();
+        String[] strindate = strCurrentCalendar.split(" ");
+        logger.info("datostoplit => "+ Arrays.toString(strindate));
+        if (strindate[0].equals("Sat") || strindate[0].equals("Sun"))
+            mostrarNotification(FacesMessage.SEVERITY_WARN, "WARN:", "Lo sentimos, los sabados y domingos no damos servicio intenta otro día.");
+        else{
+            String[] params = new String[]{strCurrentArea, MethodsGenerics.formatDate(strCurrentCalendar)};
+            ResultadoTO resultadoH = areasBusiness.obtenerHorarios(params);
+            logger.info("--RESULTADO-- \t"+resultadoH.getObjeto());
+            logger.info("-- CONFIG: \t"+listaConfig.toString());
+            List<String> horas = (List<String>) resultadoH.getObjeto();
 
-        // * Los datos son strings asi que tenemos que parciarlos a int además de darle un formato correcto para el algoritmo de generacion de horarios.
-        // * Ejemplo: "9:00"->.replace() |=> "9000".Integer.parse / 1000 | => 9 ()-> <Integer>
-        List<String> listHorarios =
-                MethodsGenerics.generarHorarios(
-                Integer.parseInt(listaConfig.getHoraServicioInicio().replace(':','0'))/1000,
-                Integer.parseInt(listaConfig.getHoraServicioFin().replace(':','0'))/1000,
-                Integer.parseInt(listaConfig.getDuracionCitas()), horas);
-        // El algoritmo generar horarios recibe tres parametros:
-        // 1. Hora Incio => <int>
-        // 2. Hora Fin => <int>
-        // 3. DuracionCita => <int>
-        // @return => List<String>
+            // * Los datos son strings asi que tenemos que parciarlos a int además de darle un formato correcto para el algoritmo de generacion de horarios.
+            // * Ejemplo: "9:00"->.replace() |=> "9000".Integer.parse / 1000 | => 9 ()-> <Integer>
+            List<String> listHorarios =
+                    MethodsGenerics.generarHorarios(
+                            Integer.parseInt(listaConfig.getHoraServicioInicio().replace(':','0'))/1000,
+                            Integer.parseInt(listaConfig.getHoraServicioFin().replace(':','0'))/1000,
+                            Integer.parseInt(listaConfig.getDuracionCitas()), horas);
+            // El algoritmo generar horarios recibe tres parametros:
+            // 1. Hora Incio => <int>
+            // 2. Hora Fin => <int>
+            // 3. DuracionCita => <int>
+            // @return => List<String>
 
-        logger.info("|----- New list horarios => "+listHorarios);
+            logger.info("|----- New list horarios => "+listHorarios);
 
-        if (resultadoH.isBlnValido()) {
-            ListHorariosShow = listHorarios;
-            if (ListHorariosShow.size() != 0)
-                mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Lista de horarios cargada encontrada");
-            else
-                mostrarNotification(FacesMessage.SEVERITY_WARN, "ALERT:", "Lo sentimos no tenemos horarios para este dia, intenta con otro");
-        } else
-            mostrarNotification(FacesMessage.SEVERITY_WARN, "WARN:", "No se pudo obtener los horarios para esta fecha intenta con otra");
+            if (resultadoH.isBlnValido()) {
+                ListHorariosShow = listHorarios;
+                if (ListHorariosShow.size() != 0)
+                    mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Lista de horarios encontrada");
+                else
+                    mostrarNotification(FacesMessage.SEVERITY_WARN, "ALERT:", "Lo sentimos no tenemos horarios para este dia, intenta con otro");
+            } else
+                mostrarNotification(FacesMessage.SEVERITY_WARN, "WARN:", "No se pudo obtener los horarios para esta fecha intenta con otra");
+        }
     }
 
     public String fechaFormatCita(){
