@@ -108,9 +108,10 @@ public class AdminCitasBean implements Serializable {
     public void getDaysDisable() {
         logger.info("----- Generando Fechas no abiles");
         ResultadoTO resultado = areasBusiness.obtenerDiasInhabiles(strIdArea);
-        if (resultado.isBlnValido())
+        if (resultado.isBlnValido()) {
             strDateDisablesCalendar = MethodsGenerics.formattingStringFechasCalendar((List<String>) resultado.getObjeto());
-        else {
+            logger.info(strDateDisablesCalendar);
+        } else {
             resultado.agregarMensaje(SeveridadMensajeEnum.ERROR, "comun.msg.citas.areas.config.error");
             vHelp.pintarMensajes(msj, resultado);
         }

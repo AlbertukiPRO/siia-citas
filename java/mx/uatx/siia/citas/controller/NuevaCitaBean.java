@@ -277,9 +277,9 @@ public class NuevaCitaBean implements Serializable {
                 if (ListHorariosShow.size() != 0)
                     mostrarNotification(FacesMessage.SEVERITY_INFO, "INF:", "Lista de horarios encontrada");
                 else
-                    mostrarNotification(FacesMessage.SEVERITY_WARN, "ALERT:", "Lo sentimos no tenemos horarios para este dia, intenta con otro");
+                    mostrarNotification(FacesMessage.SEVERITY_WARN, "ALERTA: ", "Lo sentimos no tenemos horarios para este día, intenta con otro");
             } else
-                mostrarNotification(FacesMessage.SEVERITY_WARN, "WARN:", "No se pudo obtener los horarios para esta fecha intenta con otra");
+                mostrarNotification(FacesMessage.SEVERITY_WARN, "ALERTA: ", "No se pudo obtener los horarios para esta fecha intenta con otra");
         }
     }
 
