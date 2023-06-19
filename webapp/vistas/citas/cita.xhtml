@@ -59,8 +59,8 @@
                                                 <b:dataTableColumn label="Cancelar" rendered="#{misictas.isCancelable(item.strEstatus)}">
                                                     <b:commandButton iconAwesome="trash-o"
                                                                       styleClass="btn btn-default"
-                                                                      onclick="$('#modalCancelar').modal(); javascript:return false; "
-                                                                      actionListener="#{misictas.SetModalCancelar(item.strNameTramite)}">
+                                                                      onclick="$('#modalCancelar').modal(); document.cookie = 'idcita=#{item.strIdCita}'; document.cookie = 'idhistorical=#{auth.sesion.idHistorialAcademico}';  return false; "
+                                                                     >
                                                     </b:commandButton>
                                                 </b:dataTableColumn>
                                             </b:dataTable>

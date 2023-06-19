@@ -1,11 +1,13 @@
 package mx.uatx.siia.citas.controller;
 
+import mx.uatx.siia.citas.citasBusiness.MethodsGenerics;
 import mx.uatx.siia.citas.entities.MisCitas;
 import mx.uatx.siia.citas.citasBusiness.CitaBusiness;
 import mx.uatx.siia.citas.enums.EstatusCitas;
 import mx.uatx.siia.comun.helper.VistasHelper;
 import mx.uatx.siia.serviciosUniversitarios.dto.ResultadoTO;
 import mx.uatx.siia.serviciosUniversitarios.enums.SeveridadMensajeEnum;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,10 +16,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
 import javax.faces.context.FacesContext;
+import javax.servlet.http.Cookie;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -131,24 +131,40 @@ public class MisCitasBean implements Serializable {
         Map<String, String> params = fc.getExternalContext().getRequestParameterMap();
         String data = params.get("idcita");
 
+
+
         logger.info("----> Coming data from idParam -> "+data);
     }
 
     public void Cancelar(){
         System.out.println("--- CANCELAR CITA--");
-        ResultadoTO resultado = null;
-        try {
-            resultado = citaBusiness.cancelarCita(stridCita, URLEncoder.encode(motivoCancelacion, String.valueOf(StandardCharsets.UTF_8)));
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-        int nRows = (int) resultado.getObjeto();
-        if (nRows!=0){
-            wasCanceled = !wasCanceled;
-            vHelp.redireccionar("/vistas/test/index.uat");
-        }else{
+        ResultadoTO resultado;
+
+        Map<java.lang.String, Object> params = new HashedMap();
+
+        params.put("date", MethodsGenerics.getCurrentDate());
+        params.put("user", getIdUser());
+
+
+        Map<String, Object> cookies  = FacesContext.getCurrentInstance().getExternalContext().getRequestCookieMap();
+        Cookie cookie = (Cookie) cookies.get("idcita");
+        Cookie cookieidH = (Cookie) cookies.get("idhistorical");
+        if (cookie==null){
             FacesContext.getCurrentInstance().
-                    addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "ERROR:", "No se pudo cancelar su cita intentelo mas tarde."));
+                    addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "INFO:", "Active el uso de cookies y intentelo de nuevo"));
+        }else{
+            params.put("idcita", Integer.parseInt(cookie.getValue()));
+            params.put("motivo", getMotivoCancelacion());
+            params.put("idhistorical", Integer.parseInt(cookieidH.getValue()));
+        }
+        resultado = citaBusiness.cancelarCita(params);
+
+        if (! (boolean) resultado.getObjeto()){
+            wasCanceled = true;
+            vHelp.redireccionar("/vistas/cita.uat");
+        }else{
+            //FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "ERROR:", "No se pudo cancelar su cita intentelo mas tarde."));
+            vHelp.pintarMensajes(msj, resultado);
         }
     }
 

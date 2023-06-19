@@ -1,7 +1,7 @@
 package mx.uatx.siia.citas.controller;
 
-import mx.uatx.siia.citas.modelo.areas.business.AreasBusiness;
-import mx.uatx.siia.citas.modelo.enums.URLs;
+import mx.uatx.siia.citas.areas.business.AreasBusiness;
+import mx.uatx.siia.citas.enums.URLs;
 import mx.uatx.siia.serviciosUniversitarios.dto.AreasTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ public class CitasRestControlador {
 
     @RequestMapping(value = "/micita", method = RequestMethod.GET, headers = "Accept=application/json")
     public @ResponseBody List<AreasTO> getCita(HttpServletRequest request){
-        return (List<AreasTO>) areasBusiness.obtenerAreas(URLs.Areas.getValor()).getObjeto();
+        return (List<AreasTO>) areasBusiness.obtenerAreas().getObjeto();
     }
 
     // TODO Implementar el rest template para consumir los datos en spring 100%
